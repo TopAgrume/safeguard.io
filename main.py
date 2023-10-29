@@ -1,17 +1,18 @@
 from utils import AccessEnv
 
-from api import app
-from schedule_appeal import run_schedule
 import multiprocessing
+
+from api import run_api
+from schedule_appeal import run_schedule_process
 
 if __name__ == "__main__":
     AccessEnv.on_reset()
 
     # Création des processus
-    api_process = multiprocessing.Process(target=lambda: exec(open("api.py").read()))
-    schedule_process = multiprocessing.Process(target=lambda: exec(open("schedule_appeal.py").read()))
+    api_process_obj = multiprocessing.Process(target=run_api)
+    schedule_process_obj = multiprocessing.Process(target=run_schedule_process)
 
     # Démarrage des deux processus
-    api_process.start()
-    schedule_process.start()
+    api_process_obj.start()
+    schedule_process_obj.start()
 
