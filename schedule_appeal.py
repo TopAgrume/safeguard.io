@@ -66,7 +66,7 @@ def send_alert_message():
 
 
 async def check_for_response():
-    time_amount = 12
+    time_amount = 720
     while True:
         # Wait for 12 min (720 sec) before sending reminder
         print('SCHEDULER:', f"Wait {time_amount} secs")
@@ -103,17 +103,28 @@ def send_hope_message():
 
 
 async def run_schedule():
+    loop_count = 0
     while True:
-        print('SCHEDULER:', "Sending Daily Message")
-        await send_daily_message_10h()
-        # if not alert_mode:
-        #    if time.localtime().tm_hour == 10:
-        #        await send_daily_message_10h()
-        #    elif time.localtime().tm_hour == 21:
-        #        await send_daily_message_21h()
-        # else:
-        # message info on alert tu urgent contact
-        await asyncio.sleep(120)
+        loop_count += 1
+        print('SCHEDULER:', f"5 min check loop: {loop_count = }")
+
+        # Send message
+        if not AccessEnv.on_read("alert_mode"):
+            if time.localtime().tm_hour == 10:
+                await send_daily_message_10h()
+            elif time.localtime().tm_hour == 12:
+                await send_daily_message_10h()
+            elif time.localtime().tm_hour == 14:
+                await send_daily_message_10h()
+            elif time.localtime().tm_hour == 16:
+                await send_daily_message_10h()
+            elif time.localtime().tm_hour == 21:
+                await send_daily_message_21h()
+            elif time.localtime().tm_hour == 22:
+                await send_daily_message_21h()
+
+        # Loop every five minutes
+        await asyncio.sleep(300)
 
 
 def run_schedule_process():
