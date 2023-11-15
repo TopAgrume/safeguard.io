@@ -1,8 +1,8 @@
-from utils import AccessEnv
+from utils.env_pipeline import AccessEnv
 
 import multiprocessing
 
-from api import run_api
+from src.api import run_api
 from schedule_appeal import run_schedule_process
 
 if __name__ == "__main__":

@@ -1,7 +1,6 @@
 from twilio.rest import Client
-from utils import AccessEnv
+from utils.env_pipeline import AccessEnv
 
-import logging
 import asyncio
 import time
 
@@ -13,8 +12,8 @@ server_number, client_number, emergency_number = AccessEnv.contacts()
 async def send_daily_message_10h():
     print('SCHEDULER:', "Send daily 10h Message")
     client.messages.create(
+        content_sid='HX63f8397088b8c5a38f62d648cbd75ddf',
         from_=server_number,
-        body='Hey! This is your first daily message, please answer if you are fine! :)',
         to=client_number
     )
 
@@ -25,7 +24,7 @@ async def send_daily_message_10h():
 async def send_daily_message_21h():
     print('SCHEDULER:', "Send daily 21h Message")
     client.messages.create(
-        from_=server_number,
+        content_sid='HX63f8397088b8c5a38f62d648cbd75ddf',
         body='Hey! This is your second daily message, please answer if you are fine! :)',
         to=client_number
     )
@@ -118,10 +117,12 @@ async def run_schedule():
                 await send_daily_message_10h()
             elif time.localtime().tm_hour == 16:
                 await send_daily_message_10h()
-            elif time.localtime().tm_hour == 21:
-                await send_daily_message_21h()
+            elif time.localtime().tm_hour == 20:
+                await send_daily_message_10h()
             elif time.localtime().tm_hour == 22:
-                await send_daily_message_21h()
+                await send_daily_message_10h()
+            elif time.localtime().tm_hour == 23:
+                await send_daily_message_10h()
 
         # Loop every five minutes
         await asyncio.sleep(300)
