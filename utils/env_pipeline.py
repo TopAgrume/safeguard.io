@@ -4,6 +4,7 @@ import yaml
 import os
 import json
 
+
 class AccessEnv(object):
     # Static data
     client_contact = os.getenv('client_number')

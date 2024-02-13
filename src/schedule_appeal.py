@@ -1,3 +1,6 @@
+from typing import Final
+
+import telegram
 from twilio.rest import Client
 from utils.env_pipeline import AccessEnv
 
@@ -5,17 +8,15 @@ import asyncio
 import time
 
 # sos_logger = AccessEnv.logger('SOS_SCHEDULE')
-client: Client = AccessEnv.client()
-server_number, client_number, emergency_number = AccessEnv.contacts()
+TOKEN: Final = '6969147937:AAHy6mwcoATmDbajrmo8TTzDNxFDzq5_blo'
+BOT_USERNAME: Final = '@Safeguard_io_bot'
+
+bot = telegram.Bot(TOKEN)
 
 
 async def send_daily_message_10h():
     print('SCHEDULER:', "Send daily 10h Message")
-    client.messages.create(
-        content_sid='HX63f8397088b8c5a38f62d648cbd75ddf',
-        from_=server_number,
-        to=client_number
-    )
+    await bot.send_message(chat_id=6577580728, text='Hey! This is your first daily message, please answer if you are fine! :)')
 
     AccessEnv.on_write("response_message", False)
     await check_for_response()
@@ -23,17 +24,13 @@ async def send_daily_message_10h():
 
 async def send_daily_message_21h():
     print('SCHEDULER:', "Send daily 21h Message")
-    client.messages.create(
-        content_sid='HX63f8397088b8c5a38f62d648cbd75ddf',
-        body='Hey! This is your second daily message, please answer if you are fine! :)',
-        to=client_number
-    )
+    await bot.send_message(chat_id=6577580728, text='Hey! This is your second daily message, please answer if you are fine! :)')
 
     AccessEnv.on_write("response_message", False)
     await check_for_response()
 
 
-def send_reminder():
+async def send_reminder():
     reminder_count = AccessEnv.on_read("reminder_count")
     reminder_count += 1
     AccessEnv.on_write("reminder_count", reminder_count)
@@ -43,29 +40,17 @@ def send_reminder():
         return
 
     print('SCHEDULER:', f"Send reminder {reminder_count}")
-    client.messages.create(
-        from_=server_number,
-        body=f"Reminder {reminder_count}: Please respond to the verification message.",
-        to=client_number
-    )
+    await bot.send_message(chat_id=6577580728, text=f"Reminder {reminder_count}: Please respond to the verification message.")
 
 
-def send_alert_message():
+async def send_alert_message():
     print('SCHEDULER:', 'Send Alert Message')
-    client.messages.create(
-        from_=server_number,
-        body='No response received from VAL. URGENT SYSTEM LAUNCHING',
-        to=emergency_number
-    )
-    client.messages.create(
-        from_=server_number,
-        body='Alert sent to emergency contacts. Please answer to disable it',
-        to=client_number
-    )
+    await bot.send_message(chat_id=6577580728, text='No response received from VAL. URGENT SYSTEM LAUNCHING')
+    await bot.send_message(chat_id=6577580728, text='Alert sent to emergency contacts. Please answer to disable it')
 
 
 async def check_for_response():
-    time_amount = 720
+    time_amount = 5
     while True:
         # Wait for 12 min (720 sec) before sending reminder
         print('SCHEDULER:', f"Wait {time_amount} secs")
@@ -76,29 +61,15 @@ async def check_for_response():
             break
 
         # If there is no response
-        send_reminder()
+        await send_reminder()
 
         # Set alert mode to True
         reminder_count = AccessEnv.on_read("reminder_count")
 
         if reminder_count >= 5:
-            send_alert_message()
+            await send_alert_message()
             AccessEnv.on_write("alert_mode", True)
             break
-
-
-def send_hope_message():
-    print('SCHEDULER:', 'Send Hope Message')
-    client.messages.create(
-        from_=server_number,
-        body='Alert status is reset. Everything is back to normal.',
-        to=emergency_number
-    )
-    client.messages.create(
-        from_=server_number,
-        body='Alert status is reset. Everything is back to normal.',
-        to=client_number
-    )
 
 
 async def run_schedule():
@@ -111,18 +82,11 @@ async def run_schedule():
         if not AccessEnv.on_read("alert_mode"):
             if time.localtime().tm_hour == 10:
                 await send_daily_message_10h()
-            elif time.localtime().tm_hour == 12:
-                await send_daily_message_10h()
-            elif time.localtime().tm_hour == 14:
-                await send_daily_message_10h()
-            elif time.localtime().tm_hour == 16:
-                await send_daily_message_10h()
+
             elif time.localtime().tm_hour == 20:
-                await send_daily_message_10h()
-            elif time.localtime().tm_hour == 22:
-                await send_daily_message_10h()
-            elif time.localtime().tm_hour == 23:
-                await send_daily_message_10h()
+                await send_daily_message_21h()
+            elif time.localtime().tm_hour == 21:
+                await send_daily_message_21h()
 
         # Loop every five minutes
         await asyncio.sleep(300)
