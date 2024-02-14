@@ -4,9 +4,20 @@
         "response_message": true,
         "reminder_count": 0,
         "skip": false,
-        "state": "addcontact",
+        "state": "delverif",
         "fast_check": [],
         "contacts": [],
-        "daily_message": []
+        "daily_message": [
+            [
+                "21",
+                "30",
+                "end"
+            ],
+            [
+                "20",
+                "45",
+                "test mama cito"
+            ]
+        ]
     }
 }

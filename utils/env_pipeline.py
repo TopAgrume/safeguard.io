@@ -1,5 +1,3 @@
-from typing import Tuple
-
 from twilio.rest import Client
 import logging
 import os
@@ -30,7 +28,7 @@ class AccessEnv(object):
         if method == 'add':
             current_dict.extend(value)
         if method == 'del':
-            current_dict = [element for element in current_dict if element not in value]
+            current_dict = [(contact, pair) for contact, pair in current_dict if contact not in value]
 
         AccessEnv.users[str(user_id)]['contacts'] = current_dict
         with open('data/data.json', 'w') as json_file:
@@ -46,7 +44,7 @@ class AccessEnv(object):
         if method == 'add':
             current_dict.extend(value)
         if method == 'del':
-            current_dict = [element for element in current_dict if element not in value]
+            current_dict = [(hour, min, desc) for hour, min, desc in current_dict if (hour, min) not in value]
 
         AccessEnv.users[str(user_id)]['daily_message'] = current_dict
         with open('data/data.json', 'w') as json_file:
@@ -64,6 +62,14 @@ class AccessEnv(object):
             return data[key]
 
     @staticmethod
+    def on_get_users():
+        # Open and read a JSON file
+        with open('data/data.json', 'r') as json_file:
+            data = json.load(json_file)
+
+        return list(data.keys())
+
+    @staticmethod
     def on_reset() -> None:
         file_path = "data/data.json"
 
@@ -76,13 +82,14 @@ class AccessEnv(object):
             AccessEnv.users = json.load(json_file)
 
     @staticmethod
-    def on_create_user(user_id: int) -> None:
+    def on_create_user(user_id: int, username: str) -> None:
         fresh_data: dict = {
             'alert_mode': False,
             'response_message': False,
             'reminder_count': 0,
             'skip': False,
             'state': '',
+            'username': username,
             'fast_check': (),
             'contacts': [],
             'daily_message': [],
