@@ -1,10 +1,10 @@
 {
     "6577580728": {
         "alert_mode": false,
-        "response_message": false,
+        "response_message": true,
         "reminder_count": 0,
         "skip": false,
-        "state": "",
+        "state": "addcontact",
         "fast_check": [],
         "contacts": [],
         "daily_message": []

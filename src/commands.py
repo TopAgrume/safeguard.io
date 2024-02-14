@@ -1,9 +1,10 @@
 from telegram import Update, Bot
 from telegram.ext import ContextTypes
-
+from utils.env_pipeline import AccessEnv
 
 async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_first_name: str = str(update.message.chat.first_name)
+    # TODO Create new database user_id
     await update.message.reply_text(f"Hello {user_first_name}! Thanks for chatting with me! I am a Safeguard.io bot")
 
 
@@ -33,6 +34,8 @@ async def addcontact_command(update: Update, context: ContextTypes.DEFAULT_TYPE)
                "@username2\n\n"
                "Send /empty to keep the list empty.")
 
+    user_id = update.message.from_user.id
+    AccessEnv.on_write(user_id, "state", "addcontact")
     await update.message.reply_text(message)
 
 
@@ -46,6 +49,9 @@ async def delcontact_command(update: Update, context: ContextTypes.DEFAULT_TYPE)
                "@username1\n"
                "@username2\n\n"
                "Send /empty to keep the current list.")
+
+    user_id = update.message.from_user.id
+    AccessEnv.on_write(user_id, "state", "delcontact")
     await update.message.reply_text(message)
 
 
@@ -54,6 +60,9 @@ async def addverif_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
                "8:20 - Awakening\n"
                "21:30 - End of the day\n\n"
                "Send /empty to keep the list empty.")
+
+    user_id = update.message.from_user.id
+    AccessEnv.on_write(user_id, "state", "addverif")
     await update.message.reply_text(message)
 
 
@@ -67,21 +76,33 @@ async def delverif_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
                "8:20"
                "21:30"
                "Send /empty to keep the list empty.")
+
+    user_id = update.message.from_user.id
+    AccessEnv.on_write(user_id, "state", "delverif")
     await update.message.reply_text(message)
 
 
 async def skip_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message = ("OK. Next daily verification will be skipped ()") # TODO add time + description
+
+    user_id = update.message.from_user.id
+    AccessEnv.on_write(user_id, "state", "skip")
     await update.message.reply_text(message)
 
 
 async def bugreport_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message = ("OK. Please describe the bug and what you did to see it")  # TODO add time + description
+
+    user_id = update.message.from_user.id
+    AccessEnv.on_write(user_id, "state", "bugreport")
     await update.message.reply_text(message)
 
 
 async def fastcheck_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message = ("OK. Tell your problem to emergency conctacts")  # TODO add time + description
+
+    user_id = update.message.from_user.id
+    AccessEnv.on_write(user_id, "state", "fastcheck")
     await update.message.reply_text(message)
 
 

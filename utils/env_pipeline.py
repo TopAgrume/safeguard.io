@@ -11,6 +11,8 @@ class AccessEnv(object):
 
     @staticmethod
     def on_write(user_id: int, key: str = None, value=None) -> None:
+        AccessEnv.on_reset()
+
         # Write contacts to a JSON file
         if key is not None:
             AccessEnv.users[str(user_id)][key] = value
@@ -20,6 +22,8 @@ class AccessEnv(object):
 
     @staticmethod
     def on_write_contacts(user_id: int, method: str = None, value: list = None) -> None:
+        AccessEnv.on_reset()
+
         # Write contacts to a JSON file
         current_dict = AccessEnv.users[str(user_id)]['contacts']
 
@@ -34,6 +38,8 @@ class AccessEnv(object):
 
     @staticmethod
     def on_write_verifications(user_id: int, method: str = None, value: list = None) -> None:
+        AccessEnv.on_reset()
+
         # Write verifications to a JSON file
         current_dict = AccessEnv.users[str(user_id)]['daily_message']
 
@@ -95,11 +101,11 @@ class AccessEnv(object):
         return API_TOKEN, BOT_USERNAME
 
     @staticmethod
-    def get_demo() -> str:
+    def get_demo() -> int:
         my_id = os.getenv('me')
         if not my_id:
             raise ValueError("My telegram id is missing")
-        return my_id
+        return int(my_id)
 
     @staticmethod
     def client() -> Client:
