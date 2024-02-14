@@ -43,8 +43,14 @@ class AccessEnv(object):
 
         if method == 'add':
             current_dict.extend(value)
-        if method == 'del':
-            current_dict = [(hour, min, desc) for hour, min, desc in current_dict if (hour, min) not in value]
+        elif method == 'del':
+            current_dict = [(hour, min, desc, skip) for hour, min, desc, skip in current_dict if (hour, min) not in value]
+        elif method == 'skip':
+            current_dict = [(hour, min, desc, False) if (hour, min) in value else (hour, min, desc, skip) for
+                            hour, min, desc, skip in current_dict]
+        elif method == 'unskip':
+            current_dict = [(hour, min, desc, True) if (hour, min) in value else (hour, min, desc, skip) for
+                            hour, min, desc, skip in current_dict]
 
         AccessEnv.users[str(user_id)]['daily_message'] = current_dict
         with open('data/data.json', 'w') as json_file:
@@ -87,7 +93,6 @@ class AccessEnv(object):
             'alert_mode': False,
             'response_message': False,
             'reminder_count': 0,
-            'skip': False,
             'state': '',
             'username': username,
             'fast_check': (),

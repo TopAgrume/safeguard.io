@@ -4,19 +4,61 @@
         "response_message": true,
         "reminder_count": 0,
         "skip": false,
-        "state": "delverif",
+        "state": "",
+        "username": "alexandre_dr",
         "fast_check": [],
-        "contacts": [],
-        "daily_message": [
+        "contacts": [
             [
-                "21",
-                "30",
-                "end"
+                "username1",
+                false
             ],
             [
-                "20",
-                "45",
-                "test mama cito"
+                "username2",
+                false
+            ]
+        ],
+        "daily_message": [
+            [
+                0,
+                29,
+                "non au bambino",
+                true
+            ],
+            [
+                0,
+                30,
+                "test",
+                true
+            ],
+            [
+                8,
+                20,
+                "awakening",
+                true
+            ],
+            [
+                8,
+                30,
+                "test mama cito pepi to",
+                true
+            ],
+            [
+                8,
+                40,
+                "awakening",
+                true
+            ],
+            [
+                21,
+                30,
+                "end of the day",
+                true
+            ],
+            [
+                21,
+                30,
+                "non au bambino",
+                true
             ]
         ]
     }
