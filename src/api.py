@@ -1,8 +1,10 @@
 import time
 import re
+import random
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 from telegram.ext import CallbackQueryHandler
+from datetime import datetime, timedelta
 from utils.env_pipeline import AccessEnv
 
 from src.commands import start_command, info_command, bugreport_command
@@ -109,8 +111,10 @@ async def extract_verif_del(update: Update, content: str):
     return await update.message.reply_text(message)
 
 
-async def extract_bugreport(update: Update, content: str):  # TODO link
-    print(content)
+async def extract_bugreport(update: Update, content: str):
+    filename = "bug_reports/report_" + str(random.randint(0, 999999))
+    with open(filename, 'w') as file:
+        file.write(content)
     message = "Thank you for the report!"
     return await update.message.reply_text(message)
 
@@ -162,8 +166,25 @@ async def undoskip_alarm(update: Update, content: str):
 
 
 async def extract_fastcheck(update: Update, content: str):  # TODO link
-    print(content)
-    message = "Fast Check taken into account!"
+    user_id = update.message.from_user.id
+    current_time = datetime.now()
+    # Use regular expression to extract the username from the tag
+    match_tag = re.match(r'(\d{2}) *mn', content)
+    print(match_tag.group(1))
+    if not match_tag:
+        return await update.message.reply_text(f"Unknown format: \"{content}\".")
+
+    waiting_time = int(match_tag.group(1))
+    if waiting_time > 20:
+        return await update.message.reply_text("Invalid time, 20mn max")
+
+    current_time += timedelta(minutes=waiting_time)
+    time_to_display = current_time.strftime("%H:%M")
+
+    new_alarm = (time_to_display[:2], time_to_display[3:5], "Fast Check", None)
+    AccessEnv.on_write_verifications(user_id, "add", [new_alarm])
+
+    message = f"Fast Check in {waiting_time}mn taken into account! ({time_to_display})"
     return await update.message.reply_text(message)
 
 

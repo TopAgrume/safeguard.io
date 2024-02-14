@@ -3,52 +3,15 @@
         "alert_mode": false,
         "response_message": true,
         "reminder_count": 0,
-        "skip": false,
         "state": "",
         "username": "alexandre_dr",
-        "fast_check": [],
-        "contacts": [
-            [
-                "username2",
-                false
-            ]
-        ],
+        "contacts": [],
         "daily_message": [
             [
                 "08",
-                "20",
+                "05",
                 "awakening",
-                true
-            ],
-            [
-                "08",
-                "30",
-                "test mama cito pepi to",
-                true
-            ],
-            [
-                "21",
-                "30",
-                "end of the day",
-                true
-            ],
-            [
-                "21",
-                "30",
-                "non au bambino",
-                true
-            ],
-            [
-                "08",
-                "24",
-                "awakening",
-                true
-            ],
-            [
-                "20",
-                "48",
-                "test",
-                true
+                false
             ]
         ]
     }

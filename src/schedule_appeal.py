@@ -47,9 +47,7 @@ async def send_alert_message(user_id):
     # await bot.send_message(chat_id=user_id, text='No response received from VAL. URGENT SYSTEM LAUNCHING')
     # TODO contact emergencies
     keyboard = [
-        [
-            KeyboardButton("I am back!")
-        ],
+        [KeyboardButton("I am back!")],
     ]
     reply_markup = ReplyKeyboardMarkup(keyboard, one_time_keyboard=True)
     return await bot.send_message(chat_id=user_id, reply_markup=reply_markup,
@@ -89,18 +87,31 @@ async def run_schedule(user_id: int = int(AccessEnv.get_demo())):
 
         # Send message
         if not AccessEnv.on_read(user_id, "alert_mode"):
-            get_daily_messages = AccessEnv.on_read(user_id, "daily_message")
-            for daily_check in get_daily_messages:
-                if not time.localtime().tm_hour == int(daily_check[0]):
-                    continue
-                if not time.localtime().tm_min == int(daily_check[1]):
-                    continue
+            # Loop every five minutes
+            await asyncio.sleep(60)
+            continue
 
-                # TODO add to verification loop
-                await send_daily_message(user_id, daily_check[2])
+        get_daily_messages = AccessEnv.on_read(user_id, "daily_message")
+        for daily_check in get_daily_messages:
+            if not time.localtime().tm_hour == int(daily_check[0]):
+                continue
+            if not time.localtime().tm_min == int(daily_check[1]):
+                continue
 
-        # Loop every five minutes
+            # In case of skip
+            if not daily_check[3]:
+                if daily_check[3] is None:
+                    AccessEnv.on_write_verifications(user_id, "del", daily_check[:2])
+                else:
+                    AccessEnv.on_write_verifications(user_id, "undoskip", daily_check)
+                continue
+
+            # TODO add to verification loop
+            await send_daily_message(user_id, daily_check[2])
+
         await asyncio.sleep(60)
+
+
 
 
 def run_schedule_process():

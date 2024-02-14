@@ -56,6 +56,9 @@ async def showcontacts_command(update: Update, context: ContextTypes.DEFAULT_TYP
     user_id = update.message.from_user.id
     contact_list = AccessEnv.on_read(user_id, "contacts")
 
+    if len(contact_list) == 0:
+        return await update.message.reply_text("There is no emergency contact to display.")
+
     for contact, pairing in contact_list:
         if pairing:
             message += AccessEnv.on_read(int(contact), "username") + f" - OK\n"
@@ -100,20 +103,27 @@ async def addverif_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def showverifs_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    message = "OK. Here is you list of daily verifications:\n\n"
+    message = "OK. Here is you list of daily verifications:\n"
     user_id = update.message.from_user.id
     verif_list = AccessEnv.on_read(user_id, "daily_message")
+
+    if len(verif_list) == 0:
+        return await update.message.reply_text("There is no daily check to display.")
+
     sorted_list = sorted(verif_list, key=lambda x: (x[0], x[1]))
 
-    skipped_verif, skip_bool = "\nSkipped today:\n", False
+    skipped_verif = "\nSkipped today:\n"
+    skip_bool, active = False, True
     for verif in sorted_list:
-        if verif[3]:
-            message += f"{verif[0]}:{verif[1]} - {verif[2]}\n"
+        if verif[3] or verif[3] is None:
+            message += f"\n{verif[0]}:{verif[1]} - {verif[2]}\n"
+            active = False
             continue
 
         skipped_verif += f"\n{verif[0]}:{verif[1]} - {verif[2]}"
         skip_bool = True
 
+    message += "No daily check for the next 24 hours.\n" if active else ""
     message += skipped_verif if skip_bool else ""
     return await update.message.reply_text(message)
 
@@ -175,7 +185,7 @@ async def undoskip_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def bugreport_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    message = ("OK. Please describe the bug and what you did to see it")  # TODO add time + description
+    message = ("OK. Please describe the bug and what you did to see it")
 
     user_id = update.message.from_user.id
     AccessEnv.on_write(user_id, "state", "bugreport")
@@ -183,11 +193,17 @@ async def bugreport_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def fastcheck_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    message = ("OK. Tell your problem to emergency conctacts")  # TODO add time + description
+    message = ("OK. How soon do you want to have the quick check? (< 20 mn).")  # TODO add time + description
+
+    keyboard = [
+        ["5 mn", "10 mn", "15 mn", "20 mn"],
+    ]
+    reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True, one_time_keyboard=True)
 
     user_id = update.message.from_user.id
     AccessEnv.on_write(user_id, "state", "fastcheck")
-    return await update.message.reply_text(message)
+
+    return await update.message.reply_text(message, reply_markup=reply_markup)
 
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):

@@ -95,7 +95,6 @@ class AccessEnv(object):
             'reminder_count': 0,
             'state': '',
             'username': username,
-            'fast_check': (),
             'contacts': [],
             'daily_message': [],
         }
