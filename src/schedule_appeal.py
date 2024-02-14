@@ -54,7 +54,7 @@ async def send_alert_message(user_id):
                                   text='Alert sent to emergency contacts. Please answer to disable it')
 
 
-async def check_for_response(user_id): # TODO verification queue
+async def check_for_response(user_id):  # TODO verification queue
     time_amount = 5
     while True:
         # Wait for 12 min (720 sec) before sending reminder
@@ -77,41 +77,39 @@ async def check_for_response(user_id): # TODO verification queue
             break
 
 
-async def run_schedule(user_id: int = int(AccessEnv.get_demo())):
+async def run_schedule():
     AccessEnv.on_reset()
-    loop_count = 0
 
     while True:
-        loop_count += 1
-        print('SCHEDULER:', f"1 min check loop: {loop_count = } for {user_id = }")
+        print('SCHEDULER:', "--- REFRESH ---")
 
-        # Send message
-        if not AccessEnv.on_read(user_id, "alert_mode"):
-            # Loop every five minutes
-            await asyncio.sleep(60)
-            continue
-
-        get_daily_messages = AccessEnv.on_read(user_id, "daily_message")
-        for daily_check in get_daily_messages:
-            if not time.localtime().tm_hour == int(daily_check[0]):
-                continue
-            if not time.localtime().tm_min == int(daily_check[1]):
+        for user_id in AccessEnv.on_get_users():
+            # If alert mode, do nothing
+            if AccessEnv.on_read(user_id, "alert_mode"):
                 continue
 
-            # In case of skip
-            if not daily_check[3]:
-                if daily_check[3] is None:
-                    AccessEnv.on_write_verifications(user_id, "del", daily_check[:2])
-                else:
-                    AccessEnv.on_write_verifications(user_id, "undoskip", daily_check)
-                continue
+            get_daily_messages = AccessEnv.on_read(user_id, "daily_message")
+            for hour, mn, desc, state in get_daily_messages:
+                if not time.localtime().tm_hour == int(hour):
+                    continue
+                if not time.localtime().tm_min == int(mn):
+                    continue
 
-            # TODO add to verification loop
-            await send_daily_message(user_id, daily_check[2])
+                # In case of skip or fast-check
+                if not state:
+                    if isinstance(state, bool):
+                        AccessEnv.on_write_verifications(user_id, "undo skip", [(hour, mn)])
+                        print('SCHEDULER:', f"undo skip for: {state}")
+                        continue
+
+                    # Fast-check -> delete the created check
+                    AccessEnv.on_write_verifications(user_id, "del", [(hour, mn)])
+                    print('SCHEDULER:', f"kill fast check: {state}")
+
+                # TODO add to verification loop
+                await send_daily_message(user_id, desc)
 
         await asyncio.sleep(60)
-
-
 
 
 def run_schedule_process():

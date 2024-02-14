@@ -128,8 +128,8 @@ async def skip_alarm(update: Update, content: str):
         match_tag = re.match(r'^(0[0-9]|1[0-9]|2[0-3]):([0-5][0-9])$', line)
 
         if match_tag:
-            hour, min = match_tag.group(1), match_tag.group(2)
-            skip_verif.append((hour, min))
+            hour, mn = match_tag.group(1), match_tag.group(2)
+            skip_verif.append((hour, mn))
         else:
             error_contact.append(line)
 
@@ -169,8 +169,8 @@ async def extract_fastcheck(update: Update, content: str):  # TODO link
     user_id = update.message.from_user.id
     current_time = datetime.now()
     # Use regular expression to extract the username from the tag
-    match_tag = re.match(r'(\d{2}) *mn', content)
-    print(match_tag.group(1))
+    match_tag = re.match(r'(\d+) *mn', content)
+
     if not match_tag:
         return await update.message.reply_text(f"Unknown format: \"{content}\".")
 
@@ -229,8 +229,9 @@ async def handle_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if response_message:
         # Already answered / Random call
-        print('API:', 'Response out of context')
         get_state = AccessEnv.on_read(user_id, "state")
+
+        print('API:', f"Command call {get_state=}", f"Content: {message_body=}")
         return await state_dispatcher(update, get_state, message_body)
 
     if not alert_mode:
@@ -305,5 +306,4 @@ def run_api():
     app.add_error_handler(error)
 
     # Polls the bot
-    print('API:', 'Polling...')
     app.run_polling(poll_interval=0.5)
