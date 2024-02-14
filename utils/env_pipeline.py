@@ -1,43 +1,105 @@
+from typing import Tuple
+
 from twilio.rest import Client
 import logging
-import yaml
 import os
 import json
 
 
 class AccessEnv(object):
-    # Static data
-    client_contact = os.getenv('client_number')
-    server_sid = os.getenv('server_number')
-    data: dict = {
-        'response_message': False,
-        'alert_mode': False,
-        'reminder_count': 0
-    }
+    users: dict = {}
 
     @staticmethod
-    def on_write(key: str = None, value=None) -> None:
-        # Write data to a YAML file
+    def on_write(user_id: int, key: str = None, value=None) -> None:
+        # Write contacts to a JSON file
         if key is not None:
-            AccessEnv.data[key] = value
+            AccessEnv.users[str(user_id)][key] = value
 
-        with open('../data_pipe.yaml', 'w') as yaml_file:
-            yaml.dump(AccessEnv.data, yaml_file, default_flow_style=False)
+        with open('data/data.json', 'w') as json_file:
+            json.dump(AccessEnv.users, json_file, indent=4)
 
     @staticmethod
-    def on_read(key: str = None):
-        # Open and read a YAML file
-        with open('../data_pipe.yaml', 'r') as yaml_file:
-            AccessEnv.data = yaml.safe_load(yaml_file)
+    def on_write_contacts(user_id: int, method: str = None, value: list = None) -> None:
+        # Write contacts to a JSON file
+        current_dict = AccessEnv.users[str(user_id)]['contacts']
+
+        if method == 'add':
+            current_dict.extend(value)
+        if method == 'del':
+            current_dict = [element for element in current_dict if element not in value]
+
+        AccessEnv.users[str(user_id)]['contacts'] = current_dict
+        with open('data/data.json', 'w') as json_file:
+            json.dump(AccessEnv.users, json_file, indent=4)
+
+    @staticmethod
+    def on_write_verifications(user_id: int, method: str = None, value: list = None) -> None:
+        # Write verifications to a JSON file
+        current_dict = AccessEnv.users[str(user_id)]['daily_message']
+
+        if method == 'add':
+            current_dict.extend(value)
+        if method == 'del':
+            current_dict = [element for element in current_dict if element not in value]
+
+        AccessEnv.users[str(user_id)]['daily_message'] = current_dict
+        with open('data/data.json', 'w') as json_file:
+            json.dump(AccessEnv.users, json_file, indent=4)
+
+    @staticmethod
+    def on_read(user_id: int, key: str = None):
+        # Open and read a JSON file
+        with open('data/data.json', 'r') as json_file:
+            data = json.load(json_file)[str(user_id)]
 
         if key is None:
-            return AccessEnv.data["response_message"], AccessEnv.data["alert_mode"], AccessEnv.data["reminder_count"]
+            return data["response_message"], data["alert_mode"], data["reminder_count"]
         else:
-            return AccessEnv.data[key]
+            return data[key]
 
     @staticmethod
     def on_reset() -> None:
-        AccessEnv.on_write()
+        file_path = "data/data.json"
+
+        # Check if the file exists
+        if not os.path.exists(file_path):
+            with open(file_path, 'w') as file:
+                json.dump({}, file, indent=4)
+
+        with open(file_path, 'r') as json_file:
+            AccessEnv.users = json.load(json_file)
+
+    @staticmethod
+    def on_create_user(user_id: int) -> None:
+        fresh_data: dict = {
+            'alert_mode': False,
+            'response_message': False,
+            'reminder_count': 0,
+            'skip': False,
+            'state': '',
+            'fast_check': (),
+            'contacts': [],
+            'daily_message': [],
+        }
+
+        AccessEnv.users[str(user_id)] = fresh_data
+        with open('data/data.json', 'w') as json_file:
+            json.dump(AccessEnv.users, json_file, indent=4)
+
+    @staticmethod
+    def telegram_keys() -> tuple[str, str]:
+        API_TOKEN = os.getenv('TOKEN')
+        BOT_USERNAME = os.getenv('BOT_USERNAME')
+        if not API_TOKEN or not BOT_USERNAME:
+            raise ValueError("One or more keys required environment variables are missing.")
+        return API_TOKEN, BOT_USERNAME
+
+    @staticmethod
+    def get_demo() -> str:
+        my_id = os.getenv('me')
+        if not my_id:
+            raise ValueError("My telegram id is missing")
+        return my_id
 
     @staticmethod
     def client() -> Client:
@@ -66,20 +128,8 @@ class AccessEnv(object):
     @staticmethod
     def logger(logger_name: str):
         logging.basicConfig(
-            level=logging.DEBUG,
+            level=logging.INFO,
             format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
         )
 
         return logging.getLogger(logger_name)
-
-
-class Messaging(object):
-    @staticmethod
-    def send(template_id: str, content_variable: dict):
-        client = AccessEnv.client()
-        client.messages.create(
-            content_sid=template_id,
-            from_=AccessEnv.server_sid,
-            content_variables=json.dumps(content_variable),
-            to=AccessEnv.client_contact
-        )
