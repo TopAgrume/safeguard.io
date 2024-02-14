@@ -48,7 +48,7 @@ class AccessEnv(object):
         elif method == 'skip':
             current_dict = [(hour, min, desc, False) if (hour, min) in value else (hour, min, desc, skip) for
                             hour, min, desc, skip in current_dict]
-        elif method == 'unskip':
+        elif method == 'undoskip':
             current_dict = [(hour, min, desc, True) if (hour, min) in value else (hour, min, desc, skip) for
                             hour, min, desc, skip in current_dict]
 

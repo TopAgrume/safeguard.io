@@ -10,7 +10,8 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):  # 
         AccessEnv.on_create_user(user_id, username)
 
     user_first_name: str = str(update.message.chat.first_name)
-    await update.message.reply_text(f"Hello {user_first_name}! Thanks for chatting with me! I am a Safeguard.io bot")
+    return await update.message.reply_text(f"Hello {user_first_name}! Thanks for chatting with me! I am a "
+                                           f"Safeguard.io bot")
 
 
 async def info_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -18,6 +19,7 @@ async def info_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
                "/start - start the conversation with the bot\n"
                "/info - get bot usage\n"
                "/help - ask for help to emergency contacts\n"
+               "/undohelp - disable emergency alert\n"
                "/addcontact - add emergency contacts\n"
                "/showcontacts - show emergency contacts\n"
                "/delcontact - delete emergency contacts\n"
@@ -25,9 +27,11 @@ async def info_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
                "/showverifs - show daily verfications\n"
                "/delverif - delete daily verifications\n"
                "/skip - skip next verification\n"
+               "/undoskip - activate back skipped verification\n"
                "/bugreport - report a bug\n"
                "/fastcheck - quick verification")
-    await update.message.reply_text(message)
+
+    return await update.message.reply_text(message)
 
 
 async def addcontact_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -37,13 +41,18 @@ async def addcontact_command(update: Update, context: ContextTypes.DEFAULT_TYPE)
                "Send /empty to keep the list empty.")
 
     user_id = update.message.from_user.id
+    if len(AccessEnv.on_read(user_id, "contacts")) > 9:
+        message = "You cannot add an additional contacts (10 max)."
+        return await update.message.reply_text(message)
+
     AccessEnv.on_write(user_id, "state", "addcontact")
 
-    await update.message.reply_text(message)
+    return await update.message.reply_text(message)
 
 
 async def showcontacts_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message = "OK. Here is you list of contacts:\n\n"  # TODO list contacts, + show pairing
+
     user_id = update.message.from_user.id
     contact_list = AccessEnv.on_read(user_id, "contacts")
 
@@ -54,18 +63,22 @@ async def showcontacts_command(update: Update, context: ContextTypes.DEFAULT_TYP
 
         message += AccessEnv.on_read(int(contact), "username") + f" - waiting for pairing\n"
 
-    await update.message.reply_text(message)
+    return await update.message.reply_text(message)
 
 
 async def delcontact_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message = ("OK. Chose the contact to delete.\n"
                "Send /empty to empty the current list.") #TODO impossible de revenir en arrière
-    user_id = update.message.from_user.id
 
-    keyboard = [
-        [AccessEnv.on_read(user_id, "contacts")],
-    ]
-    reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True, one_time_keyboard=True)
+    user_id = update.message.from_user.id
+    if len(AccessEnv.on_read(user_id, "contacts")) == 0:
+        message = "No contact to delete."
+        return await update.message.reply_text(message)
+
+    get_contacts = AccessEnv.on_read(user_id, "contacts")
+    display = [contact[0] for contact in get_contacts]
+
+    reply_markup = ReplyKeyboardMarkup([display], resize_keyboard=True, one_time_keyboard=True)
 
     AccessEnv.on_write(user_id, "state", "delcontact")
     return await update.message.reply_text(message, reply_markup=reply_markup)
@@ -73,20 +86,24 @@ async def delcontact_command(update: Update, context: ContextTypes.DEFAULT_TYPE)
 
 async def addverif_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message = ("OK. Send me a list of daily verifications to add. Please use this format:\n\n"
-               "8:20 - Awakening\n"
+               "08:05 - Awakening\n"
                "21:30 - End of the day\n\n"
                "Send /empty to keep the list empty.")
 
     user_id = update.message.from_user.id
+    if len(AccessEnv.on_read(user_id, "daily_message")) > 5:
+        message = "You cannot add an additional daily check."
+        return await update.message.reply_text(message)
+
     AccessEnv.on_write(user_id, "state", "addverif")
-    await update.message.reply_text(message)
+    return await update.message.reply_text(message)
 
 
 async def showverifs_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message = "OK. Here is you list of daily verifications:\n\n"
     user_id = update.message.from_user.id
     verif_list = AccessEnv.on_read(user_id, "daily_message")
-    sorted_list = sorted(verif_list, key=lambda x: (int(x[0]), int(x[1])))
+    sorted_list = sorted(verif_list, key=lambda x: (x[0], x[1]))
 
     skipped_verif, skip_bool = "\nSkipped today:\n", False
     for verif in sorted_list:
@@ -98,7 +115,7 @@ async def showverifs_command(update: Update, context: ContextTypes.DEFAULT_TYPE)
         skip_bool = True
 
     message += skipped_verif if skip_bool else ""
-    await update.message.reply_text(message)
+    return await update.message.reply_text(message)
 
 
 async def delverif_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -107,7 +124,12 @@ async def delverif_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     user_id = update.message.from_user.id
     verif_list = AccessEnv.on_read(user_id, "daily_message")
-    sorted_list = sorted(verif_list, key=lambda x: (int(x[0]), int(x[1])))
+
+    if len(AccessEnv.on_read(user_id, "daily_message")) == 0:
+        message = "No daily message to delete."
+        return await update.message.reply_text(message)
+
+    sorted_list = sorted(verif_list, key=lambda x: (x[0], x[1]))
 
     keyboard = [
         [f"{elt[0]}:{elt[1]}" for elt in sorted_list],
@@ -115,7 +137,7 @@ async def delverif_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True, one_time_keyboard=True)
 
     AccessEnv.on_write(user_id, "state", "delverif")
-    await update.message.reply_text(message, reply_markup=reply_markup)
+    return await update.message.reply_text(message, reply_markup=reply_markup)
 
 
 async def skip_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -124,7 +146,7 @@ async def skip_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.message.from_user.id
     verif_list = AccessEnv.on_read(user_id, "daily_message")
     verif_list = list(filter(lambda x: x[3], verif_list))
-    sorted_list = sorted(verif_list, key=lambda x: (int(x[0]), int(x[1])))
+    sorted_list = sorted(verif_list, key=lambda x: (x[0], x[1]))
 
     keyboard = [
         [f"{elt[0]}:{elt[1]}" for elt in sorted_list],
@@ -132,24 +154,24 @@ async def skip_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True, one_time_keyboard=True)
 
     AccessEnv.on_write(user_id, "state", "skip")
-    await update.message.reply_text(message, reply_markup=reply_markup)
+    return await update.message.reply_text(message, reply_markup=reply_markup)
 
 
-async def unskip_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def undoskip_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message = "OK. Chose the daily verifications to skip."
 
     user_id = update.message.from_user.id
     verif_list = AccessEnv.on_read(user_id, "daily_message")
     verif_list = list(filter(lambda x: not x[3], verif_list))
-    sorted_list = sorted(verif_list, key=lambda x: (int(x[0]), int(x[1])))
+    sorted_list = sorted(verif_list, key=lambda x: (x[0], x[1]))
 
     keyboard = [
         [f"{elt[0]}:{elt[1]}" for elt in sorted_list],
     ]
     reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True, one_time_keyboard=True)
 
-    AccessEnv.on_write(user_id, "state", "unskip")
-    await update.message.reply_text(message, reply_markup=reply_markup)
+    AccessEnv.on_write(user_id, "state", "undoskip")
+    return await update.message.reply_text(message, reply_markup=reply_markup)
 
 
 async def bugreport_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -157,7 +179,7 @@ async def bugreport_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     user_id = update.message.from_user.id
     AccessEnv.on_write(user_id, "state", "bugreport")
-    await update.message.reply_text(message)
+    return await update.message.reply_text(message)
 
 
 async def fastcheck_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -165,7 +187,7 @@ async def fastcheck_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     user_id = update.message.from_user.id
     AccessEnv.on_write(user_id, "state", "fastcheck")
-    await update.message.reply_text(message)
+    return await update.message.reply_text(message)
 
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -188,7 +210,7 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    await update.message.reply_text(message, reply_markup=reply_markup)
+    return await update.message.reply_text(message, reply_markup=reply_markup)
 
 
 async def undohelp_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -204,4 +226,4 @@ async def undohelp_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         ],
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
-    await update.message.reply_text(response, reply_markup=reply_markup)
+    return await update.message.reply_text(response, reply_markup=reply_markup)

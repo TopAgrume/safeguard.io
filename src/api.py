@@ -8,7 +8,7 @@ from utils.env_pipeline import AccessEnv
 from src.commands import start_command, info_command, bugreport_command
 from src.commands import addcontact_command, showcontacts_command, delcontact_command
 from src.commands import addverif_command, showverifs_command, delverif_command
-from src.commands import skip_command, unskip_command, fastcheck_command, help_command, undohelp_command
+from src.commands import skip_command, undoskip_command, fastcheck_command, help_command, undohelp_command
 
 TOKEN, BOT_USERNAME = AccessEnv.telegram_keys()
 
@@ -46,7 +46,7 @@ async def extract_user_id_del(update: Update, content: str):
 
     # Use regular expression to extract the username from the tag
     for line in content.splitlines():
-        match_tag = re.match(r'@(\w+)', line)
+        match_tag = re.match(r'(\w+)', line)
 
         if match_tag:
             del_contacts.append(match_tag.group(1))
@@ -68,10 +68,10 @@ async def extract_verif_add(update: Update, content: str):
 
     # Use regular expression to extract the username from the tag
     for line in content.splitlines():
-        match_tag = re.match(r'(\d+):(\d{2}) *- *([\w ]+)', line)
+        match_tag = re.match(r'^(0[0-9]|1[0-9]|2[0-3]):([0-5][0-9]) *- *([\w ]+)', line)
 
         if match_tag:
-            hour, min = int(match_tag.group(1)), int(match_tag.group(2))
+            hour, min = match_tag.group(1), match_tag.group(2)
             desc = match_tag.group(3)
             new_verif.append((hour, min, desc, True))
         else:
@@ -92,10 +92,10 @@ async def extract_verif_del(update: Update, content: str):
 
     # Use regular expression to extract the username from the tag
     for line in content.splitlines():
-        match_tag = re.match(r'(\d+):(\d{2})', line)
+        match_tag = re.match(r'^(0[0-9]|1[0-9]|2[0-3]):([0-5][0-9])$', line)
 
         if match_tag:
-            hour, min = int(match_tag.group(1)), int(match_tag.group(2))
+            hour, min = match_tag.group(1), match_tag.group(2)
             del_verif.append((hour, min))
         else:
             error_contact.append(line)
@@ -121,10 +121,10 @@ async def skip_alarm(update: Update, content: str):
 
     # Use regular expression to extract the username from the tag
     for line in content.splitlines():
-        match_tag = re.match(r'(\d+):(\d{2})', line) #TODO verif format 23:59
+        match_tag = re.match(r'^(0[0-9]|1[0-9]|2[0-3]):([0-5][0-9])$', line)
 
         if match_tag:
-            hour, min = int(match_tag.group(1)), int(match_tag.group(2))
+            hour, min = match_tag.group(1), match_tag.group(2)
             skip_verif.append((hour, min))
         else:
             error_contact.append(line)
@@ -138,21 +138,21 @@ async def skip_alarm(update: Update, content: str):
     return await update.message.reply_text(message)
 
 
-async def unskip_alarm(update: Update, content: str):
+async def undoskip_alarm(update: Update, content: str):
     error_contact, skip_verif = [], []
     user_id = update.message.from_user.id
 
     # Use regular expression to extract the username from the tag
     for line in content.splitlines():
-        match_tag = re.match(r'(\d+):(\d{2})', line) #TODO verif format 23:59
+        match_tag = re.match(r'^(0[0-9]|1[0-9]|2[0-3]):([0-5][0-9])$', line)
 
         if match_tag:
-            hour, min = int(match_tag.group(1)), int(match_tag.group(2))
+            hour, min = match_tag.group(1), match_tag.group(2)
             skip_verif.append((hour, min))
         else:
             error_contact.append(line)
 
-    AccessEnv.on_write_verifications(user_id, "unskip", skip_verif)
+    AccessEnv.on_write_verifications(user_id, "undoskip", skip_verif)
 
     message = "Given daily verification(s) is now activated."
     if len(error_contact) != 0:
@@ -179,7 +179,7 @@ async def state_dispatcher(update: Update, state: str, message_body: str):
         "delverif": extract_verif_del,
         "bugreport": extract_bugreport,
         "skip": skip_alarm,
-        "unskip": unskip_alarm,
+        "undoskip": undoskip_alarm,
         "fastcheck": extract_fastcheck,
     }
 
@@ -273,7 +273,7 @@ def run_api():
     app.add_handler(CommandHandler('showverifs', showverifs_command))
     app.add_handler(CommandHandler('delverif', delverif_command))
     app.add_handler(CommandHandler('skip', skip_command))
-    app.add_handler(CommandHandler('unskip', unskip_command))
+    app.add_handler(CommandHandler('undoskip', undoskip_command))
     app.add_handler(CommandHandler('fastcheck', fastcheck_command))
     app.add_handler(CallbackQueryHandler(button))
 

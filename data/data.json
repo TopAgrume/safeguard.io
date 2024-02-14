@@ -9,55 +9,45 @@
         "fast_check": [],
         "contacts": [
             [
-                "username1",
-                false
-            ],
-            [
                 "username2",
                 false
             ]
         ],
         "daily_message": [
             [
-                0,
-                29,
-                "non au bambino",
-                true
-            ],
-            [
-                0,
-                30,
+                "00",
+                "30",
                 "test",
                 true
             ],
             [
-                8,
-                20,
+                "08",
+                "20",
                 "awakening",
                 true
             ],
             [
-                8,
-                30,
+                "08",
+                "30",
                 "test mama cito pepi to",
                 true
             ],
             [
-                8,
-                40,
-                "awakening",
-                true
-            ],
-            [
-                21,
-                30,
+                "21",
+                "30",
                 "end of the day",
                 true
             ],
             [
-                21,
-                30,
+                "21",
+                "30",
                 "non au bambino",
+                true
+            ],
+            [
+                "08",
+                "24",
+                "awakening",
                 true
             ]
         ]
