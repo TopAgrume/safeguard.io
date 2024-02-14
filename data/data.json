@@ -15,12 +15,6 @@
         ],
         "daily_message": [
             [
-                "00",
-                "30",
-                "test",
-                true
-            ],
-            [
                 "08",
                 "20",
                 "awakening",
@@ -48,6 +42,12 @@
                 "08",
                 "24",
                 "awakening",
+                true
+            ],
+            [
+                "20",
+                "48",
+                "test",
                 true
             ]
         ]

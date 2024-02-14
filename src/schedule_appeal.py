@@ -1,7 +1,5 @@
-from typing import Final
-
 from telegram import Bot, KeyboardButton
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup
+from telegram import ReplyKeyboardMarkup
 from utils.env_pipeline import AccessEnv
 
 import asyncio
@@ -11,7 +9,7 @@ TOKEN, BOT_USERNAME = AccessEnv.telegram_keys()
 bot = Bot(TOKEN)
 
 
-async def send_daily_message_10h(user_id):
+async def send_daily_message(user_id: int, description: str):
     print('SCHEDULER:', f"Send daily 10h Message to {user_id = }")
 
     keyboard = [
@@ -23,7 +21,7 @@ async def send_daily_message_10h(user_id):
     reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True, one_time_keyboard=True)
 
     await bot.send_message(chat_id=user_id,
-                           text='Hey! This is your daily message, please answer if you are fine! :)',
+                           text=f"Hey! This is your daily message ({description}), please answer if you are fine! :)",
                            reply_markup=reply_markup)
 
     AccessEnv.on_write(user_id, "response_message", False)
@@ -54,12 +52,11 @@ async def send_alert_message(user_id):
         ],
     ]
     reply_markup = ReplyKeyboardMarkup(keyboard, one_time_keyboard=True)
-    await bot.send_message(chat_id=user_id,
-                           text='Alert sent to emergency contacts. Please answer to disable it',
-                           reply_markup=reply_markup)
+    return await bot.send_message(chat_id=user_id, reply_markup=reply_markup,
+                                  text='Alert sent to emergency contacts. Please answer to disable it')
 
 
-async def check_for_response(user_id):
+async def check_for_response(user_id): # TODO verification queue
     time_amount = 5
     while True:
         # Wait for 12 min (720 sec) before sending reminder
@@ -88,15 +85,22 @@ async def run_schedule(user_id: int = int(AccessEnv.get_demo())):
 
     while True:
         loop_count += 1
-        print('SCHEDULER:', f"5 min check loop: {loop_count = } for {user_id = }")
+        print('SCHEDULER:', f"1 min check loop: {loop_count = } for {user_id = }")
 
         # Send message
         if not AccessEnv.on_read(user_id, "alert_mode"):
-            if time.localtime().tm_hour == 18:
-                await send_daily_message_10h(user_id)
+            get_daily_messages = AccessEnv.on_read(user_id, "daily_message")
+            for daily_check in get_daily_messages:
+                if not time.localtime().tm_hour == int(daily_check[0]):
+                    continue
+                if not time.localtime().tm_min == int(daily_check[1]):
+                    continue
+
+                # TODO add to verification loop
+                await send_daily_message(user_id, daily_check[2])
 
         # Loop every five minutes
-        await asyncio.sleep(300)
+        await asyncio.sleep(60)
 
 
 def run_schedule_process():
