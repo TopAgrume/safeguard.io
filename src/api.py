@@ -12,7 +12,7 @@ TOKEN, BOT_USERNAME = AccessEnv.telegram_keys()
 
 async def send_hope_message(update: Update):
     print('API:', 'Send Hope Message')
-    await update.message.reply_text('Alert status is reset. Everything is back to normal.')
+    #await update.message.reply_text('Alert status is reset. Everything is back to normal.')
 
 
 async def handle_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -33,13 +33,13 @@ async def handle_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if response_message:
         # Already answered / Random call
         print('API:', 'Response out of context')
-        await update.message.reply_text("Already answered / Random call")
+        #await update.message.reply_text("Already answered / Random call")
 
     elif not alert_mode:
         print('API:', 'Response to contact and confirmation demand')
         greeting = "Have a great day! :D" if time.localtime().tm_hour == 10 else "Have a wonderful night! ;)"
         response = 'Thank you for your response! ' + greeting
-        await update.message.reply_text(response)
+        #await update.message.reply_text(response)
 
         AccessEnv.on_write(user_id, "reminder_count", 0)
         AccessEnv.on_write(user_id, "response_message", True)
@@ -47,7 +47,7 @@ async def handle_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
         print('API:', 'Response to unset the alert mode')
         AccessEnv.on_write(user_id, "alert_mode", False)
         AccessEnv.on_write(user_id, "response_message", True)
-        await send_hope_message(update)
+        #await send_hope_message(update)
 
     print('API:', 'Bot response:', response)
 

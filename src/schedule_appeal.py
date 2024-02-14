@@ -11,7 +11,7 @@ bot = Bot(TOKEN)
 
 
 async def send_daily_message_10h(user_id):
-    print('SCHEDULER', f"Send daily 10h Message to {user_id}")
+    print('SCHEDULER:', f"Send daily 10h Message to {user_id = }")
     await bot.send_message(chat_id=user_id,
                            text='Hey! This is your first daily message, please answer if you are fine! :)')
 
@@ -28,13 +28,13 @@ async def send_reminder(user_id):
     if reminder_count == 5:
         return
 
-    print('SCHEDULER', f"Send reminder {reminder_count} to {user_id}")
+    print('SCHEDULER:', f"Send reminder {reminder_count} to {user_id = }")
     await bot.send_message(chat_id=user_id,
                            text=f"Reminder {reminder_count}: Please respond to the verification message.")
 
 
 async def send_alert_message(user_id):
-    print('SCHEDULER', f"Send Alert Message from {user_id}")
+    print('SCHEDULER:', f"Send Alert Message from {user_id = }")
     await bot.send_message(chat_id=user_id, text='No response received from VAL. URGENT SYSTEM LAUNCHING')
     await bot.send_message(chat_id=user_id, text='Alert sent to emergency contacts. Please answer to disable it')
 
@@ -43,7 +43,7 @@ async def check_for_response(user_id):
     time_amount = 5
     while True:
         # Wait for 12 min (720 sec) before sending reminder
-        print('SCHEDULER', f"Wait {time_amount} secs for {user_id}")
+        print('SCHEDULER:', f"Wait {time_amount} secs for {user_id = }")
         await asyncio.sleep(time_amount)
 
         # Check for response message
@@ -68,11 +68,10 @@ async def run_schedule(user_id: int = int(AccessEnv.get_demo())):
 
     while True:
         loop_count += 1
-        print('SCHEDULER', f"5 min check loop: {loop_count = } for {user_id}")
+        print('SCHEDULER:', f"5 min check loop: {loop_count = } for {user_id = }")
 
         # Send message
         if not AccessEnv.on_read(user_id, "alert_mode"):
-            print(AccessEnv.users)
             if time.localtime().tm_hour == 1:
                 await send_daily_message_10h(user_id)
 

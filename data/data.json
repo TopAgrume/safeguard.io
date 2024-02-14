@@ -1,8 +1,8 @@
 {
     "6577580728": {
-        "alert_mode": true,
+        "alert_mode": false,
         "response_message": false,
-        "reminder_count": 5,
+        "reminder_count": 0,
         "skip": false,
         "state": "",
         "fast_check": [],
