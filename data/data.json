@@ -5,24 +5,8 @@
         "reminder_count": 0,
         "state": "",
         "username": "alexandre_dr",
-        "contacts": [
-            {
-                "id": "leo",
-                "pair": false
-            }
-        ],
-        "daily_message": [
-            {
-                "time": "08:05",
-                "desc": "Awakening",
-                "active": true
-            },
-            {
-                "time": "21:30",
-                "desc": "End of the day",
-                "active": true
-            }
-        ]
+        "contacts": [],
+        "daily_message": []
     },
     "6340506663": {
         "alert_mode": true,

@@ -2,7 +2,7 @@ import time
 import re
 import random
 from telegram import Update
-from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
+from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes, ChatMemberHandler
 from telegram.ext import CallbackQueryHandler
 from datetime import datetime, timedelta
 from utils.env_pipeline import AccessEnv
@@ -26,7 +26,7 @@ async def extract_user_id_add(update: Update, content: str):
 
     # Use regular expression to extract the username from the tag
     for line in content.splitlines():
-        match_tag = re.match(r'@(\w+)', line)
+        match_tag = re.match(r'@([\w\d_]+)', line)
 
         if match_tag:
             new_contacts.append(match_tag.group(1))
@@ -48,7 +48,7 @@ async def extract_user_id_del(update: Update, content: str):
 
     # Use regular expression to extract the username from the tag
     for line in content.splitlines():
-        match_tag = re.match(r'(\w+)', line)
+        match_tag = re.match(r'@([\w\d_]+)', line)
 
         if match_tag:
             del_contacts.append(match_tag.group(1))
@@ -164,7 +164,7 @@ async def undoskip_alarm(update: Update, content: str):
     return await update.message.reply_text(message)
 
 
-async def extract_fastcheck(update: Update, content: str):  # TODO link
+async def extract_fastcheck(update: Update, content: str):
     user_id = update.message.from_user.id
     current_time = datetime.now()
     # Use regular expression to extract the username from the tag
@@ -180,8 +180,8 @@ async def extract_fastcheck(update: Update, content: str):  # TODO link
     current_time += timedelta(minutes=waiting_time)
     time_to_display = current_time.strftime("%H:%M")
 
-    new_alarm = {"time": time_to_display, "desc": "Fast Check", "active": None}
-    AccessEnv.on_write_verifications(user_id, "add", [new_alarm])
+    new_alarm = {"time": time_to_display, "desc": "Auto fast check", "active": None}
+    AccessEnv.on_write_verifications(user_id, "add", [new_alarm], True)
 
     message = f"Fast Check in {waiting_time}mn taken into account! ({time_to_display})"
     return await update.message.reply_text(message)
@@ -297,6 +297,8 @@ def run_api():
     app.add_handler(CommandHandler('skip', skip_command))
     app.add_handler(CommandHandler('undoskip', undoskip_command))
     app.add_handler(CommandHandler('fastcheck', fastcheck_command))
+
+    # Buttons under text
     app.add_handler(CallbackQueryHandler(button))
 
     # Messages
@@ -306,4 +308,4 @@ def run_api():
     app.add_error_handler(error)
 
     # Polls the bot
-    app.run_polling(poll_interval=0.5)
+    app.run_polling(poll_interval=0.1)

@@ -8,8 +8,10 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):  # 
     username = update.message.from_user.username
 
     print("COMMAND:", f"Start {username}")
-    if user_id not in AccessEnv.on_get_users():
+    if str(user_id) not in AccessEnv.on_get_users():
         AccessEnv.on_create_user(user_id, username)
+    else:
+        print("COMMAND:", "Already inside")
 
     user_first_name: str = str(update.message.chat.first_name)
     return await update.message.reply_text(f"Hello {user_first_name}! Thanks for chatting with me! I am a "
@@ -85,7 +87,7 @@ async def delcontact_command(update: Update, context: ContextTypes.DEFAULT_TYPE)
         return await update.message.reply_text(message)
 
     get_contacts = AccessEnv.on_read(user_id, "contacts")
-    display = [contact[0] for contact in get_contacts]
+    display = ['@' + contact['tag'] for contact in get_contacts]
 
     reply_markup = ReplyKeyboardMarkup([display], resize_keyboard=True, one_time_keyboard=True)
 

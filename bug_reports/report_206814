@@ -1,0 +1,1 @@
+store user_id as int and not as string

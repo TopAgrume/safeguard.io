@@ -55,7 +55,7 @@ async def send_alert_message(user_id):
 
 
 async def check_for_response(user_id):  # TODO verification queue
-    time_amount = 5
+    time_amount = 20
     while True:
         # Wait for 12 min (720 sec) before sending reminder
         print('SCHEDULER:', f"Wait {time_amount} secs for {user_id = }")
@@ -85,7 +85,7 @@ async def run_schedule():
 
         for user_id in AccessEnv.on_get_users():
             # If alert mode, do nothing
-            if AccessEnv.on_read(user_id, "alert_mode"):
+            if not AccessEnv.on_read(user_id, "response_message"):
                 continue
 
             get_daily_messages = AccessEnv.on_read(user_id, "daily_message")

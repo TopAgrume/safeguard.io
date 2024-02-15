@@ -2,6 +2,7 @@ from twilio.rest import Client
 import logging
 import os
 import json
+from datetime import datetime
 
 
 class AccessEnv(object):
@@ -27,33 +28,54 @@ class AccessEnv(object):
         related_user_id = AccessEnv.on_get_user_usernames_id()
         if method == 'add':
             for new_contact in value:
-                if new_contact in current_dict:
+                if any(contact['tag'] == new_contact for contact in current_dict):
                     continue
 
                 if new_contact in related_user_id:
-                    current_dict.append({"id": related_user_id[new_contact], "pair": False})
+                    current_dict.append({"id": int(related_user_id[new_contact]), "tag": new_contact, "pair": False})
                     # TODO ask for pairing
                     continue
 
-                current_dict.append({"id": new_contact, "pair": False})
+                current_dict.append({"id": None, "tag": new_contact, "pair": False})
                 # TODO save for future pairing
 
         elif method == 'del':
-            current_dict = [(contact, pair) for contact, pair in current_dict if contact not in value]
+            current_dict = [contact for contact in current_dict if contact['tag'] not in value]
 
         AccessEnv.users[str(user_id)]['contacts'] = current_dict
         with open('data/data.json', 'w') as json_file:
             json.dump(AccessEnv.users, json_file, indent=4)
 
     @staticmethod
-    def on_write_verifications(user_id: int, method: str = None, value: list = None) -> None:
+    def less_than_one_hour(time1: dict, time2: dict): # TODO move into utils function
+        # Convert time strings to datetime objects
+        format_str = '%H:%M'
+        time1_obj = datetime.strptime(time1['time'], format_str)
+        time2_obj = datetime.strptime(time2['time'], format_str)
+
+        # Calculate the difference in minutes
+        difference_in_minutes = (time2_obj - time1_obj).total_seconds() / 60
+
+        # Check if the difference is less than one hour (60 minutes)
+        return abs(difference_in_minutes) < 60
+
+    @staticmethod
+    def on_write_verifications(user_id: int, method: str = None, value: list = None, skip_check: bool = False) -> None:
         AccessEnv.on_reset()
 
         # Write verifications to a JSON file
         current_dict = AccessEnv.users[str(user_id)]['daily_message']
 
-        if method == 'add': #TODO check same time / compatibility between times
-            current_dict.extend(value)
+        if method == 'add': #TODO check  compatibility between times
+            for new_checks in value:
+                if any(daily_message['time'] == new_checks['time'] for daily_message in current_dict):
+                    continue
+
+                if not skip_check:
+                    if any(AccessEnv.less_than_one_hour(daily_message, new_checks) for daily_message in current_dict):
+                        continue
+
+                current_dict.append(new_checks)
         elif method == 'del':
             current_dict = [dail_check for dail_check in current_dict if dail_check["time"] not in value]
         elif method in ('skip', 'undoskip'):
