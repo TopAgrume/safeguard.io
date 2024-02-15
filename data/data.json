@@ -6,7 +6,18 @@
         "state": "",
         "username": "alexandre_dr",
         "contacts": [],
-        "daily_message": []
+        "daily_message": [
+            {
+                "time": "08:05",
+                "desc": "Awakening",
+                "active": true
+            },
+            {
+                "time": "19:06",
+                "desc": "test",
+                "active": true
+            }
+        ]
     },
     "6340506663": {
         "alert_mode": true,

@@ -1,6 +1,7 @@
 import time
 import re
 import random
+import telegram
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes, ChatMemberHandler
 from telegram.ext import CallbackQueryHandler
@@ -9,15 +10,16 @@ from utils.env_pipeline import AccessEnv
 
 from src.commands import start_command, info_command, bugreport_command
 from src.commands import addcontact_command, showcontacts_command, delcontact_command
-from src.commands import addverif_command, showverifs_command, delverif_command
+from src.commands import addverif_command, showverifs_command, delverif_command, kill_user_data
 from src.commands import skip_command, undoskip_command, fastcheck_command, help_command, undohelp_command
 
 TOKEN, BOT_USERNAME = AccessEnv.telegram_keys()
-
+P_HTML = telegram.constants.ParseMode.HTML
 
 async def send_hope_message(update: Update):
     print('API:', 'Send Hope Message')
-    await update.message.reply_text('Alert status is reset. Everything is back to normal.')
+    message = '<b>Alert status is reset</b>. Everything is back to normal.'
+    await update.message.reply_text(text=message, parse_mode=P_HTML)
 
 
 async def extract_user_id_add(update: Update, content: str):
@@ -64,7 +66,7 @@ async def extract_user_id_del(update: Update, content: str):
     return await update.message.reply_text(message)
 
 
-async def extract_verif_add(update: Update, content: str): # TODO Check same date verif / not enough space between
+async def extract_verif_add(update: Update, content: str):  # TODO Check same date verif / not enough space between
     error_contact, new_verif = [], []
     user_id = update.message.from_user.id
 
@@ -262,22 +264,25 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if query.data == "1":  # TODO contact emergencies
         AccessEnv.on_write(user_id, "alert_mode", True)
-        return await query.edit_message_text(text="OK. Emergency contacts have received your request for help!")
+        message = ("OK. Emergency contacts have received your request for help!\n"
+                   "Type /undohelp to cancel the alert")
+        return await query.edit_message_text(text=message)
     if query.data == "2":
-        return await query.edit_message_text(text="OK. Glad to hear it was a mistake!")
+        message = "OK. Glad to hear it was a mistake!"
+        return await query.edit_message_text(text=message)
 
     if query.data == "3":
         AccessEnv.on_write(user_id, "alert_mode", False)
-        return await query.edit_message_text(
-            text="OK. Your emergency contacts have received information that the alert has been disabled")
+        message = "OK. Your emergency contacts have received information that the alert has been disabled."
+        return await query.edit_message_text(text=message)
     if query.data == "4":
-        return await query.edit_message_text(text="OK. Operation canceled.")
+        message = "OK. Operation canceled."
+        return await query.edit_message_text(text=message)
 
     return await query.edit_message_text(text=f"Unknown: Query data ({query.data})")
 
 
 def run_api():
-    AccessEnv.on_reset()
     print('API:', 'Starting bot...')
 
     app = Application.builder().token(TOKEN).build()
@@ -297,6 +302,8 @@ def run_api():
     app.add_handler(CommandHandler('skip', skip_command))
     app.add_handler(CommandHandler('undoskip', undoskip_command))
     app.add_handler(CommandHandler('fastcheck', fastcheck_command))
+    app.add_handler(CommandHandler('stop', kill_user_data))
+    app.add_handler(CommandHandler('unsubscibe', kill_user_data))
 
     # Buttons under text
     app.add_handler(CallbackQueryHandler(button))
@@ -308,4 +315,4 @@ def run_api():
     app.add_error_handler(error)
 
     # Polls the bot
-    app.run_polling(poll_interval=0.1)
+    app.run_polling()

@@ -10,21 +10,21 @@ class AccessEnv(object):
 
     @staticmethod
     def on_write(user_id: int, key: str = None, value=None) -> None:
-        AccessEnv.on_reset()
+        base_dict = AccessEnv.on_update()
 
         # Write contacts to a JSON file
         if key is not None:
-            AccessEnv.users[str(user_id)][key] = value
+            base_dict[str(user_id)][key] = value
 
         with open('data/data.json', 'w') as json_file:
-            json.dump(AccessEnv.users, json_file, indent=4)
+            json.dump(base_dict, json_file, indent=4)
 
     @staticmethod
     def on_write_contacts(user_id: int, method: str = None, value: list = None) -> None:
-        AccessEnv.on_reset()
+        base_dict = AccessEnv.on_update()
 
         # Write contacts to a JSON file
-        current_dict = AccessEnv.users[str(user_id)]['contacts']
+        current_dict = base_dict[str(user_id)]['contacts']
         related_user_id = AccessEnv.on_get_user_usernames_id()
         if method == 'add':
             for new_contact in value:
@@ -42,9 +42,9 @@ class AccessEnv(object):
         elif method == 'del':
             current_dict = [contact for contact in current_dict if contact['tag'] not in value]
 
-        AccessEnv.users[str(user_id)]['contacts'] = current_dict
+        base_dict[str(user_id)]['contacts'] = current_dict
         with open('data/data.json', 'w') as json_file:
-            json.dump(AccessEnv.users, json_file, indent=4)
+            json.dump(base_dict, json_file, indent=4)
 
     @staticmethod
     def less_than_one_hour(time1: dict, time2: dict): # TODO move into utils function
@@ -61,10 +61,10 @@ class AccessEnv(object):
 
     @staticmethod
     def on_write_verifications(user_id: int, method: str = None, value: list = None, skip_check: bool = False) -> None:
-        AccessEnv.on_reset()
+        base_dict = AccessEnv.on_update()
 
         # Write verifications to a JSON file
-        current_dict = AccessEnv.users[str(user_id)]['daily_message']
+        current_dict = base_dict[str(user_id)]['daily_message']
 
         if method == 'add': #TODO check  compatibility between times
             for new_checks in value:
@@ -83,9 +83,9 @@ class AccessEnv(object):
                 if dail_check["time"] in value:
                     dail_check["active"] = (method == 'undoskip')
 
-        AccessEnv.users[str(user_id)]['daily_message'] = current_dict
+        base_dict[str(user_id)]['daily_message'] = current_dict
         with open('data/data.json', 'w') as json_file:
-            json.dump(AccessEnv.users, json_file, indent=4)
+            json.dump(base_dict, json_file, indent=4)
 
     @staticmethod
     def on_read(user_id: int, key: str = None):
@@ -99,12 +99,14 @@ class AccessEnv(object):
             return data[key]
 
     @staticmethod
-    def on_get_users():
+    def on_get_users(method: str = "keys"):
         # Open and read a JSON file
         with open('data/data.json', 'r') as json_file:
             data = json.load(json_file)
 
-        return list(data.keys())
+        if method == "keys":
+            return list(data.keys())
+        return list(data.items())
 
     @staticmethod
     def on_get_user_id_usernames():
@@ -133,16 +135,23 @@ class AccessEnv(object):
         return user_username_to_id
 
     @staticmethod
-    def on_reset() -> None:
-        file_path = "data/data.json"
-
+    def on_update(file_path: str = "data/data.json"):
         # Check if the file exists
         if not os.path.exists(file_path):
             with open(file_path, 'w') as file:
                 json.dump({}, file, indent=4)
 
         with open(file_path, 'r') as json_file:
-            AccessEnv.users = json.load(json_file)
+            return json.load(json_file)
+
+    @staticmethod
+    def on_kill_data(user_id: int, file_path: str = "data/data.json") -> None:
+        with open(file_path, 'r') as json_file:
+            dict_users: dict = json.load(json_file)
+
+        del dict_users[str(user_id)]
+        with open(file_path, 'w') as json_file:
+            json.dump(dict_users, json_file, indent=4)
 
     @staticmethod
     def on_create_user(user_id: int, username: str) -> None:
@@ -156,9 +165,10 @@ class AccessEnv(object):
             'daily_message': [],
         }
 
-        AccessEnv.users[str(user_id)] = fresh_data
+        base_dict = AccessEnv.on_update()
+        base_dict[str(user_id)] = fresh_data
         with open('data/data.json', 'w') as json_file:
-            json.dump(AccessEnv.users, json_file, indent=4)
+            json.dump(base_dict, json_file, indent=4)
 
     @staticmethod
     def telegram_keys() -> tuple[str, str]:
@@ -167,13 +177,6 @@ class AccessEnv(object):
         if not API_TOKEN or not BOT_USERNAME:
             raise ValueError("One or more keys required environment variables are missing.")
         return API_TOKEN, BOT_USERNAME
-
-    @staticmethod
-    def get_demo() -> int:
-        my_id = os.getenv('me')
-        if not my_id:
-            raise ValueError("My telegram id is missing")
-        return int(my_id)
 
     @staticmethod
     def client() -> Client:
@@ -191,6 +194,52 @@ class AccessEnv(object):
         if not server_number or not client_number or not emergency_number:
             raise ValueError("One or more contacts required environment variables are missing.")
         return server_number, client_number, emergency_number
+
+    @staticmethod
+    def on_init_check_queue(user_id: str, daily_check: dict, waiting_time: int):
+        base_dict = AccessEnv.on_update("data/queue.json")
+        base_dict[user_id] = {
+            "time": daily_check['time'],
+            "desc": daily_check['desc'],
+            'reminder_count': 0,
+            'waiting_time': waiting_time
+        }
+
+        with open('data/queue.json', 'w') as json_file:
+            json.dump(base_dict, json_file, indent=4)
+
+    @staticmethod
+    def on_write_check_queue(user_id: str, key: str = None, value=None) -> None:
+        base_dict = AccessEnv.on_update("data/queue.json")
+
+        # Write contacts to a JSON file
+        if key is not None:
+            base_dict[str(user_id)][key] = value
+
+        with open("data/queue.json", 'w') as json_file:
+            json.dump(base_dict, json_file, indent=4)
+
+    @staticmethod
+    def on_read_check_queue(user_id: int, key: str = None):
+        # Open and read a JSON file
+        with open('data/queue.json', 'r') as json_file:
+            data = json.load(json_file)[str(user_id)]
+
+        return data[key]
+
+    @staticmethod
+    def on_get_check_users(method: str):
+        # Open and read a JSON file
+        with open('data/queue.json', 'r') as json_file:
+            data: dict = json.load(json_file)
+
+        if method == "keys":
+            return list(data.keys())
+        return list(data.items())
+
+    @staticmethod
+    def on_kill_queue_data(user_id: int, file_path: str = "data/queue.json") -> None:
+        AccessEnv.on_kill_data(user_id, file_path)
 
     @staticmethod
     def emergencies() -> str:
