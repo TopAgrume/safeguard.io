@@ -24,10 +24,21 @@ class AccessEnv(object):
 
         # Write contacts to a JSON file
         current_dict = AccessEnv.users[str(user_id)]['contacts']
-
+        related_user_id = AccessEnv.on_get_user_usernames_id()
         if method == 'add':
-            current_dict.extend(value)
-        if method == 'del':
+            for new_contact in value:
+                if new_contact in current_dict:
+                    continue
+
+                if new_contact in related_user_id:
+                    current_dict.append({"id": related_user_id[new_contact], "pair": False})
+                    # TODO ask for pairing
+                    continue
+
+                current_dict.append({"id": new_contact, "pair": False})
+                # TODO save for future pairing
+
+        elif method == 'del':
             current_dict = [(contact, pair) for contact, pair in current_dict if contact not in value]
 
         AccessEnv.users[str(user_id)]['contacts'] = current_dict
@@ -41,16 +52,14 @@ class AccessEnv(object):
         # Write verifications to a JSON file
         current_dict = AccessEnv.users[str(user_id)]['daily_message']
 
-        if method == 'add':
+        if method == 'add': #TODO check same time / compatibility between times
             current_dict.extend(value)
         elif method == 'del':
-            current_dict = [(hour, min, desc, skip) for hour, min, desc, skip in current_dict if (hour, min) not in value]
-        elif method == 'skip':
-            current_dict = [(hour, min, desc, False) if (hour, min) in value else (hour, min, desc, skip) for
-                            hour, min, desc, skip in current_dict]
-        elif method == 'undoskip':
-            current_dict = [(hour, min, desc, True) if (hour, min) in value else (hour, min, desc, skip) for
-                            hour, min, desc, skip in current_dict]
+            current_dict = [dail_check for dail_check in current_dict if dail_check["time"] not in value]
+        elif method in ('skip', 'undoskip'):
+            for dail_check in current_dict:
+                if dail_check["time"] in value:
+                    dail_check["active"] = (method == 'undoskip')
 
         AccessEnv.users[str(user_id)]['daily_message'] = current_dict
         with open('data/data.json', 'w') as json_file:
@@ -74,6 +83,32 @@ class AccessEnv(object):
             data = json.load(json_file)
 
         return list(data.keys())
+
+    @staticmethod
+    def on_get_user_id_usernames():
+        # Open and read a JSON file
+        with open('data/data.json', 'r') as json_file:
+            data = json.load(json_file)
+
+        user_id_to_username = {}
+        for user_id, data in data.items():
+            username = data.get('username', '')
+            user_id_to_username[user_id] = username
+
+        return user_id_to_username
+
+    @staticmethod
+    def on_get_user_usernames_id():
+        # Open and read a JSON file
+        with open('data/data.json', 'r') as json_file:
+            data = json.load(json_file)
+
+        user_username_to_id = {}
+        for user_id, data in data.items():
+            username = data.get('username', '')
+            user_username_to_id[username] = user_id
+
+        return user_username_to_id
 
     @staticmethod
     def on_reset() -> None:

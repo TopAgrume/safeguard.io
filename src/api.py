@@ -29,7 +29,7 @@ async def extract_user_id_add(update: Update, content: str):
         match_tag = re.match(r'@(\w+)', line)
 
         if match_tag:
-            new_contacts.append((match_tag.group(1), False))
+            new_contacts.append(match_tag.group(1))
         else:
             error_contact.append(line)
 
@@ -64,7 +64,7 @@ async def extract_user_id_del(update: Update, content: str):
     return await update.message.reply_text(message)
 
 
-async def extract_verif_add(update: Update, content: str):
+async def extract_verif_add(update: Update, content: str): # TODO Check same date verif / not enough space between
     error_contact, new_verif = [], []
     user_id = update.message.from_user.id
 
@@ -73,9 +73,8 @@ async def extract_verif_add(update: Update, content: str):
         match_tag = re.match(r'^(0[0-9]|1[0-9]|2[0-3]):([0-5][0-9]) *- *([\w ]+)', line)
 
         if match_tag:
-            hour, min = match_tag.group(1), match_tag.group(2)
-            desc = match_tag.group(3)
-            new_verif.append((hour, min, desc, True))
+            chosen_time, desc = f"{match_tag.group(1)}:{match_tag.group(2)}", match_tag.group(3)
+            new_verif.append({"time": chosen_time, "desc": desc, "active": True})
         else:
             error_contact.append(line)
 
@@ -97,8 +96,8 @@ async def extract_verif_del(update: Update, content: str):
         match_tag = re.match(r'^(0[0-9]|1[0-9]|2[0-3]):([0-5][0-9])$', line)
 
         if match_tag:
-            hour, min = match_tag.group(1), match_tag.group(2)
-            del_verif.append((hour, min))
+            chosen_time = f"{match_tag.group(1)}:{match_tag.group(2)}"
+            del_verif.append(chosen_time)
         else:
             error_contact.append(line)
 
@@ -128,8 +127,8 @@ async def skip_alarm(update: Update, content: str):
         match_tag = re.match(r'^(0[0-9]|1[0-9]|2[0-3]):([0-5][0-9])$', line)
 
         if match_tag:
-            hour, mn = match_tag.group(1), match_tag.group(2)
-            skip_verif.append((hour, mn))
+            chosen_time = f"{match_tag.group(1)}:{match_tag.group(2)}"
+            skip_verif.append(chosen_time)
         else:
             error_contact.append(line)
 
@@ -151,8 +150,8 @@ async def undoskip_alarm(update: Update, content: str):
         match_tag = re.match(r'^(0[0-9]|1[0-9]|2[0-3]):([0-5][0-9])$', line)
 
         if match_tag:
-            hour, min = match_tag.group(1), match_tag.group(2)
-            skip_verif.append((hour, min))
+            chosen_time = f"{match_tag.group(1)}:{match_tag.group(2)}"
+            skip_verif.append(chosen_time)
         else:
             error_contact.append(line)
 
@@ -181,7 +180,7 @@ async def extract_fastcheck(update: Update, content: str):  # TODO link
     current_time += timedelta(minutes=waiting_time)
     time_to_display = current_time.strftime("%H:%M")
 
-    new_alarm = (time_to_display[:2], time_to_display[3:5], "Fast Check", None)
+    new_alarm = {"time": time_to_display, "desc": "Fast Check", "active": None}
     AccessEnv.on_write_verifications(user_id, "add", [new_alarm])
 
     message = f"Fast Check in {waiting_time}mn taken into account! ({time_to_display})"
@@ -214,9 +213,10 @@ async def state_dispatcher(update: Update, state: str, message_body: str):
 
 async def handle_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message_type: str = update.message.chat.type
-    message_body: str = update.message.text.lower()
+    message_body: str = update.message.text
 
     if message_type == 'group':
+        message_body: str = message_body.lower()
         if BOT_USERNAME in message_body:
             # new_text: str = message_body.replace(BOT_USERNAME, '').strip()
             response = 'This bot does not support groups for now'

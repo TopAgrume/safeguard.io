@@ -1,4 +1,4 @@
-from telegram import Update, Bot, InlineKeyboardButton, InlineKeyboardMarkup, KeyboardButton, ReplyKeyboardMarkup
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup
 from telegram.ext import ContextTypes
 from utils.env_pipeline import AccessEnv
 
@@ -118,17 +118,17 @@ async def showverifs_command(update: Update, context: ContextTypes.DEFAULT_TYPE)
     if len(verif_list) == 0:
         return await update.message.reply_text("There is no daily check to display.")
 
-    sorted_list = sorted(verif_list, key=lambda x: (x[0], x[1]))
+    sorted_list = sorted(verif_list, key=lambda x: x["time"])
 
     skipped_verif = "\nSkipped today:\n"
     skip_bool, active = False, True
     for verif in sorted_list:
-        if verif[3] or verif[3] is None:
-            message += f"\n{verif[0]}:{verif[1]} - {verif[2]}"
+        if verif["active"] or verif["active"] is None:
+            message += f"\n{verif['time']} - {verif['desc']}"
             active = False
             continue
 
-        skipped_verif += f"\n{verif[0]}:{verif[1]} - {verif[2]}"
+        skipped_verif += f"\n{verif['time']} - {verif['desc']}"
         skip_bool = True
 
     message += "No daily check for the next 24 hours.\n" if active else ""
@@ -148,10 +148,10 @@ async def delverif_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         message = "No daily message to delete."
         return await update.message.reply_text(message)
 
-    sorted_list = sorted(verif_list, key=lambda x: (x[0], x[1]))
+    sorted_list = sorted(verif_list, key=lambda x: x["time"])
 
     keyboard = [
-        [f"{elt[0]}:{elt[1]}" for elt in sorted_list],
+        [f"{elt['time']}" for elt in sorted_list],
     ]
     reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True, one_time_keyboard=True)
 
@@ -165,11 +165,15 @@ async def skip_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     user_id = update.message.from_user.id
     verif_list = AccessEnv.on_read(user_id, "daily_message")
-    verif_list = list(filter(lambda x: x[3], verif_list))
-    sorted_list = sorted(verif_list, key=lambda x: (x[0], x[1]))
+    verif_list = list(filter(lambda x: x["active"], verif_list))
+
+    if len(verif_list) == 0:
+        return await update.message.reply_text("No daily message to skip.")
+
+    sorted_list = sorted(verif_list, key=lambda x: x['time'])
 
     keyboard = [
-        [f"{elt[0]}:{elt[1]}" for elt in sorted_list],
+        [f"{elt['time']}" for elt in sorted_list],
     ]
     reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True, one_time_keyboard=True)
 
@@ -183,11 +187,15 @@ async def undoskip_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     user_id = update.message.from_user.id
     verif_list = AccessEnv.on_read(user_id, "daily_message")
-    verif_list = list(filter(lambda x: not x[3], verif_list))
-    sorted_list = sorted(verif_list, key=lambda x: (x[0], x[1]))
+    verif_list = list(filter(lambda x: not x['active'], verif_list))
+
+    if len(verif_list) == 0:
+        return await update.message.reply_text("No daily message skip to undo.")
+
+    sorted_list = sorted(verif_list, key=lambda x: x['time'])
 
     keyboard = [
-        [f"{elt[0]}:{elt[1]}" for elt in sorted_list],
+        [f"{elt['time']}" for elt in sorted_list],
     ]
     reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True, one_time_keyboard=True)
 
@@ -197,7 +205,7 @@ async def undoskip_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def bugreport_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     print("COMMAND:", f"Bug Report")
-    message = ("OK. Please describe the bug and what you did to see it")
+    message = "OK. Please describe the bug and what you did to see it"
 
     user_id = update.message.from_user.id
     AccessEnv.on_write(user_id, "state", "bugreport")
@@ -206,7 +214,7 @@ async def bugreport_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def fastcheck_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     print("COMMAND:", f"Fast Check")
-    message = ("OK. How soon do you want to have the quick check? (< 20 mn).")  # TODO add time + description
+    message = "OK. How soon do you want to have the quick check? (< 20 mn)."  # TODO add time + description
 
     keyboard = [
         ["5 mn", "10 mn", "15 mn", "20 mn"],

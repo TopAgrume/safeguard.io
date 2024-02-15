@@ -89,25 +89,26 @@ async def run_schedule():
                 continue
 
             get_daily_messages = AccessEnv.on_read(user_id, "daily_message")
-            for hour, mn, desc, state in get_daily_messages:
-                if not time.localtime().tm_hour == int(hour):
+            for unique_check in get_daily_messages:
+                if not time.localtime().tm_hour == int(unique_check["time"][:2]):
                     continue
-                if not time.localtime().tm_min == int(mn):
+                if not time.localtime().tm_min == int(unique_check["time"][3:5]):
                     continue
 
                 # In case of skip or fast-check
+                state = unique_check["active"]
                 if not state:
                     if isinstance(state, bool):
-                        AccessEnv.on_write_verifications(user_id, "undo skip", [(hour, mn)])
+                        AccessEnv.on_write_verifications(user_id, "undoskip", [unique_check["time"]])
                         print('SCHEDULER:', f"undo skip for: {state}")
                         continue
 
                     # Fast-check -> delete the created check
-                    AccessEnv.on_write_verifications(user_id, "del", [(hour, mn)])
+                    AccessEnv.on_write_verifications(user_id, "del", [unique_check["time"]])
                     print('SCHEDULER:', f"kill fast check: {state}")
 
                 # TODO add to verification loop
-                await send_daily_message(user_id, desc)
+                await send_daily_message(user_id, unique_check["desc"])
 
         await asyncio.sleep(60)
 
