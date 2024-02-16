@@ -8,7 +8,7 @@ from telegram.ext import CallbackQueryHandler
 from datetime import datetime, timedelta
 from utils.env_pipeline import AccessEnv
 
-from src.commands import start_command, info_command, bugreport_command, request_command
+from src.commands import start_command, info_command, bugreport_command, request_command, verify_condition
 from src.commands import addcontact_command, showcontacts_command, delcontact_command
 from src.commands import addverif_command, showverifs_command, delverif_command, kill_user_data
 from src.commands import skip_command, undoskip_command, fastcheck_command, help_command, undohelp_command
@@ -215,7 +215,7 @@ async def extract_fastcheck(update: Update, content: str):
 
 
 async def default_case(update: Update, content: str):
-    return await update.message.reply_text(f"Response out of context -> Unknown command ({content})")
+    return await update.message.reply_text(f"Excuse me, I didn't understand your request.")
 
 
 async def state_dispatcher(update: Update, state: str, message_body: str):
@@ -238,7 +238,8 @@ async def state_dispatcher(update: Update, state: str, message_body: str):
     return await selected_case(update, message_body)
 
 
-async def handle_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
+@verify_condition
+async def handle_messages(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs):
     message_type: str = update.message.chat.type
     message_body: str = update.message.text
 
@@ -272,6 +273,7 @@ async def handle_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
     print('API:', 'Response to unset the alert mode')
     AccessEnv.on_write(user_id, "alert_mode", False)
     AccessEnv.on_write(user_id, "response_message", True)
+    await manual_undohelp(user_id, update.message.from_user.username)
     return await send_hope_message(update)
 
 
@@ -280,8 +282,8 @@ async def error(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def manual_help(user_id: int, username: str):
-    message = (f"🚨<b>ALERT</b>🚨. @{username} has manually triggered the call for help."
-               " <b>Don't take this call lightly and make sure she/he is okay!</b>")
+    message = (f"🚨<b>ALERT</b>🚨. @{username} has manually triggered the call for help.\n"
+               "<b>Don't take this call lightly and make sure she/he is okay!</b>")
 
     for contact in AccessEnv.on_read(user_id, "contacts"):
         if not contact["pair"]:
@@ -291,8 +293,8 @@ async def manual_help(user_id: int, username: str):
 
 
 async def manual_undohelp(user_id: int, username: str):
-    message = (
-        f"⚠️<b>Alert disabled</b>⚠️. @{username} manually disabled the alert. Make sure it was a simple mistake.")
+    message = (f"⚠️<b>Alert disabled</b>⚠️. @{username} manually disabled the alert."
+               " Make sure it was a simple mistake.")
 
     for contact in AccessEnv.on_read(user_id, "contacts"):
         if not contact["pair"]:
@@ -370,6 +372,7 @@ def run_api():
 
     # Commands
     app.add_handler(CommandHandler('start', start_command))
+    app.add_handler(CommandHandler('subscribe', start_command))
     app.add_handler(CommandHandler('info', info_command))
     app.add_handler(CommandHandler('help', help_command))
     app.add_handler(CommandHandler('undohelp', undohelp_command))

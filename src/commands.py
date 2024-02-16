@@ -6,6 +6,18 @@ import telegram
 P_HTML = telegram.constants.ParseMode.HTML
 
 
+def verify_condition(func):
+    async def wrapper(update, context, **kwargs):
+        username = update.message.from_user.username
+        if username is None or username == "":
+            message = "Please create a username in your Telegram profile in order to use my features."
+            await update.message.reply_text(message)
+        else:
+            await func(update, context, **kwargs)
+
+    return wrapper
+
+
 async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.message.from_user.id
     user_first_name: str = str(update.message.chat.first_name)
@@ -57,13 +69,14 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 old_contact['id'] = user_id
         AccessEnv.on_write(int(contact_key), "contacts", old_contacts)
 
-    return await request_command(update, context)
+    return await request_command(update, context, quiet=True)
 
 
-async def info_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+@verify_condition
+async def info_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs):
     message = ("I make sure everything is okay! Here are commands to interact with me ;).\n"
                "\n<b>Edit bot configuration</b>\n"
-               "/start - start the conversation with the bot\n"
+               "/start or /subscribe - start the conversation with the bot\n"
                "/info - get bot usage\n"
                "/stop or /unsubscribe - delete personal data\n"
                "\n<b>In case of emergency</b>\n"
@@ -88,7 +101,8 @@ async def info_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return await update.message.reply_text(message, parse_mode=P_HTML)
 
 
-async def addcontact_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+@verify_condition
+async def addcontact_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs):
     print("COMMAND:", f"AddContact")
     message = ("OK. Send me a list of contacts to add.\n"
                "<b>Please use this format:</b>\n\n"
@@ -106,7 +120,8 @@ async def addcontact_command(update: Update, context: ContextTypes.DEFAULT_TYPE)
     return await update.message.reply_text(message, parse_mode=P_HTML)
 
 
-async def showcontacts_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+@verify_condition
+async def showcontacts_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs):
     print("COMMAND:", f"ShowContacts")
     message = "OK. Here is your list of contacts:\n\n"
 
@@ -127,7 +142,8 @@ async def showcontacts_command(update: Update, context: ContextTypes.DEFAULT_TYP
     return await update.message.reply_text(message, parse_mode=P_HTML)
 
 
-async def delcontact_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+@verify_condition
+async def delcontact_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs):
     print("COMMAND:", f"DeleteContact")
     message = ("OK. Chose the contact to delete.\n"
                "Send /empty to empty the current list.")
@@ -146,7 +162,8 @@ async def delcontact_command(update: Update, context: ContextTypes.DEFAULT_TYPE)
     return await update.message.reply_text(message, reply_markup=reply_markup, parse_mode=P_HTML)
 
 
-async def addverif_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+@verify_condition
+async def addverif_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs):
     print("COMMAND:", f"AddDailyCheck")
     message = ("OK. Send me a list of daily verifications to add. <b>Please use this format</b>:\n\n"
                "08:05 - Awakening\n"
@@ -162,7 +179,8 @@ async def addverif_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return await update.message.reply_text(message, parse_mode=P_HTML)
 
 
-async def showverifs_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+@verify_condition
+async def showverifs_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs):
     print("COMMAND:", f"ShowDailyChecks")
     message = "OK. Here is you list of daily verifications:\n"
     user_id = update.message.from_user.id
@@ -190,7 +208,8 @@ async def showverifs_command(update: Update, context: ContextTypes.DEFAULT_TYPE)
     return await update.message.reply_text(message, parse_mode=P_HTML)
 
 
-async def delverif_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+@verify_condition
+async def delverif_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs):
     print("COMMAND:", f"DeleteDailyChecks")
     message = ("OK. Chose the daily verifications to delete.\n"
                "Send /empty to empty the current list.")
@@ -213,7 +232,8 @@ async def delverif_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return await update.message.reply_text(message, reply_markup=reply_markup)
 
 
-async def skip_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+@verify_condition
+async def skip_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs):
     print("COMMAND:", f"SkipDailyCheck")
     message = "OK. Chose the daily verifications to skip."
 
@@ -236,7 +256,8 @@ async def skip_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return await update.message.reply_text(message, reply_markup=reply_markup)
 
 
-async def undoskip_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+@verify_condition
+async def undoskip_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs):
     print("COMMAND:", f"Undo SkipDailyCheck")
     message = "OK. Chose the daily verifications to skip."
 
@@ -259,7 +280,8 @@ async def undoskip_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return await update.message.reply_text(message, reply_markup=reply_markup)
 
 
-async def bugreport_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+@verify_condition
+async def bugreport_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs):
     print("COMMAND:", f"Bug Report")
     message = "OK. Please describe the bug and what you did to see it."
 
@@ -268,12 +290,13 @@ async def bugreport_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return await update.message.reply_text(message)
 
 
-async def request_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+@verify_condition
+async def request_command(update: Update, context: ContextTypes.DEFAULT_TYPE, quiet: bool = False, **kwargs):
     print("COMMAND:", f"Association request")
     user_id = update.message.from_user.id
     contact_request = AccessEnv.on_read(user_id, "contact_request")
 
-    if len(contact_request) == 0:
+    if len(contact_request) == 0 and not quiet:
         message = "<b>There is no association request.</b>"
         return await update.message.reply_text(message, parse_mode=P_HTML)
 
@@ -291,7 +314,8 @@ async def request_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(message, reply_markup=reply_markup, parse_mode=P_HTML)
 
 
-async def fastcheck_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+@verify_condition
+async def fastcheck_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs):
     print("COMMAND:", f"Fast Check")
     message = "OK. How soon do you want to have the quick check? <b>(less than 20mn)</b>"
 
@@ -306,7 +330,8 @@ async def fastcheck_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return await update.message.reply_text(message, reply_markup=reply_markup, parse_mode=P_HTML)
 
 
-async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+@verify_condition
+async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs):
     print("COMMAND:", f"Help")
     user_id = update.message.from_user.id
     alert_mode = AccessEnv.on_read(user_id, "alert_mode")
@@ -330,7 +355,8 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return await update.message.reply_text(message, reply_markup=reply_markup, parse_mode=P_HTML)
 
 
-async def undohelp_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+@verify_condition
+async def undohelp_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs):
     print("COMMAND:", f"Undo help")
     user_id = update.message.from_user.id
     if not AccessEnv.on_read(user_id, "alert_mode"):
@@ -348,7 +374,8 @@ async def undohelp_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return await update.message.reply_text(response, reply_markup=reply_markup, parse_mode=P_HTML)
 
 
-async def kill_user_data(update: Update, context: ContextTypes.DEFAULT_TYPE):
+@verify_condition
+async def kill_user_data(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs):
     print("COMMAND:", f"Kill user data")
     user_id = update.message.from_user.id
     AccessEnv.on_kill_data(user_id)

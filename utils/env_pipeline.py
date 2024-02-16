@@ -292,6 +292,8 @@ class AccessEnv(object):
 
         if method == "keys":
             return list(data.keys())
+        if method == "dict":
+            return data
         return list(data.items())
 
     @staticmethod

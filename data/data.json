@@ -1,34 +1,25 @@
 {
-    "6340506663": {
-        "alert_mode": false,
-        "response_message": true,
-        "state": "",
-        "username": "leo",
-        "contacts": [],
-        "daily_message": [],
-        "contact_request": {}
-    },
     "6577580728": {
         "alert_mode": false,
         "response_message": true,
         "state": "",
         "username": "alexandre_dr",
-        "contacts": [],
+        "contacts": [
+            {
+                "id": 6874476665,
+                "tag": "chri_dr",
+                "pair": true
+            }
+        ],
         "daily_message": [],
         "contact_request": {}
     },
     "6874476665": {
-        "alert_mode": true,
+        "alert_mode": false,
         "response_message": true,
         "state": "",
         "username": "chri_dr",
-        "contacts": [
-            {
-                "id": 6577580728,
-                "tag": "alexandre_dr",
-                "pair": true
-            }
-        ],
+        "contacts": [],
         "daily_message": [],
         "contact_request": {}
     }
