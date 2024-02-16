@@ -6,7 +6,7 @@ import telegram
 import asyncio
 
 TOKEN, BOT_USERNAME = AccessEnv.telegram_keys()
-LOOP_QUEUE_TIME, WAITING_TIME = 60, 10
+LOOP_QUEUE_TIME, WAITING_TIME = 1, 10
 P_HTML = telegram.constants.ParseMode.HTML
 bot = Bot(TOKEN)
 

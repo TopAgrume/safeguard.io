@@ -10,7 +10,8 @@ def verify_condition(func):
     async def wrapper(update, context, **kwargs):
         username = update.message.from_user.username
         if username is None or username == "":
-            message = "Please create a username in your Telegram profile in order to use my features."
+            message = ("Please create a username in your Telegram profile in order to use my features."
+                       " Then use /start if you are not already registered.")
             await update.message.reply_text(message)
         else:
             await func(update, context, **kwargs)
@@ -18,7 +19,8 @@ def verify_condition(func):
     return wrapper
 
 
-async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+@verify_condition
+async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs):
     user_id = update.message.from_user.id
     user_first_name: str = str(update.message.chat.first_name)
 
