@@ -1,8 +1,81 @@
 from twilio.rest import Client
+from datetime import datetime
+
 import logging
 import os
 import json
-from datetime import datetime
+
+MAX_TIME_DIFF = 60
+
+
+def less_than_one_hour(time1: dict, time2: dict):  # TODO move into utils function
+    # Convert time strings to datetime objects
+    time1_obj = datetime.strptime(time1['time'], '%H:%M')
+    time2_obj = datetime.strptime(time2['time'], '%H:%M')
+
+    # Calculate the difference in minutes
+    difference_in_minutes = (time2_obj - time1_obj).total_seconds() / 60
+
+    return abs(difference_in_minutes) < MAX_TIME_DIFF
+
+
+def add_user_and_link_request(user_id: int, username: str, current_dict: list, value: list):
+    special_action = []
+    related_user_id = AccessEnv.on_get_user_usernames_id()
+
+    for new_contact in value:
+        if any(contact['tag'] == new_contact for contact in current_dict):
+            continue
+
+        if new_contact in list(related_user_id.keys()):
+            new_contact_id = related_user_id[new_contact]
+            current_dict.append({"id": int(new_contact_id), "tag": new_contact, "pair": False})
+
+            # Write in destination contact_request
+            request_dict = AccessEnv.on_read(int(new_contact_id), "contact_request")
+            request_dict[str(user_id)] = username
+            AccessEnv.on_write(int(new_contact_id), "contact_request", request_dict)
+
+            # Actions to take
+            pair_asking = {"id": int(new_contact_id), "tag": new_contact}
+            special_action.append(pair_asking)
+            continue
+
+        current_dict.append({"id": None, "tag": new_contact, "pair": False})
+
+        # Save the data
+        pair_asking = {"tag": username, "dest_tags": [new_contact]}
+        for origin_id, content in AccessEnv.on_get_request_user("items"):
+            if origin_id == str(origin_id):
+                content['dest_tags'].append(new_contact)
+                AccessEnv.on_write_request(origin_id, 'dest_tags', content['dest_tags'])
+                break
+        else:
+            AccessEnv.on_init_request(str(user_id), pair_asking)
+
+    return current_dict, special_action
+
+
+def delete_user_and_request(user_id: int, current_dict: list, value: list):
+    filtered_dict = []
+
+    for contact in current_dict:
+        if contact['tag'] not in value:
+            filtered_dict.append(contact)
+            continue
+
+        user_tag = contact['id']
+        if user_tag is None:
+            dest_tags = AccessEnv.on_read_request(user_id, "dest_tags")
+            dest_tags.remove(contact['tag'])
+            AccessEnv.on_write_request(str(user_id), "dest_tags", dest_tags)
+            continue
+
+        contact_request = AccessEnv.on_read(user_tag, "contact_request")
+        del contact_request[str(user_id)]
+        AccessEnv.on_write(user_tag, "contact_request", contact_request)
+
+    return filtered_dict
 
 
 class AccessEnv(object):
@@ -20,44 +93,22 @@ class AccessEnv(object):
             json.dump(base_dict, json_file, indent=4)
 
     @staticmethod
-    def on_write_contacts(user_id: int, method: str = None, value: list = None) -> None:
+    def on_write_contacts(user_id: int, username: str, method: str = None, value: list = None):
         base_dict = AccessEnv.on_update()
-
-        # Write contacts to a JSON file
+        special_action = []
         current_dict = base_dict[str(user_id)]['contacts']
-        related_user_id = AccessEnv.on_get_user_usernames_id()
+
         if method == 'add':
-            for new_contact in value:
-                if any(contact['tag'] == new_contact for contact in current_dict):
-                    continue
-
-                if new_contact in related_user_id:
-                    current_dict.append({"id": int(related_user_id[new_contact]), "tag": new_contact, "pair": False})
-                    # TODO ask for pairing
-                    continue
-
-                current_dict.append({"id": None, "tag": new_contact, "pair": False})
-                # TODO save for future pairing
-
+            current_dict, special_action = add_user_and_link_request(user_id, username, current_dict, value)
         elif method == 'del':
-            current_dict = [contact for contact in current_dict if contact['tag'] not in value]
+            current_dict = delete_user_and_request(user_id, current_dict, value)
 
+        base_dict = AccessEnv.on_update()
         base_dict[str(user_id)]['contacts'] = current_dict
         with open('data/data.json', 'w') as json_file:
             json.dump(base_dict, json_file, indent=4)
 
-    @staticmethod
-    def less_than_one_hour(time1: dict, time2: dict): # TODO move into utils function
-        # Convert time strings to datetime objects
-        format_str = '%H:%M'
-        time1_obj = datetime.strptime(time1['time'], format_str)
-        time2_obj = datetime.strptime(time2['time'], format_str)
-
-        # Calculate the difference in minutes
-        difference_in_minutes = (time2_obj - time1_obj).total_seconds() / 60
-
-        # Check if the difference is less than one hour (60 minutes)
-        return abs(difference_in_minutes) < 60
+        return special_action
 
     @staticmethod
     def on_write_verifications(user_id: int, method: str = None, value: list = None, skip_check: bool = False) -> None:
@@ -66,13 +117,13 @@ class AccessEnv(object):
         # Write verifications to a JSON file
         current_dict = base_dict[str(user_id)]['daily_message']
 
-        if method == 'add': #TODO check  compatibility between times
+        if method == 'add':
             for new_checks in value:
                 if any(daily_message['time'] == new_checks['time'] for daily_message in current_dict):
                     continue
 
                 if not skip_check:
-                    if any(AccessEnv.less_than_one_hour(daily_message, new_checks) for daily_message in current_dict):
+                    if any(less_than_one_hour(daily_message, new_checks) for daily_message in current_dict):
                         continue
 
                 current_dict.append(new_checks)
@@ -163,6 +214,7 @@ class AccessEnv(object):
             'username': username,
             'contacts': [],
             'daily_message': [],
+            'contact_request': {}
         }
 
         base_dict = AccessEnv.on_update()
@@ -239,6 +291,48 @@ class AccessEnv(object):
 
     @staticmethod
     def on_kill_queue_data(user_id: int, file_path: str = "data/queue.json") -> None:
+        AccessEnv.on_kill_data(user_id, file_path)
+
+    @staticmethod
+    def on_get_request_user(method: str = "keys"):
+        with open('data/request.json', 'r') as json_file:
+            data = json.load(json_file)
+
+        if method == "keys":
+            return list(data.keys)
+        return list(data.items())
+
+    @staticmethod
+    def on_init_request(user_id: str, daily_check: dict):
+        base_dict = AccessEnv.on_update("data/request.json")
+        base_dict[user_id] = daily_check
+
+        with open('data/request.json', 'w') as json_file:
+            json.dump(base_dict, json_file, indent=4)
+
+    @staticmethod
+    def on_write_request(user_id: str, key: str = None, value=None) -> None:
+        base_dict = AccessEnv.on_update("data/request.json")
+
+        # Write contacts to a JSON file
+        if key is not None:
+            base_dict[str(user_id)][key] = value
+        else:
+            base_dict[str(user_id)][key]
+
+        with open("data/request.json", 'w') as json_file:
+            json.dump(base_dict, json_file, indent=4)
+
+    @staticmethod
+    def on_read_request(user_id: int, key: str = None):
+        # Open and read a JSON file
+        with open('data/request.json', 'r') as json_file:
+            data = json.load(json_file)[str(user_id)]
+
+        return data[key]
+
+    @staticmethod
+    def on_kill_request(user_id: int, file_path: str = "data/request.json") -> None:
         AccessEnv.on_kill_data(user_id, file_path)
 
     @staticmethod

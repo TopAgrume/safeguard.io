@@ -2,19 +2,20 @@ import time
 import re
 import random
 import telegram
-from telegram import Update
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, Bot
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes, ChatMemberHandler
 from telegram.ext import CallbackQueryHandler
 from datetime import datetime, timedelta
 from utils.env_pipeline import AccessEnv
 
-from src.commands import start_command, info_command, bugreport_command
+from src.commands import start_command, info_command, bugreport_command, request_command
 from src.commands import addcontact_command, showcontacts_command, delcontact_command
 from src.commands import addverif_command, showverifs_command, delverif_command, kill_user_data
 from src.commands import skip_command, undoskip_command, fastcheck_command, help_command, undohelp_command
 
 TOKEN, BOT_USERNAME = AccessEnv.telegram_keys()
 P_HTML = telegram.constants.ParseMode.HTML
+bot = Bot(TOKEN)
 
 async def send_hope_message(update: Update):
     print('API:', 'Send Hope Message')
@@ -22,9 +23,27 @@ async def send_hope_message(update: Update):
     await update.message.reply_text(text=message, parse_mode=P_HTML)
 
 
+async def notif_user(update: Update, notif_details: list):
+    user_id = update.message.from_user.id
+
+    for notif in notif_details:
+        print("API:", f"Notif user from del/add {user_id=} to {notif['id']}")
+        message = f"<b>Do you want to accept the pairing invitation from @{notif['tag']}</b>"
+
+        keyboard = [
+            [
+                InlineKeyboardButton("Yes", callback_data=str(user_id)),
+                InlineKeyboardButton("No", callback_data="5"),
+            ],
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        await bot.send_message(chat_id=notif['id'], text=message, reply_markup=reply_markup, parse_mode=P_HTML)
+
+
 async def extract_user_id_add(update: Update, content: str):
     error_contact, new_contacts = [], []
     user_id = update.message.from_user.id
+    user_username = update.message.from_user.username
 
     # Use regular expression to extract the username from the tag
     for line in content.splitlines():
@@ -35,7 +54,9 @@ async def extract_user_id_add(update: Update, content: str):
         else:
             error_contact.append(line)
 
-    AccessEnv.on_write_contacts(user_id, "add", new_contacts)
+    # Send notif to the new users
+    notification = AccessEnv.on_write_contacts(user_id, user_username, "add", new_contacts)
+    await notif_user(update, notification)
 
     message = "Given contacts are now added to your account."
     if len(error_contact) != 0:
@@ -47,6 +68,7 @@ async def extract_user_id_add(update: Update, content: str):
 async def extract_user_id_del(update: Update, content: str):
     error_contact, del_contacts = [], []
     user_id = update.message.from_user.id
+    user_username = update.message.from_user.username
 
     # Use regular expression to extract the username from the tag
     for line in content.splitlines():
@@ -57,7 +79,7 @@ async def extract_user_id_del(update: Update, content: str):
         else:
             error_contact.append(line)
 
-    AccessEnv.on_write_contacts(user_id, "del", del_contacts)
+    AccessEnv.on_write_contacts(user_id, user_username, "del", del_contacts)
 
     message = "Given contacts are now deleted from your account."
     if len(error_contact) != 0:
@@ -116,6 +138,7 @@ async def extract_bugreport(update: Update, content: str):
     filename = "bug_reports/report_" + str(random.randint(0, 999999))
     with open(filename, 'w') as file:
         file.write(content)
+        file.close()
     message = "Thank you for the report!"
     return await update.message.reply_text(message)
 
@@ -262,6 +285,9 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # 'button' will be called for each button the user clicks
     await query.answer()
 
+    if query.data is None:
+        return await query.edit_message_text(text=f"Unknown: Query data empty ({query.data})")
+
     if query.data == "1":  # TODO contact emergencies
         AccessEnv.on_write(user_id, "alert_mode", True)
         message = ("OK. Emergency contacts have received your request for help!\n"
@@ -278,8 +304,28 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if query.data == "4":
         message = "OK. Operation canceled."
         return await query.edit_message_text(text=message)
+    if query.data == "5":
+        contact_request = AccessEnv.on_read(user_id, "contact_request")
+        del contact_request[query.data]
+        AccessEnv.on_write(user_id, "contact_request", contact_request)
 
-    return await query.edit_message_text(text=f"Unknown: Query data ({query.data})")
+        message = "OK. Association request declined."
+        return await query.edit_message_text(text=message)
+
+    updated_pairing = []
+    contacts_pairing = AccessEnv.on_read(int(query.data), "contact")
+
+    for contact in contacts_pairing:
+        if contact['id'] == user_id:
+            contact['pair'] = True
+        updated_pairing.append(contact)
+
+    AccessEnv.on_write(int(query.data), "contact", updated_pairing)
+    users_data = AccessEnv.on_get_user_id_usernames()
+
+    print('API:', f"Response message to association with {int(query.data)}")
+    message = f"OK. Successful association with @{users_data[query.data]}."
+    return await query.edit_message_text(text=message)
 
 
 def run_api():
@@ -304,6 +350,7 @@ def run_api():
     app.add_handler(CommandHandler('fastcheck', fastcheck_command))
     app.add_handler(CommandHandler('stop', kill_user_data))
     app.add_handler(CommandHandler('unsubscibe', kill_user_data))
+    app.add_handler(CommandHandler('request', request_command))
 
     # Buttons under text
     app.add_handler(CallbackQueryHandler(button))

@@ -1,31 +1,42 @@
 {
+    "6340506663": {
+        "alert_mode": false,
+        "response_message": true,
+        "reminder_count": 0,
+        "state": "",
+        "username": "leo",
+        "contacts": [],
+        "daily_message": [
+            {
+                "time": "19:25",
+                "desc": "caca",
+                "active": true
+            }
+        ],
+        "contact_request": {
+            "6577580728": "alexandre_dr"
+        }
+    },
     "6577580728": {
         "alert_mode": false,
         "response_message": true,
         "reminder_count": 0,
         "state": "",
         "username": "alexandre_dr",
-        "contacts": [],
+        "contacts": [
+            {
+                "id": 6340506663,
+                "tag": "leo",
+                "pair": false
+            }
+        ],
         "daily_message": [
             {
-                "time": "08:05",
-                "desc": "Awakening",
-                "active": true
-            },
-            {
-                "time": "19:06",
+                "time": "19:21",
                 "desc": "test",
                 "active": true
             }
-        ]
-    },
-    "6340506663": {
-        "alert_mode": true,
-        "response_message": true,
-        "reminder_count": 0,
-        "state": "",
-        "username": "leo",
-        "contacts": [],
-        "daily_message": []
+        ],
+        "contact_request": {}
     }
 }

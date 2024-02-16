@@ -13,6 +13,7 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):  # 
     print("COMMAND:", f"Start {username}")
     if str(user_id) not in AccessEnv.on_get_users():
         AccessEnv.on_create_user(user_id, username)
+        # TODO link
     else:
         print("COMMAND:", "Already inside")
 
@@ -34,6 +35,7 @@ async def info_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
                "/addcontact - add emergency contacts\n"
                "/showcontacts - show emergency contacts\n"
                "/delcontact - delete emergency contacts\n"
+               "/request - show received association requests\n"
                "\n<b>Edit daily messages</b>\n"
                "/addverif - add daily verification\n"
                "/showverifs - show daily verfications\n"
@@ -68,13 +70,14 @@ async def addcontact_command(update: Update, context: ContextTypes.DEFAULT_TYPE)
 
 async def showcontacts_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     print("COMMAND:", f"ShowContacts")
-    message = "OK. Here is you list of contacts:\n\n"  # TODO list contacts, + show pairing
+    message = "OK. Here is you list of contacts:\n\n"  # TODO show pairing
 
     user_id = update.message.from_user.id
     contact_list = AccessEnv.on_read(user_id, "contacts")
 
     if len(contact_list) == 0:
-        return await update.message.reply_text("There is no emergency contact to display.")
+        message = "<b>There is no emergency contact to display.</b>"
+        return await update.message.reply_text(message, parse_mode=P_HTML)
 
     for contact in contact_list:
         if contact['pair']:
@@ -94,7 +97,7 @@ async def delcontact_command(update: Update, context: ContextTypes.DEFAULT_TYPE)
     user_id = update.message.from_user.id
     if len(AccessEnv.on_read(user_id, "contacts")) == 0:
         message = "<b>No contact to delete.</b>"
-        return await update.message.reply_text(message)
+        return await update.message.reply_text(message, parse_mode=P_HTML)
 
     get_contacts = AccessEnv.on_read(user_id, "contacts")
     display = ['@' + contact['tag'] for contact in get_contacts]
@@ -220,11 +223,34 @@ async def undoskip_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def bugreport_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     print("COMMAND:", f"Bug Report")
-    message = "OK. Please describe the bug and what you did to see it"
+    message = "OK. Please describe the bug and what you did to see it."
 
     user_id = update.message.from_user.id
     AccessEnv.on_write(user_id, "state", "bugreport")
     return await update.message.reply_text(message)
+
+
+async def request_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    print("COMMAND:", f"Association request")
+    user_id = update.message.from_user.id
+    contact_request = AccessEnv.on_read(user_id, "contact_request")
+
+    if len(contact_request) == 0:
+        message = "<b>There is no association request.</b>"
+        return await update.message.reply_text(message, parse_mode=P_HTML)
+
+    for id, username in contact_request:
+        print("COMMAND:", f"Notif user from del/add {user_id=} to {id}")
+        message = f"<b>Do you want to accept the pairing invitation from @{username}</b>"
+
+        keyboard = [
+            [
+                InlineKeyboardButton("Yes", callback_data=id),
+                InlineKeyboardButton("No", callback_data="5"),
+            ],
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        await update.message.reply_text(message, reply_markup=reply_markup, parse_mode=P_HTML)
 
 
 async def fastcheck_command(update: Update, context: ContextTypes.DEFAULT_TYPE):

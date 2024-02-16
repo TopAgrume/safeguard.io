@@ -2,7 +2,6 @@ from telegram import Bot, KeyboardButton
 from telegram import ReplyKeyboardMarkup
 from utils.env_pipeline import AccessEnv
 
-import telegram
 import asyncio
 import time
 

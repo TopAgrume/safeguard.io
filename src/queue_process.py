@@ -6,7 +6,7 @@ import telegram
 import asyncio
 
 TOKEN, BOT_USERNAME = AccessEnv.telegram_keys()
-LOOP_QUEUE_TIME, WAITING_TIME = 1, 10
+LOOP_QUEUE_TIME, WAITING_TIME = 60, 10
 P_HTML = telegram.constants.ParseMode.HTML
 bot = Bot(TOKEN)
 
@@ -39,7 +39,7 @@ async def send_alert_message(user_id):
     return await bot.send_message(chat_id=user_id, text=message, reply_markup=reply_markup)
 
 
-async def check_for_response():  # TODO verification queue
+async def check_for_response():
     while True:
         print('WORKING QUEUE:', '--- REFRESH ---')
 
