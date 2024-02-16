@@ -17,6 +17,7 @@ TOKEN, BOT_USERNAME = AccessEnv.telegram_keys()
 P_HTML = telegram.constants.ParseMode.HTML
 bot = Bot(TOKEN)
 
+
 async def send_hope_message(update: Update):
     print('API:', 'Send Hope Message')
     message = '<b>Alert status is reset</b>. Everything is back to normal.'
@@ -25,15 +26,16 @@ async def send_hope_message(update: Update):
 
 async def notif_user(update: Update, notif_details: list):
     user_id = update.message.from_user.id
+    username = update.message.from_user.username
 
     for notif in notif_details:
         print("API:", f"Notif user from del/add {user_id=} to {notif['id']}")
-        message = f"<b>Do you want to accept the pairing invitation from @{notif['tag']}</b>"
+        message = f"<b>Do you want to accept the pairing invitation from @{username} ?</b>"
 
         keyboard = [
             [
-                InlineKeyboardButton("Yes", callback_data=str(user_id)),
-                InlineKeyboardButton("No", callback_data="5"),
+                InlineKeyboardButton("Yes", callback_data=f"+{str(user_id)}"),
+                InlineKeyboardButton("No", callback_data=f"-{str(user_id)}"),
             ],
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
@@ -47,7 +49,7 @@ async def extract_user_id_add(update: Update, content: str):
 
     # Use regular expression to extract the username from the tag
     for line in content.splitlines():
-        match_tag = re.match(r'@([\w\d_]+)', line)
+        match_tag = re.match(r'@(\w+)', line)
 
         if match_tag:
             new_contacts.append(match_tag.group(1))
@@ -58,7 +60,7 @@ async def extract_user_id_add(update: Update, content: str):
     notification = AccessEnv.on_write_contacts(user_id, user_username, "add", new_contacts)
     await notif_user(update, notification)
 
-    message = "Given contacts are now added to your account."
+    message = "Given contacts are now added to your account.\nThey received an association request."
     if len(error_contact) != 0:
         message += "\nFollowing contacts weren't added due to their unknown format:\n" + str(error_contact)
 
@@ -72,7 +74,7 @@ async def extract_user_id_del(update: Update, content: str):
 
     # Use regular expression to extract the username from the tag
     for line in content.splitlines():
-        match_tag = re.match(r'@([\w\d_]+)', line)
+        match_tag = re.match(r'@(\w+)', line)
 
         if match_tag:
             del_contacts.append(match_tag.group(1))
@@ -250,7 +252,7 @@ async def handle_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
 
     user_id = update.message.from_user.id
-    response_message, alert_mode, _ = AccessEnv.on_read(user_id)
+    response_message, alert_mode = AccessEnv.on_read(user_id)
 
     if response_message:
         # Already answered / Random call
@@ -264,13 +266,11 @@ async def handle_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
         greeting = "Have a great day! :D" if time.localtime().tm_hour == 10 else "Have a wonderful night! ;)"
         response = 'Thank you for your response! ' + greeting
 
-        AccessEnv.on_write(user_id, "reminder_count", 0)
         AccessEnv.on_write(user_id, "response_message", True)
         return await update.message.reply_text(response)
 
     print('API:', 'Response to unset the alert mode')
     AccessEnv.on_write(user_id, "alert_mode", False)
-    AccessEnv.on_write(user_id, "reminder_count", 0)
     AccessEnv.on_write(user_id, "response_message", True)
     return await send_hope_message(update)
 
@@ -279,19 +279,42 @@ async def error(update: Update, context: ContextTypes.DEFAULT_TYPE):
     print('API ERROR:', f'Update {update} caused error {context}')
 
 
+async def manual_help(user_id: int, username: str):
+    message = (f"🚨<b>ALERT</b>🚨. @{username} has manually triggered the call for help."
+               " <b>Don't take this call lightly and make sure she/he is okay!</b>")
+
+    for contact in AccessEnv.on_read(user_id, "contacts"):
+        if not contact["pair"]:
+            continue
+
+        await bot.send_message(chat_id=contact["id"], text=message, parse_mode=P_HTML)
+
+
+async def manual_undohelp(user_id: int, username: str):
+    message = (
+        f"⚠️<b>Alert disabled</b>⚠️. @{username} manually disabled the alert. Make sure it was a simple mistake.")
+
+    for contact in AccessEnv.on_read(user_id, "contacts"):
+        if not contact["pair"]:
+            continue
+
+        await bot.send_message(chat_id=contact["id"], text=message, parse_mode=P_HTML)
+
+
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     user_id = query.from_user.id
     # 'button' will be called for each button the user clicks
     await query.answer()
 
-    if query.data is None:
+    if query.data is None or len(query.data) == 0:
         return await query.edit_message_text(text=f"Unknown: Query data empty ({query.data})")
 
-    if query.data == "1":  # TODO contact emergencies
+    if query.data == "1":
         AccessEnv.on_write(user_id, "alert_mode", True)
         message = ("OK. Emergency contacts have received your request for help!\n"
                    "Type /undohelp to cancel the alert")
+        await manual_help(user_id, query.from_user.username)
         return await query.edit_message_text(text=message)
     if query.data == "2":
         message = "OK. Glad to hear it was a mistake!"
@@ -300,32 +323,44 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if query.data == "3":
         AccessEnv.on_write(user_id, "alert_mode", False)
         message = "OK. Your emergency contacts have received information that the alert has been disabled."
+        await manual_undohelp(user_id, query.from_user.username)
         return await query.edit_message_text(text=message)
     if query.data == "4":
         message = "OK. Operation canceled."
         return await query.edit_message_text(text=message)
-    if query.data == "5":
+
+    if query.data[0] == "-":
         contact_request = AccessEnv.on_read(user_id, "contact_request")
-        del contact_request[query.data]
+        del contact_request[query.data[1:]]
         AccessEnv.on_write(user_id, "contact_request", contact_request)
+        message = "<b>OK. Association request declined.</b>"
+        return await query.edit_message_text(text=message, parse_mode=P_HTML)
 
-        message = "OK. Association request declined."
-        return await query.edit_message_text(text=message)
-
+    origin_id = int(query.data[1:])
     updated_pairing = []
-    contacts_pairing = AccessEnv.on_read(int(query.data), "contact")
+    contacts_pairing = AccessEnv.on_read(origin_id, "contacts")
 
     for contact in contacts_pairing:
         if contact['id'] == user_id:
             contact['pair'] = True
         updated_pairing.append(contact)
 
-    AccessEnv.on_write(int(query.data), "contact", updated_pairing)
+    AccessEnv.on_write(origin_id, "contacts", updated_pairing)
     users_data = AccessEnv.on_get_user_id_usernames()
 
-    print('API:', f"Response message to association with {int(query.data)}")
-    message = f"OK. Successful association with @{users_data[query.data]}."
-    return await query.edit_message_text(text=message)
+    contact_request = AccessEnv.on_read(user_id, "contact_request")
+    del contact_request[query.data[1:]]
+    AccessEnv.on_write(user_id, "contact_request", contact_request)
+
+    print('API:', f"Response message to association with {origin_id}")
+    message = (f"<b>@{query.from_user.username} has accepted your association "
+               f"request and will be contacted in the event of an emergency.</b>")
+    await bot.send_message(chat_id=origin_id, text=message, parse_mode=P_HTML)
+
+    message = (f"<b>Successful association @{users_data[query.data[1:]]}. "
+               f"You will now be informed if this person no longer gives any news.</b>")
+
+    return await query.edit_message_text(text=message, parse_mode=P_HTML)
 
 
 def run_api():

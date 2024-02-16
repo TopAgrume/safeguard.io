@@ -28,18 +28,17 @@ async def send_reminder(user_id: str, user_data: dict):
 
 async def send_alert_message(user_id):
     print('WORKING QUEUE:', f"Send Alert Message to/from {user_id=}")
-    # await bot.send_message(chat_id=user_id, text='No response received from VAL. URGENT SYSTEM LAUNCHING')
-    # TODO contact emergencies
     keyboard = [
         [KeyboardButton("I am back!")],
     ]
     reply_markup = ReplyKeyboardMarkup(keyboard, one_time_keyboard=True)
 
-    message = 'Alert sent to emergency contacts. Please answer to disable it'
-    return await bot.send_message(chat_id=user_id, text=message, reply_markup=reply_markup)
+    message = '!! Alert sent to emergency contacts. <b>Please answer to disable it.</b>'
+    return await bot.send_message(chat_id=user_id, text=message, reply_markup=reply_markup, parse_mode=P_HTML)
 
 
 async def check_for_response():
+    await asyncio.sleep(5)
     while True:
         print('WORKING QUEUE:', '--- REFRESH ---')
 

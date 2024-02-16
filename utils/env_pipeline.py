@@ -8,7 +8,7 @@ import json
 MAX_TIME_DIFF = 60
 
 
-def less_than_one_hour(time1: dict, time2: dict):  # TODO move into utils function
+def less_than_one_hour(time1: dict, time2: dict):
     # Convert time strings to datetime objects
     time1_obj = datetime.strptime(time1['time'], '%H:%M')
     time2_obj = datetime.strptime(time2['time'], '%H:%M')
@@ -46,7 +46,7 @@ def add_user_and_link_request(user_id: int, username: str, current_dict: list, v
         # Save the data
         pair_asking = {"tag": username, "dest_tags": [new_contact]}
         for origin_id, content in AccessEnv.on_get_request_user("items"):
-            if origin_id == str(origin_id):
+            if origin_id == str(user_id):
                 content['dest_tags'].append(new_contact)
                 AccessEnv.on_write_request(origin_id, 'dest_tags', content['dest_tags'])
                 break
@@ -58,7 +58,7 @@ def add_user_and_link_request(user_id: int, username: str, current_dict: list, v
 
 def delete_user_and_request(user_id: int, current_dict: list, value: list):
     filtered_dict = []
-
+    print(current_dict)
     for contact in current_dict:
         if contact['tag'] not in value:
             filtered_dict.append(contact)
@@ -68,13 +68,19 @@ def delete_user_and_request(user_id: int, current_dict: list, value: list):
         if user_tag is None:
             dest_tags = AccessEnv.on_read_request(user_id, "dest_tags")
             dest_tags.remove(contact['tag'])
-            AccessEnv.on_write_request(str(user_id), "dest_tags", dest_tags)
+            if len(dest_tags) == 0:
+                request_contacts: dict = AccessEnv.on_get_request_user("dict")
+                del request_contacts[str(user_id)]
+                AccessEnv.on_write_all_request(request_contacts)
+            else:
+                AccessEnv.on_write_request(str(user_id), "dest_tags", dest_tags)
             continue
 
         contact_request = AccessEnv.on_read(user_tag, "contact_request")
-        del contact_request[str(user_id)]
-        AccessEnv.on_write(user_tag, "contact_request", contact_request)
-
+        if str(user_id) in contact_request:
+            del contact_request[str(user_id)]
+            AccessEnv.on_write(user_tag, "contact_request", contact_request)
+    print("test")
     return filtered_dict
 
 
@@ -145,7 +151,7 @@ class AccessEnv(object):
             data = json.load(json_file)[str(user_id)]
 
         if key is None:
-            return data["response_message"], data["alert_mode"], data["reminder_count"]
+            return data["response_message"], data["alert_mode"]
         else:
             return data[key]
 
@@ -208,8 +214,7 @@ class AccessEnv(object):
     def on_create_user(user_id: int, username: str) -> None:
         fresh_data: dict = {
             'alert_mode': False,
-            'response_message': False,
-            'reminder_count': 0,
+            'response_message': True,
             'state': '',
             'username': username,
             'contacts': [],
@@ -300,6 +305,8 @@ class AccessEnv(object):
 
         if method == "keys":
             return list(data.keys)
+        if method == "dict":
+            return data
         return list(data.items())
 
     @staticmethod
@@ -318,10 +325,15 @@ class AccessEnv(object):
         if key is not None:
             base_dict[str(user_id)][key] = value
         else:
-            base_dict[str(user_id)][key]
+            base_dict[str(user_id)][key] = value
 
         with open("data/request.json", 'w') as json_file:
             json.dump(base_dict, json_file, indent=4)
+
+    @staticmethod
+    def on_write_all_request(all_data: dict) -> None:
+        with open("data/request.json", 'w') as json_file:
+            json.dump(all_data, json_file, indent=4)
 
     @staticmethod
     def on_read_request(user_id: int, key: str = None):

@@ -6,20 +6,58 @@ import telegram
 P_HTML = telegram.constants.ParseMode.HTML
 
 
-async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):  # TODO PAIRING
+async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.message.from_user.id
-    username = update.message.from_user.username
-
-    print("COMMAND:", f"Start {username}")
-    if str(user_id) not in AccessEnv.on_get_users():
-        AccessEnv.on_create_user(user_id, username)
-        # TODO link
-    else:
-        print("COMMAND:", "Already inside")
-
     user_first_name: str = str(update.message.chat.first_name)
-    message = f"Hello {user_first_name}! Thanks for chatting with me! I am a Safeguard.io bot"
-    return await update.message.reply_text(message)
+
+    if user_id is None:
+        message = (f"Hello {user_first_name}! Make sure to <b>create a username</b> in your account settings"
+                   "to use my features. When this is done, use the <b>/start</b> command.")
+        return await update.message.reply_text(message, parse_mode=P_HTML)
+
+    username = update.message.from_user.username
+    print("COMMAND:", f"Start user @{username}")
+    if str(user_id) in AccessEnv.on_get_users():
+        print("COMMAND:", "Already inside")
+        message = "Your profile is already linked with Safeguard.io!"
+        return await update.message.reply_text(message)
+
+    AccessEnv.on_create_user(user_id, username)
+    message = f"Hello {user_first_name}! Thanks for chatting with me! I am Safeguard.io :)."
+    await update.message.reply_text(message)
+
+    exploit_data = {}
+    remove_user_id = []
+    request_data = AccessEnv.on_get_request_user("dict")
+    for origin_id, content in request_data.items():
+        remove_tag = []
+        for dest_tag in content["dest_tags"]:
+            if username == dest_tag:
+                print('COMMANDS:', f"Send new user request from @{username}")
+                remove_tag.append(username)
+                exploit_data[origin_id] = content['tag']
+
+        content["dest_tags"] = [element for element in content["dest_tags"] if element not in remove_tag]
+
+        if len(content["dest_tags"]) == 0:
+            remove_user_id.append(origin_id)
+
+    # Del request data
+    for key in remove_user_id:
+        if key in request_data:
+            del request_data[key]
+
+    AccessEnv.on_write_all_request(request_data)
+    AccessEnv.on_write(user_id, "contact_request", exploit_data)
+
+    for contact_key in exploit_data.keys():
+        old_contacts = AccessEnv.on_read(int(contact_key), "contacts")
+        for old_contact in old_contacts:
+            if old_contact['tag'] == username:
+                old_contact['id'] = user_id
+        AccessEnv.on_write(int(contact_key), "contacts", old_contacts)
+
+    return await request_command(update, context)
 
 
 async def info_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -70,7 +108,7 @@ async def addcontact_command(update: Update, context: ContextTypes.DEFAULT_TYPE)
 
 async def showcontacts_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     print("COMMAND:", f"ShowContacts")
-    message = "OK. Here is you list of contacts:\n\n"  # TODO show pairing
+    message = "OK. Here is your list of contacts:\n\n"
 
     user_id = update.message.from_user.id
     contact_list = AccessEnv.on_read(user_id, "contacts")
@@ -81,7 +119,7 @@ async def showcontacts_command(update: Update, context: ContextTypes.DEFAULT_TYP
 
     for contact in contact_list:
         if contact['pair']:
-            message += f"<b>@{contact['tag']}</b> - <b>OK</b>\n"
+            message += f"<b>@{contact['tag']}</b>\n"
             continue
 
         message += f"<b>@{contact['tag']}</b> - waiting for pairing\n"
@@ -92,7 +130,7 @@ async def showcontacts_command(update: Update, context: ContextTypes.DEFAULT_TYP
 async def delcontact_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     print("COMMAND:", f"DeleteContact")
     message = ("OK. Chose the contact to delete.\n"
-               "Send /empty to empty the current list.")  # TODO impossible de revenir en arrière
+               "Send /empty to empty the current list.")
 
     user_id = update.message.from_user.id
     if len(AccessEnv.on_read(user_id, "contacts")) == 0:
@@ -239,14 +277,14 @@ async def request_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         message = "<b>There is no association request.</b>"
         return await update.message.reply_text(message, parse_mode=P_HTML)
 
-    for id, username in contact_request:
+    for id, username in contact_request.items():
         print("COMMAND:", f"Notif user from del/add {user_id=} to {id}")
         message = f"<b>Do you want to accept the pairing invitation from @{username}</b>"
 
         keyboard = [
             [
-                InlineKeyboardButton("Yes", callback_data=id),
-                InlineKeyboardButton("No", callback_data="5"),
+                InlineKeyboardButton("Yes", callback_data=f"+{id}"),
+                InlineKeyboardButton("No", callback_data=f"-{id}"),
             ],
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
@@ -255,7 +293,7 @@ async def request_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def fastcheck_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     print("COMMAND:", f"Fast Check")
-    message = "OK. How soon do you want to have the quick check? <b>(less than 20mn)</b>"  # TODO add time + description
+    message = "OK. How soon do you want to have the quick check? <b>(less than 20mn)</b>"
 
     keyboard = [
         ["5 mn", "10 mn", "15 mn", "20 mn"],
@@ -276,12 +314,11 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         message = "<b>You are already in alert mode!</b>"
         return await update.message.reply_text(message, parse_mode=P_HTML)
 
-    AccessEnv.on_write(user_id, "reminder_count", 0)
     if not AccessEnv.on_read(user_id, "response_message"):
         AccessEnv.on_write(user_id, "response_message", True)
         await update.message.reply_text("Answer received, daily verification off...")
 
-    message = "<b>Do you want to notify emergency contacts?</b>"  # TODO add time + description
+    message = "<b>Do you want to notify emergency contacts?</b>"
     keyboard = [
         [
             InlineKeyboardButton("Yes", callback_data="1"),
@@ -300,7 +337,7 @@ async def undohelp_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         message = "<b>This operation can only be used in alert state!</b>"
         return await update.message.reply_text(message, parse_mode=P_HTML)
 
-    response = "<b>Do you want to cancel the alert?</b>"  # TODO add time + description
+    response = "<b>Do you want to cancel the alert?</b>"
     keyboard = [
         [
             InlineKeyboardButton("Yes", callback_data="3"),
@@ -315,5 +352,5 @@ async def kill_user_data(update: Update, context: ContextTypes.DEFAULT_TYPE):
     print("COMMAND:", f"Kill user data")
     user_id = update.message.from_user.id
     AccessEnv.on_kill_data(user_id)
-    message = "<b>Your personal data has been deleted</b>"
+    message = "<b>Your personal data has been deleted.</b>"
     return await update.message.reply_text(message, parse_mode=P_HTML)
