@@ -3,13 +3,13 @@ import re
 import random
 import telegram
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, Bot
-from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes, ChatMemberHandler
+from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 from telegram.ext import CallbackQueryHandler
 from datetime import datetime, timedelta
 from utils.env_pipeline import AccessEnv
 
 from src.commands import start_command, info_command, bugreport_command, request_command, verify_condition
-from src.commands import addcontact_command, showcontacts_command, delcontact_command
+from src.commands import addcontact_command, showcontacts_command, delcontact_command, empty_command
 from src.commands import addverif_command, showverifs_command, delverif_command, kill_user_data
 from src.commands import skip_command, undoskip_command, fastcheck_command, help_command, undohelp_command
 
@@ -20,7 +20,7 @@ bot = Bot(TOKEN)
 
 async def send_hope_message(update: Update):
     print('API:', 'Send Hope Message')
-    message = '<b>Alert status is reset</b>. Everything is back to normal.'
+    message = '<b>Alert status is reset</b>. Everything is back to normal. ✅'
     await update.message.reply_text(text=message, parse_mode=P_HTML)
 
 
@@ -30,7 +30,7 @@ async def notif_user(update: Update, notif_details: list):
 
     for notif in notif_details:
         print("API:", f"Notif user from del/add {user_id=} to {notif['id']}")
-        message = f"<b>Do you want to accept the pairing invitation from @{username} ?</b>"
+        message = f"<b>Do you want to accept the pairing invitation from @{username}? 🤝</b>"
 
         keyboard = [
             [
@@ -60,10 +60,11 @@ async def extract_user_id_add(update: Update, content: str):
     notification = AccessEnv.on_write_contacts(user_id, user_username, "add", new_contacts)
     await notif_user(update, notification)
 
-    message = "Given contacts are now added to your account.\nThey received an association request."
+    message = "Given contact(s) are now added to your account.\nThey received an association request.🎉\n"
     if len(error_contact) != 0:
-        message += "\nFollowing contacts weren't added due to their unknown format:\n" + str(error_contact)
-
+        message += "\nFollowing contact(s) weren't added due to their unknown format:\n"
+    for elt in error_contact:
+        message += f"\n❌ {elt}"
     return await update.message.reply_text(message)
 
 
@@ -83,10 +84,11 @@ async def extract_user_id_del(update: Update, content: str):
 
     AccessEnv.on_write_contacts(user_id, user_username, "del", del_contacts)
 
-    message = "Given contacts are now deleted from your account."
+    message = "Given contact(s) are now deleted from your account.🚮\n"
     if len(error_contact) != 0:
-        message += "\nFollowing contacts weren't removed due to their unknown format:\n" + str(error_contact)
-
+        message += "\nFollowing contact(s) weren't removed due to their unknown format:\n"
+    for elt in error_contact:
+        message += f"\n❌ {elt}"
     return await update.message.reply_text(message)
 
 
@@ -106,10 +108,11 @@ async def extract_verif_add(update: Update, content: str):  # TODO Check same da
 
     AccessEnv.on_write_verifications(user_id, "add", new_verif)
 
-    message = "Given daily verifications are now added to your account."
+    message = "Given daily verification(s) are now added to your account. 📅🔐\n"
     if len(error_contact) != 0:
-        message += "\nFollowing verifications weren't added due to their unknown format:\n" + str(error_contact)
-
+        message += "\nFollowing verification(s) weren't added due to their unknown format:\n"
+    for elt in error_contact:
+        message += f"\n❌ {elt}"
     return await update.message.reply_text(message)
 
 
@@ -129,10 +132,11 @@ async def extract_verif_del(update: Update, content: str):
 
     AccessEnv.on_write_verifications(user_id, "del", del_verif)
 
-    message = "Given daily verifications are now deleted to your account."
+    message = "Given daily verification(s) are now deleted to your account.🚫📅\n"
     if len(error_contact) != 0:
-        message += "\nFollowing verifications weren't removed due to their unknown format:\n" + str(error_contact)
-
+        message += "\nFollowing verification(s) weren't removed due to their unknown format:\n"
+    for elt in error_contact:
+        message += f"\n❌ {elt}"
     return await update.message.reply_text(message)
 
 
@@ -161,10 +165,11 @@ async def skip_alarm(update: Update, content: str):
 
     AccessEnv.on_write_verifications(user_id, "skip", skip_verif)
 
-    message = "Given daily verification(s) is now skipped for the next 24h."
+    message = "Given daily verification(s) are now skipped for the next 24h.⏰✨\n"
     if len(error_contact) != 0:
-        message += "\nFollowing verification(s) weren't skipped due to their unknown format:\n" + str(error_contact)
-
+        message += "\nFollowing verification(s) weren't skipped due to their unknown format:\n"
+    for elt in error_contact:
+        message += f"\n❌ {elt}"
     return await update.message.reply_text(message)
 
 
@@ -184,10 +189,11 @@ async def undoskip_alarm(update: Update, content: str):
 
     AccessEnv.on_write_verifications(user_id, "undoskip", skip_verif)
 
-    message = "Given daily verification(s) is now activated."
+    message = "Given daily verification(s) are now activated.🔐🔄\n"
     if len(error_contact) != 0:
-        message += "\nFollowing verification(s) weren't activated due to their unknown format:\n" + str(error_contact)
-
+        message += "\nFollowing verification(s) weren't activated due to their unknown format:\n"
+        for elt in error_contact:
+            message += f"\n❌ {elt}"
     return await update.message.reply_text(message)
 
 
@@ -210,12 +216,12 @@ async def extract_fastcheck(update: Update, content: str):
     new_alarm = {"time": time_to_display, "desc": "Auto fast check", "active": None}
     AccessEnv.on_write_verifications(user_id, "add", [new_alarm], True)
 
-    message = f"Fast Check in {waiting_time}mn taken into account! ({time_to_display})"
+    message = f"Fast Check in {waiting_time}mn taken into account! ({time_to_display}) 🚀"
     return await update.message.reply_text(message)
 
 
 async def default_case(update: Update, content: str):
-    return await update.message.reply_text(f"Excuse me, I didn't understand your request.")
+    return await update.message.reply_text(f"Excuse me, I didn't quite understand your request. 🤔")
 
 
 async def state_dispatcher(update: Update, state: str, message_body: str):
@@ -240,17 +246,7 @@ async def state_dispatcher(update: Update, state: str, message_body: str):
 
 @verify_condition
 async def handle_messages(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs):
-    message_type: str = update.message.chat.type
     message_body: str = update.message.text
-
-    if message_type == 'group':
-        message_body: str = message_body.lower()
-        if BOT_USERNAME in message_body:
-            # new_text: str = message_body.replace(BOT_USERNAME, '').strip()
-            response = 'This bot does not support groups for now'
-            await update.message.reply_text(response)
-        else:
-            return
 
     user_id = update.message.from_user.id
     response_message, alert_mode = AccessEnv.on_read(user_id)
@@ -264,8 +260,8 @@ async def handle_messages(update: Update, context: ContextTypes.DEFAULT_TYPE, **
 
     if not alert_mode:
         print('API:', 'Response to contact and confirmation demand')
-        greeting = "Have a great day! :D" if time.localtime().tm_hour == 10 else "Have a wonderful night! ;)"
-        response = 'Thank you for your response! ' + greeting
+        greeting = "Have a great day 🌞!" if time.localtime().tm_hour < 16 else "Have a wonderful afternoon 🌅!"
+        response = f"Thank you for your response! {greeting}"
 
         AccessEnv.on_write(user_id, "response_message", True)
         return await update.message.reply_text(response)
@@ -282,8 +278,8 @@ async def error(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def manual_help(user_id: int, username: str):
-    message = (f"🚨<b>ALERT</b>🚨. @{username} has manually triggered the call for help.\n"
-               "<b>Don't take this call lightly and make sure she/he is okay!</b>")
+    message = (f"🚨<b>ALERT</b>🚨. @{username} has manually triggered the call for help."
+               " <b>Please take this call seriously and ensure their well-being!</b>")
 
     for contact in AccessEnv.on_read(user_id, "contacts"):
         if not contact["pair"]:
@@ -294,7 +290,7 @@ async def manual_help(user_id: int, username: str):
 
 async def manual_undohelp(user_id: int, username: str):
     message = (f"⚠️<b>Alert disabled</b>⚠️. @{username} manually disabled the alert."
-               " Make sure it was a simple mistake.")
+               " <b>Please confirm it was intentional or check if it was a simple mistake.</b>")
 
     for contact in AccessEnv.on_read(user_id, "contacts"):
         if not contact["pair"]:
@@ -314,17 +310,17 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if query.data == "1":
         AccessEnv.on_write(user_id, "alert_mode", True)
-        message = ("OK. Emergency contacts have received your request for help!\n"
-                   "Type /undohelp to cancel the alert")
+        message = ("OK. Emergency contacts have received your request for help! 🆘\n"
+                   "Type /undohelp to cancel the alert.")
         await manual_help(user_id, query.from_user.username)
         return await query.edit_message_text(text=message)
     if query.data == "2":
-        message = "OK. Glad to hear it was a mistake!"
+        message = "OK 😅. Glad to hear it was a mistake!"
         return await query.edit_message_text(text=message)
 
     if query.data == "3":
         AccessEnv.on_write(user_id, "alert_mode", False)
-        message = "OK. Your emergency contacts have received information that the alert has been disabled."
+        message = "OK. Your emergency contacts have received information that the alert has been disabled. 📢"
         await manual_undohelp(user_id, query.from_user.username)
         return await query.edit_message_text(text=message)
     if query.data == "4":
@@ -335,7 +331,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         contact_request = AccessEnv.on_read(user_id, "contact_request")
         del contact_request[query.data[1:]]
         AccessEnv.on_write(user_id, "contact_request", contact_request)
-        message = "<b>OK. Association request declined.</b>"
+        message = "<b>OK. Association request declined. ❌</b>"
         return await query.edit_message_text(text=message, parse_mode=P_HTML)
 
     origin_id = int(query.data[1:])
@@ -356,10 +352,10 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     print('API:', f"Response message to association with {origin_id}")
     message = (f"<b>@{query.from_user.username} has accepted your association "
-               f"request and will be contacted in the event of an emergency.</b>")
+               f"request and will be contacted in the event of an emergency. 🤝</b>")
     await bot.send_message(chat_id=origin_id, text=message, parse_mode=P_HTML)
 
-    message = (f"<b>Successful association @{users_data[query.data[1:]]}. "
+    message = (f"<b>Successful association @{users_data[query.data[1:]]} 🎉. "
                f"You will now be informed if this person no longer gives any news.</b>")
 
     return await query.edit_message_text(text=message, parse_mode=P_HTML)
@@ -389,6 +385,7 @@ def run_api():
     app.add_handler(CommandHandler('stop', kill_user_data))
     app.add_handler(CommandHandler('unsubscibe', kill_user_data))
     app.add_handler(CommandHandler('request', request_command))
+    app.add_handler(CommandHandler('empty', empty_command))
 
     # Buttons under text
     app.add_handler(CallbackQueryHandler(button))

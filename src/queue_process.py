@@ -1,12 +1,12 @@
 from telegram import Bot, KeyboardButton
 from telegram import ReplyKeyboardMarkup
 from utils.env_pipeline import AccessEnv
-
+import random
 import telegram
 import asyncio
 
 TOKEN, BOT_USERNAME = AccessEnv.telegram_keys()
-LOOP_QUEUE_TIME, WAITING_TIME = 1, 10
+LOOP_QUEUE_TIME, WAITING_TIME = 60, 10
 P_HTML = telegram.constants.ParseMode.HTML
 bot = Bot(TOKEN)
 
@@ -22,8 +22,17 @@ async def send_reminder(user_id: str, user_data: dict):
 
     print('WORKING QUEUE:', f"Send {reminder_count=} to {user_id=}")
 
-    message = f"<b>Reminder {reminder_count}</b>: Please respond to the verification message!"
-    await bot.send_message(chat_id=user_id, text=message, parse_mode=P_HTML)
+    messages = [
+        f"<b>Reminder {reminder_count}</b>: Please respond to the verification message! 📬",
+        f"<b>Reminder {reminder_count}:</b> Don't forget to reply to the verification message! 📬",
+        f"<b>Reminder {reminder_count}:</b> Your prompt response to the verification message is appreciated! 📬",
+        f"<b>Reminder {reminder_count}:</b> Kindly acknowledge the verification message. 📬",
+        f"<b>Reminder {reminder_count}:</b> Ensure you respond to the verification message in a timely manner! 📬",
+        f"<b>Reminder {reminder_count}:</b> Please take a moment to reply to the verification message! 📬",
+        f"<b>Reminder {reminder_count}:</b> A quick response to the verification message is required! 📬"
+    ]
+    random_message = random.choice(messages)
+    await bot.send_message(chat_id=user_id, text=random_message, parse_mode=P_HTML)
 
 
 async def send_alert_message(user_id):
@@ -33,7 +42,7 @@ async def send_alert_message(user_id):
     time = user_data['time']
     desc = user_data['desc']
     message = (f"🚨<b>ALERT</b>🚨. I haven't heard from @{username} for his/her {time} callback."
-               "<b>Don't take this call lightly and make sure she/he is okay! It could be urgent!</b>\n"
+               "<b>Don't take this call lightly and make sure she/he is okay! It might be urgent!</b>\n"
                f"This could be important, here is the description that was given to this recall:\n\n {desc}")
 
     for contact in AccessEnv.on_read(user_id, "contacts"):

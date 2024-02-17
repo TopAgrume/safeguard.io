@@ -3,11 +3,21 @@ from telegram.ext import ContextTypes
 from utils.env_pipeline import AccessEnv
 import telegram
 
+TOKEN, BOT_USERNAME = AccessEnv.telegram_keys()
 P_HTML = telegram.constants.ParseMode.HTML
 
 
 def verify_condition(func):
     async def wrapper(update, context, **kwargs):
+        message_type: str = update.message.chat.type
+        if message_type == 'group':
+            message_body: str = message_body.lower()
+            if BOT_USERNAME in message_body:
+                # new_text: str = message_body.replace(BOT_USERNAME, '').strip()
+                response = 'This bot does not support groups for now. 🚫'
+                await update.message.reply_text(response)
+            else:
+                return
         username = update.message.from_user.username
         if username is None or username == "":
             message = ("Please create a username in your Telegram profile in order to use my features."
@@ -25,7 +35,7 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kw
     user_first_name: str = str(update.message.chat.first_name)
 
     if user_id is None:
-        message = (f"Hello {user_first_name}! Make sure to <b>create a username</b> in your account settings"
+        message = (f"Hello {user_first_name} 👋! Make sure to <b>create a username</b> in your account settings"
                    "to use my features. When this is done, use the <b>/start</b> command.")
         return await update.message.reply_text(message, parse_mode=P_HTML)
 
@@ -37,7 +47,7 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kw
         return await update.message.reply_text(message)
 
     AccessEnv.on_create_user(user_id, username)
-    message = f"Hello {user_first_name}! Thanks for chatting with me! I am Safeguard.io :)."
+    message = f"Hello {user_first_name} 🌟! Thanks for chatting with me! I am Safeguard.io 😊."
     await update.message.reply_text(message)
 
     exploit_data = {}
@@ -76,28 +86,29 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kw
 
 @verify_condition
 async def info_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs):
-    message = ("I make sure everything is okay! Here are commands to interact with me ;).\n"
+    message = ("Welcome! I'm here to ensure everything is smooth for you. Use these commands to interact with me:\n"
                "\n<b>Edit bot configuration</b>\n"
-               "/start or /subscribe - start the conversation with the bot\n"
-               "/info - get bot usage\n"
-               "/stop or /unsubscribe - delete personal data\n"
+               "/start or /subscribe - Initiate a conversation with me.\n"
+               "/stop or /unsubscribe - Delete personal related data.\n"
+               "/info - Receive information on how to use the bot.\n"
                "\n<b>In case of emergency</b>\n"
-               "/help - ask for help to emergency contacts\n"
-               "/undohelp - disable emergency alert\n"
+               "/help - Request emergency assistance from your contacts.\n"
+               "/undohelp - Disable emergency alerts.\n"
                "\n<b>Edit emergency contacts</b>\n"
-               "/addcontact - add emergency contacts\n"
-               "/showcontacts - show emergency contacts\n"
-               "/delcontact - delete emergency contacts\n"
-               "/request - show received association requests\n"
+               "/addcontact - Add new emergency contacts.\n"
+               "/showcontacts - Display your list of emergency contacts.\n"
+               "/delcontact - Delete specific emergency contacts.\n"
+               "/request - View received association requests.\n"
                "\n<b>Edit daily messages</b>\n"
-               "/addverif - add daily verification\n"
-               "/showverifs - show daily verfications\n"
-               "/delverif - delete daily verifications\n"
-               "/skip - skip next verification\n"
-               "/undoskip - activate back skipped verification\n"
-               "/fastcheck - quick verification\n"
+               "/addverif - Add a daily verification message.\n"
+               "/showverifs - Display your list of daily verifications.\n"
+               "/delverif - Delete specific daily verifications.\n"
+               "/skip - Skip the next verification.\n"
+               "/undoskip - Activate the previously skipped verification.\n"
+               "/fastcheck - Perform a quick verification.\n"
                "\n<b>Miscellaneous</b>\n"
-               "/bugreport - report a bug")
+               "/bugreport - Report any bugs you encounter or suggest improvements!\n\n"
+               "Feel free to ask for assistance or information anytime! 😊")
 
     print("COMMAND:", f"Info")
     return await update.message.reply_text(message, parse_mode=P_HTML)
@@ -106,15 +117,15 @@ async def info_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwa
 @verify_condition
 async def addcontact_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs):
     print("COMMAND:", f"AddContact")
-    message = ("OK. Send me a list of contacts to add.\n"
-               "<b>Please use this format:</b>\n\n"
+    message = ("Sure thing! Please provide me with a list of contacts you'd like to add. 📋\n"
+               "<b>Make sure to use the following format:</b>\n\n"
                "<b>@username1</b>\n"
                "<b>@username2</b>\n\n"
                "Send /empty to keep the list empty.")
 
     user_id = update.message.from_user.id
     if len(AccessEnv.on_read(user_id, "contacts")) > 9:
-        message = "You cannot add an additional contacts (10 max)."
+        message = "You cannot add an additional contacts (10 max). 🛑"
         return await update.message.reply_text(message)
 
     AccessEnv.on_write(user_id, "state", "addcontact")
@@ -125,21 +136,21 @@ async def addcontact_command(update: Update, context: ContextTypes.DEFAULT_TYPE,
 @verify_condition
 async def showcontacts_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs):
     print("COMMAND:", f"ShowContacts")
-    message = "OK. Here is your list of contacts:\n\n"
+    message = "Sure thing! Here is your list of contacts:\n\n"
 
     user_id = update.message.from_user.id
     contact_list = AccessEnv.on_read(user_id, "contacts")
 
     if len(contact_list) == 0:
-        message = "<b>There is no emergency contact to display.</b>"
+        message = "<b>There is no emergency contact to display. 🆘</b>"
         return await update.message.reply_text(message, parse_mode=P_HTML)
 
     for contact in contact_list:
         if contact['pair']:
-            message += f"<b>@{contact['tag']}</b>\n"
+            message += f"👤 <b>@{contact['tag']}</b>\n"
             continue
 
-        message += f"<b>@{contact['tag']}</b> - waiting for pairing\n"
+        message += f"🚫 <b>@{contact['tag']}</b> - Waiting for pairing.\n"
 
     return await update.message.reply_text(message, parse_mode=P_HTML)
 
@@ -147,12 +158,11 @@ async def showcontacts_command(update: Update, context: ContextTypes.DEFAULT_TYP
 @verify_condition
 async def delcontact_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs):
     print("COMMAND:", f"DeleteContact")
-    message = ("OK. Chose the contact to delete.\n"
-               "Send /empty to empty the current list.")
+    message = "Sure! Chose the contact to delete.🗑️\n"
 
     user_id = update.message.from_user.id
     if len(AccessEnv.on_read(user_id, "contacts")) == 0:
-        message = "<b>No contact to delete.</b>"
+        message = "<b>No contact to delete. 📭</b>"
         return await update.message.reply_text(message, parse_mode=P_HTML)
 
     get_contacts = AccessEnv.on_read(user_id, "contacts")
@@ -167,14 +177,15 @@ async def delcontact_command(update: Update, context: ContextTypes.DEFAULT_TYPE,
 @verify_condition
 async def addverif_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs):
     print("COMMAND:", f"AddDailyCheck")
-    message = ("OK. Send me a list of daily verifications to add. <b>Please use this format</b>:\n\n"
+    message = ("OK. Send me a list of daily verifications to add. 📅⏰\n"
+               "<b>Please use this format</b>:\n\n"
                "08:05 - Awakening\n"
                "21:30 - End of the day\n\n"
-               "Send /empty to keep the list empty.")
+               "Click /empty to cancel the operation.")
 
     user_id = update.message.from_user.id
     if len(AccessEnv.on_read(user_id, "daily_message")) > 5:
-        message = "<b>You cannot add an additional daily check.</b>"
+        message = "<b>You cannot add an additional daily check (6 max). 🛑</b>"
         return await update.message.reply_text(message, parse_mode=P_HTML)
 
     AccessEnv.on_write(user_id, "state", "addverif")
@@ -184,28 +195,28 @@ async def addverif_command(update: Update, context: ContextTypes.DEFAULT_TYPE, *
 @verify_condition
 async def showverifs_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs):
     print("COMMAND:", f"ShowDailyChecks")
-    message = "OK. Here is you list of daily verifications:\n"
+    message = "OK. Here is you list of daily verifications:\n\n"
     user_id = update.message.from_user.id
     verif_list = AccessEnv.on_read(user_id, "daily_message")
 
     if len(verif_list) == 0:
-        message = "<b>There is no daily check to display.</b>"
+        message = "<b>There is no daily check to display. 📅</b>"
         return await update.message.reply_text(message, parse_mode=P_HTML)
 
     sorted_list = sorted(verif_list, key=lambda x: x["time"])
 
-    skipped_verif = "\n<b>Skipped today:</b>\n"
+    skipped_verif = "\n<b>Skipped today:</b>\n\n"
     skip_bool, active = False, True
     for verif in sorted_list:
         if verif["active"] or verif["active"] is None:
-            message += f"\n<b>{verif['time']}</b> - {verif['desc']}"
+            message += f"🕗 <b>{verif['time']}</b> - {verif['desc']}\n"
             active = False
             continue
 
-        skipped_verif += f"\n<b>{verif['time']}</b> - {verif['desc']}"
+        skipped_verif += f"🚫 <b>{verif['time']}</b> - {verif['desc']}\n"
         skip_bool = True
 
-    message += "<b>No daily check for the next 24 hours.</b>\n" if active else ""
+    message += "<b>No daily check for the next 24 hours.</b>  📅\n" if active else ""
     message += skipped_verif if skip_bool else ""
     return await update.message.reply_text(message, parse_mode=P_HTML)
 
@@ -213,14 +224,14 @@ async def showverifs_command(update: Update, context: ContextTypes.DEFAULT_TYPE,
 @verify_condition
 async def delverif_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs):
     print("COMMAND:", f"DeleteDailyChecks")
-    message = ("OK. Chose the daily verifications to delete.\n"
-               "Send /empty to empty the current list.")
+    message = ("Alright! Please choose the daily verifications you'd like to delete. ❌🕒\n"
+               "Click /empty to cancel the operation.")
 
     user_id = update.message.from_user.id
     verif_list = AccessEnv.on_read(user_id, "daily_message")
 
     if len(AccessEnv.on_read(user_id, "daily_message")) == 0:
-        message = "<b>No daily message to delete.</b>"
+        message = "<b>No daily message to delete. 📅</b>"
         return await update.message.reply_text(message, parse_mode=P_HTML)
 
     sorted_list = sorted(verif_list, key=lambda x: x["time"])
@@ -237,14 +248,15 @@ async def delverif_command(update: Update, context: ContextTypes.DEFAULT_TYPE, *
 @verify_condition
 async def skip_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs):
     print("COMMAND:", f"SkipDailyCheck")
-    message = "OK. Chose the daily verifications to skip."
+    message = ("Sure! Please choose the daily verifications you'd like to skip. 🚫🕒\n"
+               "Click /empty to cancel the operation.")
 
     user_id = update.message.from_user.id
     verif_list = AccessEnv.on_read(user_id, "daily_message")
     verif_list = list(filter(lambda x: x["active"], verif_list))
 
     if len(verif_list) == 0:
-        message = "<b>No daily message to skip.</b>"
+        message = "<b>No daily message to skip. 📅</b>"
         return await update.message.reply_text(message, parse_mode=P_HTML)
 
     sorted_list = sorted(verif_list, key=lambda x: x['time'])
@@ -261,14 +273,15 @@ async def skip_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwa
 @verify_condition
 async def undoskip_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs):
     print("COMMAND:", f"Undo SkipDailyCheck")
-    message = "OK. Chose the daily verifications to skip."
+    message = ("OK. Please choose the daily verifications you'd like to undo skip for. 🔄🕒\n"
+               "Click /empty to cancel the operation.")
 
     user_id = update.message.from_user.id
     verif_list = AccessEnv.on_read(user_id, "daily_message")
     verif_list = list(filter(lambda x: not x['active'], verif_list))
 
     if len(verif_list) == 0:
-        message = "<b>No daily message skip to undo.</b>"
+        message = "<b>No daily message skip to undo. 📅</b>"
         return await update.message.reply_text(message, parse_mode=P_HTML)
 
     sorted_list = sorted(verif_list, key=lambda x: x['time'])
@@ -285,7 +298,8 @@ async def undoskip_command(update: Update, context: ContextTypes.DEFAULT_TYPE, *
 @verify_condition
 async def bugreport_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs):
     print("COMMAND:", f"Bug Report")
-    message = "OK. Please describe the bug and what you did to see it."
+    message = ("Sure! Please describe the bug and the steps you took to encounter it. 🐞📝\n"
+               "Click /empty to cancel the operation.")
 
     user_id = update.message.from_user.id
     AccessEnv.on_write(user_id, "state", "bugreport")
@@ -299,12 +313,12 @@ async def request_command(update: Update, context: ContextTypes.DEFAULT_TYPE, qu
     contact_request = AccessEnv.on_read(user_id, "contact_request")
 
     if len(contact_request) == 0 and not quiet:
-        message = "<b>There is no association request.</b>"
+        message = "<b>There is no association request. 🤷‍♂️</b>"
         return await update.message.reply_text(message, parse_mode=P_HTML)
 
     for id, username in contact_request.items():
         print("COMMAND:", f"Notif user from del/add {user_id=} to {id}")
-        message = f"<b>Do you want to accept the pairing invitation from @{username}</b>"
+        message = f"<b>Do you want to accept the pairing invitation from @{username} 🤝?</b>"
 
         keyboard = [
             [
@@ -319,8 +333,9 @@ async def request_command(update: Update, context: ContextTypes.DEFAULT_TYPE, qu
 @verify_condition
 async def fastcheck_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs):
     print("COMMAND:", f"Fast Check")
-    message = "OK. How soon do you want to have the quick check? <b>(less than 20mn)</b>"
-
+    message = ("Alright! When would you like to have the quick check? 🕒🚀 "
+               "<b>(less than 20 minutes)</b>\n"
+               "Click /empty to cancel the operation.")
     keyboard = [
         ["5 mn", "10 mn", "15 mn", "20 mn"],
     ]
@@ -338,14 +353,14 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwa
     user_id = update.message.from_user.id
     alert_mode = AccessEnv.on_read(user_id, "alert_mode")
     if alert_mode:
-        message = "<b>You are already in alert mode!</b>"
+        message = "<b>You are already in alert mode! 🚨</b>"
         return await update.message.reply_text(message, parse_mode=P_HTML)
 
     if not AccessEnv.on_read(user_id, "response_message"):
         AccessEnv.on_write(user_id, "response_message", True)
-        await update.message.reply_text("Answer received, daily verification off...")
+        await update.message.reply_text("Answer received, daily verification has been turned off.")
 
-    message = "<b>Do you want to notify emergency contacts?</b>"
+    message = "<b>Do you want to notify emergency contacts? 🚨</b>"
     keyboard = [
         [
             InlineKeyboardButton("Yes", callback_data="1"),
@@ -362,10 +377,10 @@ async def undohelp_command(update: Update, context: ContextTypes.DEFAULT_TYPE, *
     print("COMMAND:", f"Undo help")
     user_id = update.message.from_user.id
     if not AccessEnv.on_read(user_id, "alert_mode"):
-        message = "<b>This operation can only be used in alert state!</b>"
+        message = "<b>This operation can only be used in alert state! ⚠️</b>"
         return await update.message.reply_text(message, parse_mode=P_HTML)
 
-    response = "<b>Do you want to cancel the alert?</b>"
+    response = "<b>Do you want to cancel the alert? 🤔</b>"
     keyboard = [
         [
             InlineKeyboardButton("Yes", callback_data="3"),
@@ -377,9 +392,17 @@ async def undohelp_command(update: Update, context: ContextTypes.DEFAULT_TYPE, *
 
 
 @verify_condition
+async def empty_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs):
+    user_id = update.message.from_user.id
+    AccessEnv.on_write(user_id, "state", "")
+    message = "Sure thing! Operation canceled. ✅"
+    return await update.message.reply_text(message)
+
+
+@verify_condition
 async def kill_user_data(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs):
     print("COMMAND:", f"Kill user data")
     user_id = update.message.from_user.id
     AccessEnv.on_kill_data(user_id)
-    message = "<b>Your personal data has been deleted.</b>"
+    message = "<b>Your personal data has been deleted.🗑️</b>"
     return await update.message.reply_text(message, parse_mode=P_HTML)
