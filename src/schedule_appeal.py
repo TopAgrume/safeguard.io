@@ -27,11 +27,11 @@ async def send_daily_message(user_id: int, description: str):
 
 
 async def run_schedule():
-    current_minute = -1
+    current_hour = -1
     while True:
-        while datetime.now().hour != current_minute:
-            current_minute = datetime.now().hour
-            print('SCHEDULER:', f"--- REFRESH {current_minute}h ---")
+        if datetime.now().hour != current_hour:
+            current_hour = datetime.now().hour
+            print('SCHEDULER:', f"--- REFRESH {current_hour}h ---")
 
         for user_id, user_data in AccessEnv.on_get_users("items"):
             # If alert mode, do nothing

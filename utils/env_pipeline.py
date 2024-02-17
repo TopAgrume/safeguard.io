@@ -1,4 +1,3 @@
-from twilio.rest import Client
 from datetime import datetime
 
 import logging
@@ -241,22 +240,22 @@ class AccessEnv(object):
             raise ValueError("One or more keys required environment variables are missing.")
         return API_TOKEN, BOT_USERNAME
 
-    @staticmethod
-    def client() -> Client:
-        account_sid = os.getenv('account_sid')
-        auth_token = os.getenv('auth_token')
-        if not account_sid or not auth_token:
-            raise ValueError("One or more keys required environment variables are missing.")
-        return Client(account_sid, auth_token)
+    # @staticmethod
+    # def client() -> Client:
+    #     account_sid = os.getenv('account_sid')
+    #     auth_token = os.getenv('auth_token')
+    #     if not account_sid or not auth_token:
+    #         raise ValueError("One or more keys required environment variables are missing.")
+    #     return Client(account_sid, auth_token)
 
-    @staticmethod
-    def contacts() -> tuple[str, str, str]:
-        server_number = os.getenv('server_number')
-        client_number = os.getenv('client_number')
-        emergency_number = os.getenv('emergency_number')
-        if not server_number or not client_number or not emergency_number:
-            raise ValueError("One or more contacts required environment variables are missing.")
-        return server_number, client_number, emergency_number
+    # @staticmethod
+    # def contacts() -> tuple[str, str, str]:
+    #     server_number = os.getenv('server_number')
+    #     client_number = os.getenv('client_number')
+    #     emergency_number = os.getenv('emergency_number')
+    #     if not server_number or not client_number or not emergency_number:
+    #         raise ValueError("One or more contacts required environment variables are missing.")
+    #     return server_number, client_number, emergency_number
 
     @staticmethod
     def on_init_check_queue(user_id: str, daily_check: dict, waiting_time: int):
@@ -355,12 +354,12 @@ class AccessEnv(object):
     def on_kill_request(user_id: int, file_path: str = "data/request.json") -> None:
         AccessEnv.on_kill_data(user_id, file_path)
 
-    @staticmethod
-    def emergencies() -> str:
-        emergency_number = os.getenv('emergency_number')
-        if not emergency_number:
-            raise ValueError("emergency numbers are missing.")
-        return emergency_number
+    # @staticmethod
+    # def emergencies() -> str:
+    #     emergency_number = os.getenv('emergency_number')
+    #     if not emergency_number:
+    #         raise ValueError("emergency numbers are missing.")
+    #     return emergency_number
 
     @staticmethod
     def logger(logger_name: str):
