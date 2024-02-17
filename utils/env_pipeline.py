@@ -5,7 +5,7 @@ import logging
 import os
 import json
 
-MAX_TIME_DIFF = 60
+MAX_TIME_DIFF = 45
 
 
 def less_than_one_hour(time1: dict, time2: dict):

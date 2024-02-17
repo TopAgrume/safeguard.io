@@ -27,7 +27,7 @@
     },
     "6577580728": {
         "alert_mode": false,
-        "response_message": true,
+        "response_message": false,
         "state": "",
         "username": "alexandre_dr",
         "contacts": [
@@ -37,12 +37,18 @@
                 "pair": true
             },
             {
-                "id": null,
-                "tag": "dede",
-                "pair": false
+                "id": 6874476665,
+                "tag": "chri_dr",
+                "pair": true
             }
         ],
-        "daily_message": [],
+        "daily_message": [
+            {
+                "time": "02:46",
+                "desc": "test",
+                "active": true
+            }
+        ],
         "contact_request": {}
     },
     "6874476665": {

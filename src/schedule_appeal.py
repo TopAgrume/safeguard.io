@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from telegram import Bot, KeyboardButton
 from telegram import ReplyKeyboardMarkup
 from utils.env_pipeline import AccessEnv
@@ -6,7 +8,7 @@ import asyncio
 import time
 
 TOKEN, BOT_USERNAME = AccessEnv.telegram_keys()
-LOOP_SCHEDULER_TIME, WAITING_TIME = 60, 12
+WAITING_TIME = 9
 bot = Bot(TOKEN)
 
 
@@ -20,7 +22,7 @@ async def send_daily_message(user_id: int, description: str):
         ],
     ]
     reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True, one_time_keyboard=True)
-    message = f"Hey! This is your daily message ({description}), please answer if you are fine! :)"
+    message = f"Hey 🙂🌟! This is your daily message ({description}), please answer if you are fine!"
     return await bot.send_message(chat_id=user_id, text=message, reply_markup=reply_markup)
 
 
@@ -56,7 +58,10 @@ async def run_schedule():
                 AccessEnv.on_init_check_queue(str(user_id), unique_check, WAITING_TIME)
                 await send_daily_message(user_id, unique_check["desc"])
 
-        await asyncio.sleep(LOOP_SCHEDULER_TIME)
+        current_minute = datetime.now().minute
+        # Wait until the minute changes
+        while datetime.now().minute == current_minute:
+            await asyncio.sleep(1)
 
 
 def run_schedule_process():

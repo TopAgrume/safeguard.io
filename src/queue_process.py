@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from telegram import Bot, KeyboardButton
 from telegram import ReplyKeyboardMarkup
 from utils.env_pipeline import AccessEnv
@@ -6,7 +8,7 @@ import telegram
 import asyncio
 
 TOKEN, BOT_USERNAME = AccessEnv.telegram_keys()
-LOOP_QUEUE_TIME, WAITING_TIME = 60, 10
+WAITING_TIME = 9
 P_HTML = telegram.constants.ParseMode.HTML
 bot = Bot(TOKEN)
 
@@ -60,7 +62,6 @@ async def send_alert_message(user_id):
 
 
 async def check_for_response():
-    await asyncio.sleep(5)
     while True:
         print('WORKING QUEUE:', '--- REFRESH ---')
 
@@ -85,7 +86,11 @@ async def check_for_response():
             user_data['waiting_time'] -= 1
             AccessEnv.on_write_check_queue(user_id, 'waiting_time', user_data['waiting_time'])
 
-        await asyncio.sleep(LOOP_QUEUE_TIME)
+        current_minute = datetime.now().minute
+        # Wait until the minute changes
+        while datetime.now().minute == current_minute:
+            await asyncio.sleep(1)
+        await asyncio.sleep(5)
 
 
 def run_queue_process():

@@ -10,6 +10,8 @@ P_HTML = telegram.constants.ParseMode.HTML
 def verify_condition(func):
     async def wrapper(update, context, **kwargs):
         message_type: str = update.message.chat.type
+        message_body: str = update.message.text
+
         if message_type == 'group':
             message_body: str = message_body.lower()
             if BOT_USERNAME in message_body:
@@ -21,7 +23,7 @@ def verify_condition(func):
         username = update.message.from_user.username
         if username is None or username == "":
             message = ("Please create a username in your Telegram profile in order to use my features."
-                       " Then use /start if you are not already registered.")
+                       " Then use /start if you are not already registered 📲✨.")
             await update.message.reply_text(message)
         else:
             await func(update, context, **kwargs)
