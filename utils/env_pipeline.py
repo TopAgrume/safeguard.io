@@ -5,7 +5,7 @@ import logging
 import os
 import json
 
-MAX_TIME_DIFF = 45
+MAX_TIME_DIFF = 20
 
 
 def less_than_one_hour(time1: dict, time2: dict):
@@ -117,10 +117,11 @@ class AccessEnv(object):
         return special_action
 
     @staticmethod
-    def on_write_verifications(user_id: int, method: str = None, value: list = None, skip_check: bool = False) -> None:
+    def on_write_verifications(user_id: int, method: str = None, value: list = None, skip_check: bool = False):
         base_dict = AccessEnv.on_update()
 
         # Write verifications to a JSON file
+        not_valid = []
         current_dict = base_dict[str(user_id)]['daily_message']
 
         if method == 'add':
@@ -130,6 +131,7 @@ class AccessEnv(object):
 
                 if not skip_check:
                     if any(less_than_one_hour(daily_message, new_checks) for daily_message in current_dict):
+                        not_valid.append(new_checks['time'])
                         continue
 
                 current_dict.append(new_checks)
@@ -137,12 +139,16 @@ class AccessEnv(object):
             current_dict = [dail_check for dail_check in current_dict if dail_check["time"] not in value]
         elif method in ('skip', 'undoskip'):
             for dail_check in current_dict:
+                if dail_check["active"] is None:
+                    continue
                 if dail_check["time"] in value:
                     dail_check["active"] = (method == 'undoskip')
 
         base_dict[str(user_id)]['daily_message'] = current_dict
         with open('data/data.json', 'w') as json_file:
             json.dump(base_dict, json_file, indent=4)
+
+        return not_valid
 
     @staticmethod
     def on_read(user_id: int, key: str = None):

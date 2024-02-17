@@ -63,8 +63,8 @@ async def extract_user_id_add(update: Update, content: str):
     message = "Given contact(s) are now added to your account.\nThey received an association request.🎉\n"
     if len(error_contact) != 0:
         message += "\nFollowing contact(s) weren't added due to their unknown format:\n"
-    for elt in error_contact:
-        message += f"\n❌ {elt}"
+        for elt in error_contact:
+            message += f"\n❌ {elt}"
     return await update.message.reply_text(message)
 
 
@@ -87,12 +87,12 @@ async def extract_user_id_del(update: Update, content: str):
     message = "Given contact(s) are now deleted from your account.🚮\n"
     if len(error_contact) != 0:
         message += "\nFollowing contact(s) weren't removed due to their unknown format:\n"
-    for elt in error_contact:
-        message += f"\n❌ {elt}"
+        for elt in error_contact:
+            message += f"\n❌ {elt}"
     return await update.message.reply_text(message)
 
 
-async def extract_verif_add(update: Update, content: str):  # TODO Check same date verif / not enough space between
+async def extract_verif_add(update: Update, content: str):
     error_contact, new_verif = [], []
     user_id = update.message.from_user.id
 
@@ -106,13 +106,19 @@ async def extract_verif_add(update: Update, content: str):  # TODO Check same da
         else:
             error_contact.append(line)
 
-    AccessEnv.on_write_verifications(user_id, "add", new_verif)
+    not_valid = AccessEnv.on_write_verifications(user_id, "add", new_verif)
 
     message = "Given daily verification(s) are now added to your account. 📅🔐\n"
     if len(error_contact) != 0:
         message += "\nFollowing verification(s) weren't added due to their unknown format:\n"
-    for elt in error_contact:
-        message += f"\n❌ {elt}"
+        for elt in error_contact:
+            message += f"\n❌ {elt}"
+        message += "\n"
+    if len(not_valid) != 0:
+        message += ("\nFollowing verification(s) weren't added. Make sure to"
+                    "space daily messages at least 20 minutes apart:\n")
+        for elt in not_valid:
+            message += f"\n❌ {elt}"
     return await update.message.reply_text(message)
 
 
@@ -135,13 +141,14 @@ async def extract_verif_del(update: Update, content: str):
     message = "Given daily verification(s) are now deleted to your account.🚫📅\n"
     if len(error_contact) != 0:
         message += "\nFollowing verification(s) weren't removed due to their unknown format:\n"
-    for elt in error_contact:
-        message += f"\n❌ {elt}"
+        for elt in error_contact:
+            message += f"\n❌ {elt}"
     return await update.message.reply_text(message)
 
 
 async def extract_bugreport(update: Update, content: str):
-    filename = "bug_reports/report_" + str(random.randint(0, 999999))
+    date = datetime.now().strftime("%d.%m.%Y_%Hh%M")
+    filename = f"bug_reports/report_{date}_{random.randint(0, 999999)}"
     with open(filename, 'w') as file:
         file.write(content)
         file.close()
@@ -168,8 +175,8 @@ async def skip_alarm(update: Update, content: str):
     message = "Given daily verification(s) are now skipped for the next 24h.⏰✨\n"
     if len(error_contact) != 0:
         message += "\nFollowing verification(s) weren't skipped due to their unknown format:\n"
-    for elt in error_contact:
-        message += f"\n❌ {elt}"
+        for elt in error_contact:
+            message += f"\n❌ {elt}"
     return await update.message.reply_text(message)
 
 

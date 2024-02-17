@@ -22,9 +22,9 @@ def verify_condition(func):
                 return
         username = update.message.from_user.username
         if username is None or username == "":
-            message = ("Please create a username in your Telegram profile in order to use my features."
-                       " Then use /start if you are not already registered 📲✨.")
-            await update.message.reply_text(message)
+            message = ("Please <b>create a username</b> in your Telegram profile in order to use my features."
+                       " Then use <b>/start</b> if you are not already registered 📲✨.")
+            await update.message.reply_text(message, parse_mode=P_HTML)
         else:
             await func(update, context, **kwargs)
 
@@ -35,11 +35,6 @@ def verify_condition(func):
 async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs):
     user_id = update.message.from_user.id
     user_first_name: str = str(update.message.chat.first_name)
-
-    if user_id is None:
-        message = (f"Hello {user_first_name} 👋! Make sure to <b>create a username</b> in your account settings"
-                   "to use my features. When this is done, use the <b>/start</b> command.")
-        return await update.message.reply_text(message, parse_mode=P_HTML)
 
     username = update.message.from_user.username
     print("COMMAND:", f"Start user @{username}")
@@ -210,8 +205,13 @@ async def showverifs_command(update: Update, context: ContextTypes.DEFAULT_TYPE,
     skipped_verif = "\n<b>Skipped today:</b>\n\n"
     skip_bool, active = False, True
     for verif in sorted_list:
-        if verif["active"] or verif["active"] is None:
+        if verif["active"]:
             message += f"🕗 <b>{verif['time']}</b> - {verif['desc']}\n"
+            active = False
+            continue
+
+        if verif["active"] is None:
+            message += f"⏭️ <b>{verif['time']}</b> - {verif['desc']}\n"
             active = False
             continue
 
@@ -289,7 +289,7 @@ async def undoskip_command(update: Update, context: ContextTypes.DEFAULT_TYPE, *
     sorted_list = sorted(verif_list, key=lambda x: x['time'])
 
     keyboard = [
-        [f"{elt['time']}" for elt in sorted_list],
+        [f"{elt['time']}" for elt in sorted_list if elt['active'] is not None],
     ]
     reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True, one_time_keyboard=True)
 

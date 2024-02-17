@@ -25,32 +25,6 @@
         ],
         "contact_request": {}
     },
-    "6577580728": {
-        "alert_mode": false,
-        "response_message": false,
-        "state": "",
-        "username": "alexandre_dr",
-        "contacts": [
-            {
-                "id": 6340506663,
-                "tag": "heldeck",
-                "pair": true
-            },
-            {
-                "id": 6874476665,
-                "tag": "chri_dr",
-                "pair": true
-            }
-        ],
-        "daily_message": [
-            {
-                "time": "02:46",
-                "desc": "test",
-                "active": true
-            }
-        ],
-        "contact_request": {}
-    },
     "6874476665": {
         "alert_mode": false,
         "response_message": true,
@@ -58,6 +32,65 @@
         "username": "chri_dr",
         "contacts": [],
         "daily_message": [],
+        "contact_request": {}
+    },
+    "1939935789": {
+        "alert_mode": false,
+        "response_message": true,
+        "state": "",
+        "username": "Valoowaoo",
+        "contacts": [
+            {
+                "id": 6577580728,
+                "tag": "alexandre_dr",
+                "pair": true
+            }
+        ],
+        "daily_message": [
+            {
+                "time": "09:00",
+                "desc": "Awakening",
+                "active": true
+            },
+            {
+                "time": "17:53",
+                "desc": "test",
+                "active": true
+            },
+            {
+                "time": "18:19",
+                "desc": "Auto fast check",
+                "active": null
+            }
+        ],
+        "contact_request": {
+            "6577580728": "alexandre_dr"
+        }
+    },
+    "6577580728": {
+        "alert_mode": false,
+        "response_message": true,
+        "state": "",
+        "username": "alexandre_dr",
+        "contacts": [
+            {
+                "id": 1939935789,
+                "tag": "Valoowaoo",
+                "pair": false
+            }
+        ],
+        "daily_message": [
+            {
+                "time": "08:05",
+                "desc": "Awakening",
+                "active": true
+            },
+            {
+                "time": "20:06",
+                "desc": "Auto fast check",
+                "active": null
+            }
+        ],
         "contact_request": {}
     }
 }

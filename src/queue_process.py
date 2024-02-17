@@ -63,8 +63,12 @@ async def send_alert_message(user_id):
 
 async def check_for_response():
     await asyncio.sleep(5)
+    current_minute = -1
     while True:
-        print('WORKING QUEUE:', '--- REFRESH ---')
+        # Wait until the next hour
+        while datetime.now().hour != current_minute:
+            current_minute = datetime.now().hour
+            print('WORKING QUEUE:', f"--- REFRESH {current_minute}h ---")
 
         for user_id, user_data in AccessEnv.on_get_check_users("items"):
             # Check for response message
@@ -91,7 +95,6 @@ async def check_for_response():
         # Wait until the minute changes
         while datetime.now().minute == current_minute:
             await asyncio.sleep(1)
-        await asyncio.sleep(5)
 
 
 def run_queue_process():
