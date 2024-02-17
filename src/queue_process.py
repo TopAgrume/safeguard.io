@@ -62,6 +62,7 @@ async def send_alert_message(user_id):
 
 
 async def check_for_response():
+    await asyncio.sleep(5)
     while True:
         print('WORKING QUEUE:', '--- REFRESH ---')
 
