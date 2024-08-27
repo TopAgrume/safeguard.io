@@ -262,7 +262,7 @@ async def handle_messages(update: Update, context: ContextTypes.DEFAULT_TYPE, **
 @debug_logger
 async def error(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Log errors caused by updates."""
-    print(f'Update {update} caused error {context.error}')
+    logger.error(f'Update {update} caused error {context.error}')
 
 
 @debug_logger
