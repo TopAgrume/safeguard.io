@@ -1,16 +1,36 @@
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup, Message
 from telegram.ext import ContextTypes
 from utils.env_pipeline import AccessEnv
 import telegram
 from logzero import logger
+from functools import wraps
 
 TOKEN, BOT_USERNAME = AccessEnv.telegram_keys()
 P_HTML = telegram.constants.ParseMode.HTML
 
 
 def verify_condition(func): # VALID
-    async def wrapper(update, context, **kwargs):
-        logger.debug(f"COMMAND: {func.__name__} call")
+    """
+    Decorator to verify conditions before executing bot commands.
+
+    This decorator checks if:
+    1. The message is from a group (not supported)
+    2. The user has a username (required)
+
+    If conditions are not met, appropriate messages are sent to the user.
+
+    Args:
+        func (Callable): The function to be decorated.
+
+    Returns:
+        Callable: The wrapped function.
+    """
+    @wraps(func)
+    async def wrapper(update, context, **kwargs) -> Message | None:
+        if func.__name__ == "handle_messages":
+            logger.debug(f"API: {func.__name__} call")
+        else:
+            logger.debug(f"COMMAND: {func.__name__} call")
 
         message_type: str = update.message.chat.type
         message_body: str = update.message.text
@@ -35,18 +55,35 @@ def verify_condition(func): # VALID
 
 
 @verify_condition
-async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs):
+async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs) -> Message:
+    """
+    Handle the /start command for the Telegram bot.
+
+    This function:
+    1. Checks if the user is already registered
+    2. Registers new users
+    3. Processes any pending contact requests for the user
+    4. Sends a welcome message
+
+    Args:
+        update (Update): The incoming update.
+        context (ContextTypes.DEFAULT_TYPE): The context object for the update.
+        **kwargs: Additional keyword arguments.
+
+    Returns:
+        Message: Response message from the bot.
+    """
     user_id = update.message.from_user.id
     user_first_name = str(update.message.chat.first_name)
     username = update.message.from_user.username
 
     if AccessEnv.user_already_registered(user_id):
-        logger.debug(f"User @{username} already registered")
+        logger.debug(f"└── User @{username} already registered")
         message = "Your profile is already linked with Safeguard.io!"
         return await update.message.reply_text(message)
 
     AccessEnv.on_create_user(user_id, username)
-    logger.debug(f"New user @{username} registered")
+    logger.debug(f"└── New user @{username} registered")
     message = f"Hello {user_first_name} 🌟! Thanks for chatting with me! I am Safeguard.io 😊."
     await update.message.reply_text(message)
 
@@ -85,7 +122,18 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kw
 
 
 @verify_condition # VALID
-async def info_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs):
+async def info_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs) -> Message:
+    """
+    Handle the /info command, providing information about bot usage.
+
+    Args:
+        update (Update): The incoming update.
+        context (ContextTypes.DEFAULT_TYPE): The context object for the update.
+        **kwargs: Additional keyword arguments.
+
+    Returns:
+        Message: Response message from the bot.
+    """
     message = ("Welcome! I'm here to ensure everything is smooth for you. Use these commands to interact with me:\n"
                "\n<b>Edit bot configuration</b>\n"
                "/start or /subscribe - Initiate a conversation with me.\n"
@@ -114,10 +162,23 @@ async def info_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwa
 
 
 @verify_condition # VALID
-async def addcontact_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs):
+async def addcontact_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs) -> Message:
+    """
+    Handle the /addcontact command, allowing users to add emergency contacts.
+
+    Args:
+        update (Update): The incoming update.
+        context (ContextTypes.DEFAULT_TYPE): The context object for the update.
+        **kwargs: Additional keyword arguments.
+
+    Returns:
+        Message: Response message from the bot.
+    """
     user_id = update.message.from_user.id
+    username = update.message.from_user.username
 
     if len(AccessEnv.read_user_properties(user_id, "contacts")) > 9:
+        logger.debug(f"└── User @{username} already have 10 contacts")
         message = "You cannot add an additional contacts (10 max). 🛑"
         return await update.message.reply_text(message)
 
@@ -132,11 +193,24 @@ async def addcontact_command(update: Update, context: ContextTypes.DEFAULT_TYPE,
 
 
 @verify_condition # VALID
-async def showcontacts_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs):
+async def showcontacts_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs) -> Message:
+    """
+    Handle the /showcontacts command, displaying the user's emergency contacts.
+
+    Args:
+        update (Update): The incoming update.
+        context (ContextTypes.DEFAULT_TYPE): The context object for the update.
+        **kwargs: Additional keyword arguments.
+
+    Returns:
+        Message: Response message from the bot.
+    """
     user_id = update.message.from_user.id
     contact_list = AccessEnv.read_user_properties(user_id, "contacts")
+    username = update.message.from_user.username
 
     if len(contact_list) == 0:
+        logger.debug(f"└── User @{username} does not have any contact")
         message = "<b>There is no emergency contact to display. 🆘</b>"
         return await update.message.reply_text(message, parse_mode=P_HTML)
 
@@ -153,11 +227,24 @@ async def showcontacts_command(update: Update, context: ContextTypes.DEFAULT_TYP
 
 
 @verify_condition # VALID
-async def delcontact_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs):
+async def delcontact_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs) -> Message:
+    """
+    Handle the /delcontact command, allowing users to delete emergency contacts.
+
+    Args:
+        update (Update): The incoming update.
+        context (ContextTypes.DEFAULT_TYPE): The context object for the update.
+        **kwargs: Additional keyword arguments.
+
+    Returns:
+        Message: Response message from the bot.
+    """
     user_id = update.message.from_user.id
     user_contacts = AccessEnv.read_user_properties(user_id, "contacts")
+    username = update.message.from_user.username
 
     if len(user_contacts) == 0:
+        logger.debug(f"└── User @{username} does not have any contact to delete")
         message = "<b>No contact to delete. 📭</b>"
         return await update.message.reply_text(message, parse_mode=P_HTML)
 
@@ -171,10 +258,23 @@ async def delcontact_command(update: Update, context: ContextTypes.DEFAULT_TYPE,
 
 
 @verify_condition # VALID
-async def addverif_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs):
+async def addverif_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs) -> Message:
+    """
+    Handle the /addverif command, allowing users to add daily verification messages.
+
+    Args:
+        update (Update): The incoming update.
+        context (ContextTypes.DEFAULT_TYPE): The context object for the update.
+        **kwargs: Additional keyword arguments.
+
+    Returns:
+        Message: Response message from the bot.
+    """
     user_id = update.message.from_user.id
+    username = update.message.from_user.username
 
     if len(AccessEnv.read_user_properties(user_id, "daily_message")) > 5:
+        logger.debug(f"└── User @{username} already have 6 verifications")
         message = "<b>You cannot add an additional daily check (6 max). 🛑</b>"
         return await update.message.reply_text(message, parse_mode=P_HTML)
 
@@ -189,11 +289,24 @@ async def addverif_command(update: Update, context: ContextTypes.DEFAULT_TYPE, *
 
 
 @verify_condition # VALID
-async def showverifs_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs):
+async def showverifs_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs) -> Message:
+    """
+    Handle the /showverifs command, displaying the user's daily verification messages.
+
+    Args:
+        update (Update): The incoming update.
+        context (ContextTypes.DEFAULT_TYPE): The context object for the update.
+        **kwargs: Additional keyword arguments.
+
+    Returns:
+        Message: Response message from the bot.
+    """
     user_id = update.message.from_user.id
     verif_list = AccessEnv.read_user_properties(user_id, "daily_message")
+    username = update.message.from_user.username
 
     if len(verif_list) == 0:
+        logger.debug(f"└── User @{username} does not have any verification")
         message = "<b>There is no daily check to display. 📅</b>"
         return await update.message.reply_text(message, parse_mode=P_HTML)
 
@@ -223,11 +336,24 @@ async def showverifs_command(update: Update, context: ContextTypes.DEFAULT_TYPE,
 
 
 @verify_condition # VALID
-async def delverif_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs):
+async def delverif_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs) -> Message:
+    """
+    Handle the /delverif command, allowing users to delete daily verification messages.
+
+    Args:
+        update (Update): The incoming update.
+        context (ContextTypes.DEFAULT_TYPE): The context object for the update.
+        **kwargs: Additional keyword arguments.
+
+    Returns:
+        Message: Response message from the bot.
+    """
     user_id = update.message.from_user.id
+    username = update.message.from_user.username
     verif_list = AccessEnv.read_user_properties(user_id, "daily_message")
 
     if len(verif_list) == 0:
+        logger.debug(f"└── User @{username} does not have any verification to delete")
         message = "<b>No daily message to delete. 📅</b>"
         return await update.message.reply_text(message, parse_mode=P_HTML)
 
@@ -244,12 +370,26 @@ async def delverif_command(update: Update, context: ContextTypes.DEFAULT_TYPE, *
 
 
 @verify_condition # VALID
-async def skip_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs):
+async def skip_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs) -> Message:
+    """
+    Handle the /skip command, allowing users to skip the next daily verification.
+
+    Args:
+        update (Update): The incoming update.
+        context (ContextTypes.DEFAULT_TYPE): The context object for the update.
+        **kwargs: Additional keyword arguments.
+
+    Returns:
+        Message: Response message from the bot.
+    """
     user_id = update.message.from_user.id
+    username = update.message.from_user.username
+
     verif_list = AccessEnv.read_user_properties(user_id, "daily_message")
     verif_list = list(filter(lambda x: x["active"], verif_list))
 
     if len(verif_list) == 0:
+        logger.debug(f"└── User @{username} does not have daily message to skip")
         message = "<b>No daily message to skip. 📅</b>"
         return await update.message.reply_text(message, parse_mode=P_HTML)
 
@@ -266,12 +406,25 @@ async def skip_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwa
 
 
 @verify_condition # VALID
-async def undoskip_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs):
+async def undoskip_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs) -> Message:
+    """
+    Handle the /undoskip command, allowing users to undo skipped daily verifications.
+
+    Args:
+        update (Update): The incoming update.
+        context (ContextTypes.DEFAULT_TYPE): The context object for the update.
+        **kwargs: Additional keyword arguments.
+
+    Returns:
+        Message: Response message from the bot.
+    """
     user_id = update.message.from_user.id
+    username = update.message.from_user.username
     verif_list = AccessEnv.read_user_properties(user_id, "daily_message")
     verif_list = list(filter(lambda x: not x['active'], verif_list))
 
     if len(verif_list) == 0:
+        logger.debug(f"└── User @{username} does not have daily message skip to undo")
         message = "<b>No daily message skip to undo. 📅</b>"
         return await update.message.reply_text(message, parse_mode=P_HTML)
 
@@ -288,7 +441,18 @@ async def undoskip_command(update: Update, context: ContextTypes.DEFAULT_TYPE, *
 
 
 @verify_condition # VALID
-async def bugreport_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs):
+async def bugreport_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs) -> Message:
+    """
+    Handle the /bugreport command, allowing users to report bugs or suggest improvements.
+
+    Args:
+        update (Update): The incoming update.
+        context (ContextTypes.DEFAULT_TYPE): The context object for the update.
+        **kwargs: Additional keyword arguments.
+
+    Returns:
+        Message: Response message from the bot.
+    """
     user_id = update.message.from_user.id
     AccessEnv.update_user_properties(user_id, "state", "bugreport")
 
@@ -298,11 +462,25 @@ async def bugreport_command(update: Update, context: ContextTypes.DEFAULT_TYPE, 
 
 
 @verify_condition # VALID
-async def request_command(update: Update, context: ContextTypes.DEFAULT_TYPE, quiet: bool = False, **kwargs):
+async def request_command(update: Update, context: ContextTypes.DEFAULT_TYPE, quiet: bool = False, **kwargs) -> Message:
+    """
+    Handle the /request command, showing and processing association requests.
+
+    Args:
+        update (Update): The incoming update.
+        context (ContextTypes.DEFAULT_TYPE): The context object for the update.
+        quiet (bool): If True, don't send a message if there are no requests.
+        **kwargs: Additional keyword arguments.
+
+    Returns:
+        Message: Response message from the bot.
+    """
     user_id = update.message.from_user.id
+    username = update.message.from_user.username
     contact_request = AccessEnv.read_user_properties(user_id, "contact_request")
 
     if len(contact_request) == 0 and not quiet:
+        logger.debug(f"└── User @{username} does not have any association request")
         message = "<b>There is no association request. 🤷‍♂️</b>"
         return await update.message.reply_text(message, parse_mode=P_HTML)
 
@@ -320,7 +498,18 @@ async def request_command(update: Update, context: ContextTypes.DEFAULT_TYPE, qu
 
 
 @verify_condition # VALID
-async def fastcheck_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs):
+async def fastcheck_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs) -> Message:
+    """
+    Handle the /fastcheck command, allowing users to set up a quick verification.
+
+    Args:
+        update (Update): The incoming update.
+        context (ContextTypes.DEFAULT_TYPE): The context object for the update.
+        **kwargs: Additional keyword arguments.
+
+    Returns:
+        Message: Response message from the bot.
+    """
     keyboard = ["5 mn", "10 mn", "15 mn", "20 mn"]
     reply_markup = ReplyKeyboardMarkup([keyboard], resize_keyboard=True, one_time_keyboard=True)
 
@@ -334,11 +523,24 @@ async def fastcheck_command(update: Update, context: ContextTypes.DEFAULT_TYPE, 
 
 
 @verify_condition # VALID
-async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs):
+async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs) -> Message:
+    """
+    Handle the /help command, allowing users to notify emergency contacts.
+
+    Args:
+        update (Update): The incoming update.
+        context (ContextTypes.DEFAULT_TYPE): The context object for the update.
+        **kwargs: Additional keyword arguments.
+
+    Returns:
+        Message: Response message from the bot.
+    """
     user_id = update.message.from_user.id
+    username = update.message.from_user.username
     alert_mode = AccessEnv.read_user_properties(user_id, "alert_mode")
 
     if alert_mode:
+        logger.debug(f"└── User @{username} already in alert mode")
         message = "<b>You are already in alert mode! 🚨</b>"
         return await update.message.reply_text(message, parse_mode=P_HTML)
 
@@ -359,10 +561,23 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwa
 
 
 @verify_condition # VALID
-async def undohelp_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs):
+async def undohelp_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs) -> Message:
+    """
+    Handle the /undohelp command, allowing users to cancel the alert state.
+
+    Args:
+        update (Update): The incoming update.
+        context (ContextTypes.DEFAULT_TYPE): The context object for the update.
+        **kwargs: Additional keyword arguments.
+
+    Returns:
+        Message: Response message from the bot.
+    """
     user_id = update.message.from_user.id
+    username = update.message.from_user.username
 
     if not AccessEnv.read_user_properties(user_id, "alert_mode"):
+        logger.debug(f"└── User @{username} already in safe mode")
         message = "<b>This operation can only be used in alert state! ⚠️</b>"
         return await update.message.reply_text(message, parse_mode=P_HTML)
 
@@ -378,7 +593,18 @@ async def undohelp_command(update: Update, context: ContextTypes.DEFAULT_TYPE, *
 
 
 @verify_condition # VALID
-async def empty_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs):
+async def empty_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs) -> Message:
+    """
+    Handle the /empty command, canceling the current operation.
+
+    Args:
+        update (Update): The incoming update.
+        context (ContextTypes.DEFAULT_TYPE): The context object for the update.
+        **kwargs: Additional keyword arguments.
+
+    Returns:
+        Message: Response message from the bot.
+    """
     user_id = update.message.from_user.id
     AccessEnv.update_user_properties(user_id, "state", "")
     message = "Sure thing! Operation canceled. ✅"
@@ -386,7 +612,18 @@ async def empty_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kw
 
 
 @verify_condition # VALID
-async def kill_user_data(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs):
+async def kill_user_data(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs) -> Message:
+    """
+    Handle the command to delete all user data.
+
+    Args:
+        update (Update): The incoming update.
+        context (ContextTypes.DEFAULT_TYPE): The context object for the update.
+        **kwargs: Additional keyword arguments.
+
+    Returns:
+        Message: Response message from the bot.
+    """
     user_id = update.message.from_user.id
     AccessEnv.on_kill_data(user_id)
     message = "<b>Your personal data has been deleted.🗑️</b>"

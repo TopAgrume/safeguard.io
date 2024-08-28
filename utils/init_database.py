@@ -23,11 +23,31 @@ def init_database():
         username VARCHAR(255) UNIQUE NOT NULL,
         alert_mode BOOLEAN DEFAULT FALSE,
         response_message BOOLEAN DEFAULT TRUE,
-        state TEXT DEFAULT '',
-        contacts JSONB DEFAULT '[]'::JSONB,
-        daily_message JSONB DEFAULT '[]'::JSONB,
-        contact_request JSONB DEFAULT '{}'::JSONB
-    )
+        state TEXT DEFAULT ''
+    );
+    
+    CREATE TABLE IF NOT EXISTS contacts (
+        user_id BIGINT REFERENCES users(id) ON DELETE CASCADE,
+        contact_id BIGINT REFERENCES users(id) ON DELETE CASCADE,
+        tag VARCHAR(255),
+        pair BOOLEAN DEFAULT FALSE,
+        PRIMARY KEY (user_id, contact_id)
+    );
+    
+    CREATE TABLE IF NOT EXISTS daily_messages (
+        id SERIAL PRIMARY KEY,
+        user_id BIGINT REFERENCES users(id) ON DELETE CASCADE,
+        time TIME,
+        description TEXT,
+        active BOOLEAN
+    );
+    
+    CREATE TABLE IF NOT EXISTS contact_requests (
+        user_id BIGINT REFERENCES users(id) ON DELETE CASCADE,
+        requester_id BIGINT REFERENCES users(id) ON DELETE CASCADE,
+        requester_tag VARCHAR(255),
+        PRIMARY KEY (user_id, requester_id)
+    );
     """)
 
     print("Table 'users' created successfully (if it didn't exist).")

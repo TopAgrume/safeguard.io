@@ -13,20 +13,38 @@ from telegram.ext import Application, CommandHandler, MessageHandler, filters, C
 from telegram.constants import ParseMode
 
 from utils.env_pipeline import AccessEnv
-from utils.debug_tool import debug_logger
 from src import commands
 
 TOKEN, BOT_USERNAME = AccessEnv.telegram_keys()
 bot = Bot(TOKEN)
 
-@debug_logger
+import functools
+from logzero import logger
+
+def debug_logger(func):
+    @functools.wraps(func)
+    async def wrapper(*args, **kwargs):
+        logger.debug(f"API: {func.__name__} call")
+        return await func(*args, **kwargs)
+    return wrapper
+
+def sub_debug_logger(func):
+    @functools.wraps(func)
+    async def wrapper(*args, **kwargs):
+        logger.debug(f"    └── {func.__name__} call")
+        return await func(*args, **kwargs)
+    return wrapper
+
 async def send_hope_message(update: Update) -> None:
     """Send a message indicating that the alert status has been reset."""
+    username = update.message.from_user.username
+    logger.debug(f"└── User @{username} sent a hope message to reset the alert status")
+
     message = '<b>Alert status is reset</b>. Everything is back to normal. ✅'
     await update.message.reply_text(text=message, parse_mode=ParseMode.HTML)
 
 
-@debug_logger
+@sub_debug_logger
 async def notif_pairing_invitation(update: Update, notif_details: list) -> None:
     """
     Send notification to users about a pairing invitation.
@@ -51,7 +69,7 @@ async def notif_pairing_invitation(update: Update, notif_details: list) -> None:
         await bot.send_message(chat_id=notif['id'], text=message, reply_markup=reply_markup, parse_mode=ParseMode.HTML)
 
 
-@debug_logger
+@sub_debug_logger
 async def process_contacts(update: Update, content: str, action: str) -> None:
     """
     Process adding or deleting contacts.
@@ -86,7 +104,7 @@ async def process_contacts(update: Update, content: str, action: str) -> None:
     await update.message.reply_text(message)
 
 
-@debug_logger
+@sub_debug_logger
 async def process_verifications(update: Update, content: str, action: str) -> None:
     """
     Process adding or deleting verifications.
@@ -130,7 +148,7 @@ async def process_verifications(update: Update, content: str, action: str) -> No
     await update.message.reply_text(message)
 
 
-@debug_logger
+@sub_debug_logger
 async def extract_bugreport(update: Update, content: str) -> None:
     """
     Extract and save a bug report.
@@ -146,7 +164,7 @@ async def extract_bugreport(update: Update, content: str) -> None:
     await update.message.reply_text("Thank you for the report!")
 
 
-@debug_logger
+@sub_debug_logger
 async def process_alarm(update: Update, content: str, action: str) -> None:
     """
     Process skipping or undoing skip for alarms.
@@ -177,7 +195,7 @@ async def process_alarm(update: Update, content: str, action: str) -> None:
     await update.message.reply_text(message)
 
 
-@debug_logger
+@sub_debug_logger
 async def extract_fastcheck(update: Update, content: str) -> Message:
     """
     Extract and process a fast check request.
@@ -204,7 +222,6 @@ async def extract_fastcheck(update: Update, content: str) -> Message:
     await update.message.reply_text(message)
 
 
-@debug_logger
 async def state_dispatcher(update: Update, state: str, message_body: str) -> None:
     """
     Dispatch the appropriate function based on the current state.
@@ -214,6 +231,7 @@ async def state_dispatcher(update: Update, state: str, message_body: str) -> Non
         state (str): The current state of the conversation.
         message_body (str): The message content.
     """
+    username = update.message.from_user.username
     switch_dict = {
         "addcontact": lambda: process_contacts(update, message_body, "add"),
         "delcontact": lambda: process_contacts(update, message_body, "del"),
@@ -225,6 +243,7 @@ async def state_dispatcher(update: Update, state: str, message_body: str) -> Non
         "fastcheck": lambda: extract_fastcheck(update, message_body),
     }
 
+    logger.debug(f"└── User @{username} answered to call '{state or 'empty'}' with content: '{update.message.text}'")
     await switch_dict.get(state, lambda: update.message.reply_text("Excuse me, I didn't quite understand your request. 🤔"))()
 
 
@@ -242,18 +261,17 @@ async def handle_messages(update: Update, context: ContextTypes.DEFAULT_TYPE, **
 
     if response_message:
         get_state = AccessEnv.read_user_properties(user_id, "state")
-        logger.debug(f"API: User answer to call '{get_state}' with content: '{update.message.text}'")
         AccessEnv.update_user_properties(user_id, "state", "")
         return await state_dispatcher(update, get_state, update.message.text)
 
     if not alert_mode:
-        logger.debug('API: Response to confirmation demand')
+        logger.debug('└── User response to verification demand')
         greeting = "Have a great day 🌞!" if datetime.now().hour < 16 else "Have a wonderful afternoon 🌅!"
         response = f"Thank you for your response! {greeting}"
         AccessEnv.update_user_properties(user_id, "response_message", True)
         return await update.message.reply_text(response)
 
-    logger.debug('API: Response to unset the alert mode')
+    logger.debug('└── User response to unset the alert mode')
     AccessEnv.update_user_properties(user_id, "alert_mode", False)
     AccessEnv.update_user_properties(user_id, "response_message", True)
     await manual_undohelp(user_id, update.message.from_user.username)
@@ -262,7 +280,7 @@ async def handle_messages(update: Update, context: ContextTypes.DEFAULT_TYPE, **
 
 async def error(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Log errors caused by updates."""
-    logger.error(f'Update {update} caused error {context.error}')
+    logger.error(f'===> Update {update} caused error {context.error}')
 
 
 @debug_logger
