@@ -35,13 +35,13 @@ def sub_debug_logger(func):
         return await func(*args, **kwargs)
     return wrapper
 
-async def send_hope_message(update: Update) -> None:
+async def send_hope_message(update: Update) -> Message:
     """Send a message indicating that the alert status has been reset."""
     username = update.message.from_user.username
     logger.debug(f"└── User @{username} sent a hope message to reset the alert status")
 
     message = '<b>Alert status is reset</b>. Everything is back to normal. ✅'
-    await update.message.reply_text(text=message, parse_mode=ParseMode.HTML)
+    return await update.message.reply_text(text=message, parse_mode=ParseMode.HTML)
 
 
 @sub_debug_logger
@@ -70,7 +70,7 @@ async def notif_pairing_invitation(update: Update, notif_details: list) -> None:
 
 
 @sub_debug_logger
-async def process_contacts(update: Update, content: str, action: str) -> None:
+async def process_contacts(update: Update, content: str, action: str) -> Message:
     """
     Process adding or deleting contacts.
 
@@ -101,11 +101,11 @@ async def process_contacts(update: Update, content: str, action: str) -> None:
         message += "\nFollowing contact(s) weren't processed due to their unknown format:\n"
         message += "\n".join(f"❌ {contact}" for contact in error_contacts)
 
-    await update.message.reply_text(message)
+    return await update.message.reply_text(message)
 
 
 @sub_debug_logger
-async def process_verifications(update: Update, content: str, action: str) -> None:
+async def process_verifications(update: Update, content: str, action: str) -> Message:
     """
     Process adding or deleting verifications.
 
@@ -145,11 +145,11 @@ async def process_verifications(update: Update, content: str, action: str) -> No
         message += "\nFollowing verification(s) weren't processed due to their unknown format:\n"
         message += "\n".join(f"❌ {verif}" for verif in error_verifs)
 
-    await update.message.reply_text(message)
+    return await update.message.reply_text(message)
 
 
 @sub_debug_logger
-async def extract_bugreport(update: Update, content: str) -> None:
+async def extract_bugreport(update: Update, content: str) -> Message:
     """
     Extract and save a bug report.
 
@@ -161,11 +161,11 @@ async def extract_bugreport(update: Update, content: str) -> None:
     filename = f"bug_reports/report_{date}_{random.randint(0, 999999)}"
     with open(filename, 'w') as file:
         file.write(content)
-    await update.message.reply_text("Thank you for the report!")
+    return await update.message.reply_text("Thank you for the report!")
 
 
 @sub_debug_logger
-async def process_alarm(update: Update, content: str, action: str) -> None:
+async def process_alarm(update: Update, content: str, action: str) -> Message:
     """
     Process skipping or undoing skip for alarms.
 
@@ -192,7 +192,7 @@ async def process_alarm(update: Update, content: str, action: str) -> None:
         message += f"\nFollowing verification(s) weren't {action}ped due to their unknown format:\n"
         message += "\n".join(f"❌ {alarm}" for alarm in error_alarms)
 
-    await update.message.reply_text(message)
+    return await update.message.reply_text(message)
 
 
 @sub_debug_logger
@@ -219,10 +219,10 @@ async def extract_fastcheck(update: Update, content: str) -> Message:
     AccessEnv.on_write_verifications(user_id, "add", [new_alarm], True)
 
     message = f"Fast Check in {waiting_time}mn taken into account! ({time_to_display}) 🚀"
-    await update.message.reply_text(message)
+    return await update.message.reply_text(message)
 
 
-async def state_dispatcher(update: Update, state: str, message_body: str) -> None:
+async def state_dispatcher(update: Update, state: str, message_body: str) -> Message:
     """
     Dispatch the appropriate function based on the current state.
 
@@ -244,11 +244,11 @@ async def state_dispatcher(update: Update, state: str, message_body: str) -> Non
     }
 
     logger.debug(f"└── User @{username} answered to call '{state or 'empty'}' with content: '{update.message.text}'")
-    await switch_dict.get(state, lambda: update.message.reply_text("Excuse me, I didn't quite understand your request. 🤔"))()
+    return await switch_dict.get(state, lambda: update.message.reply_text("Excuse me, I didn't quite understand your request. 🤔"))()
 
 
 @commands.verify_condition
-async def handle_messages(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs) -> Message | None:
+async def handle_messages(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs) -> Message:
     """
     Handle incoming messages and route them to the appropriate function.
 
@@ -318,7 +318,7 @@ async def manual_undohelp(user_id: int, username: str) -> None:
 
 
 @debug_logger
-async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Message | bool:
+async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Message:
     """
     Handle button callback queries.
 
@@ -376,7 +376,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Message 
         message = (f"<b>Successful association @{users_data[query.data[1:]]} 🎉. "
                    f"You will now be informed if this person no longer gives any news.</b>")
 
-    await query.edit_message_text(text=message, parse_mode=ParseMode.HTML)
+    return await query.edit_message_text(text=message, parse_mode=ParseMode.HTML)
 
 
 def run_api():

@@ -1,5 +1,7 @@
-Welcome to AI-Cocaine Documentation
-===================================
+Welcome to Safeguard.io Documentation
+=====================================
+
+This website is the official documentation for the Safeguard.io project. The Safeguard.io project is a chatbot that is designed to help isolated users.
 
 Chatbot
 -------
@@ -9,7 +11,7 @@ Chatbot
    :caption: Chatbot
 
    Chatbot <autoapi/react_chatbot/index>
-   Multi Agents Class <autoapi/commands/index>
+   Commands <autoapi/commands/index>
 
 
 Actions
@@ -20,7 +22,7 @@ Actions
    :caption: Actions API
 
    Chatbot <autoapi/react_chatbot/index>
-   Multi Agents Class <autoapi/commands/index>
+   Commands <autoapi/commands/index>
 
 
 Indices and tables
