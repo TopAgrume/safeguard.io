@@ -3,7 +3,7 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" /><link rel="next" title="commands" href="../commands/index.html" /><link rel="prev" title="Welcome to AI-Cocaine Documentation" href="../../index.html" />
+<link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" /><link rel="next" title="commands" href="../commands/index.html" /><link rel="prev" title="Welcome to Safeguard.io Documentation" href="../../index.html" />
 
     <!-- Generated with Sphinx 7.4.7 and Furo 2024.08.06 -->
         <title>react_chatbot - Safeguard.io 0.1 documentation</title>
@@ -202,12 +202,12 @@
   <p class="caption" role="heading"><span class="caption-text">Chatbot</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Chatbot</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../commands/index.html">Multi Agents Class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../commands/index.html">Commands</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Actions API</span></p>
 <ul class="current">
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Chatbot</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../commands/index.html">Multi Agents Class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../commands/index.html">Commands</a></li>
 </ul>
 
 </div>
@@ -275,31 +275,31 @@ It provides various commands and message handlers to interact with users and man
 <tr class="row-even"><td><p><a class="reference internal" href="#react_chatbot.sub_debug_logger" title="react_chatbot.sub_debug_logger"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sub_debug_logger</span></code></a>(func)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#react_chatbot.send_hope_message" title="react_chatbot.send_hope_message"><code class="xref py py-obj docutils literal notranslate"><span class="pre">send_hope_message</span></code></a>(→ None)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#react_chatbot.send_hope_message" title="react_chatbot.send_hope_message"><code class="xref py py-obj docutils literal notranslate"><span class="pre">send_hope_message</span></code></a>(→ telegram.Message)</p></td>
 <td><p>Send a message indicating that the alert status has been reset.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#react_chatbot.notif_pairing_invitation" title="react_chatbot.notif_pairing_invitation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">notif_pairing_invitation</span></code></a>(→ None)</p></td>
 <td><p>Send notification to users about a pairing invitation.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#react_chatbot.process_contacts" title="react_chatbot.process_contacts"><code class="xref py py-obj docutils literal notranslate"><span class="pre">process_contacts</span></code></a>(→ None)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#react_chatbot.process_contacts" title="react_chatbot.process_contacts"><code class="xref py py-obj docutils literal notranslate"><span class="pre">process_contacts</span></code></a>(→ telegram.Message)</p></td>
 <td><p>Process adding or deleting contacts.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#react_chatbot.process_verifications" title="react_chatbot.process_verifications"><code class="xref py py-obj docutils literal notranslate"><span class="pre">process_verifications</span></code></a>(→ None)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#react_chatbot.process_verifications" title="react_chatbot.process_verifications"><code class="xref py py-obj docutils literal notranslate"><span class="pre">process_verifications</span></code></a>(→ telegram.Message)</p></td>
 <td><p>Process adding or deleting verifications.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#react_chatbot.extract_bugreport" title="react_chatbot.extract_bugreport"><code class="xref py py-obj docutils literal notranslate"><span class="pre">extract_bugreport</span></code></a>(→ None)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#react_chatbot.extract_bugreport" title="react_chatbot.extract_bugreport"><code class="xref py py-obj docutils literal notranslate"><span class="pre">extract_bugreport</span></code></a>(→ telegram.Message)</p></td>
 <td><p>Extract and save a bug report.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#react_chatbot.process_alarm" title="react_chatbot.process_alarm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">process_alarm</span></code></a>(→ None)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#react_chatbot.process_alarm" title="react_chatbot.process_alarm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">process_alarm</span></code></a>(→ telegram.Message)</p></td>
 <td><p>Process skipping or undoing skip for alarms.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#react_chatbot.extract_fastcheck" title="react_chatbot.extract_fastcheck"><code class="xref py py-obj docutils literal notranslate"><span class="pre">extract_fastcheck</span></code></a>(→ telegram.Message)</p></td>
 <td><p>Extract and process a fast check request.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#react_chatbot.state_dispatcher" title="react_chatbot.state_dispatcher"><code class="xref py py-obj docutils literal notranslate"><span class="pre">state_dispatcher</span></code></a>(→ None)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#react_chatbot.state_dispatcher" title="react_chatbot.state_dispatcher"><code class="xref py py-obj docutils literal notranslate"><span class="pre">state_dispatcher</span></code></a>(→ telegram.Message)</p></td>
 <td><p>Dispatch the appropriate function based on the current state.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#react_chatbot.handle_messages" title="react_chatbot.handle_messages"><code class="xref py py-obj docutils literal notranslate"><span class="pre">handle_messages</span></code></a>(→ telegram.Message | None)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#react_chatbot.handle_messages" title="react_chatbot.handle_messages"><code class="xref py py-obj docutils literal notranslate"><span class="pre">handle_messages</span></code></a>(→ telegram.Message)</p></td>
 <td><p>Handle incoming messages and route them to the appropriate function.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#react_chatbot.error" title="react_chatbot.error"><code class="xref py py-obj docutils literal notranslate"><span class="pre">error</span></code></a>(→ None)</p></td>
@@ -311,7 +311,7 @@ It provides various commands and message handlers to interact with users and man
 <tr class="row-even"><td><p><a class="reference internal" href="#react_chatbot.manual_undohelp" title="react_chatbot.manual_undohelp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">manual_undohelp</span></code></a>(→ None)</p></td>
 <td><p>Send a manual undo help alert to user's contacts.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#react_chatbot.button" title="react_chatbot.button"><code class="xref py py-obj docutils literal notranslate"><span class="pre">button</span></code></a>(→ telegram.Message | bool)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#react_chatbot.button" title="react_chatbot.button"><code class="xref py py-obj docutils literal notranslate"><span class="pre">button</span></code></a>(→ telegram.Message)</p></td>
 <td><p>Handle button callback queries.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#react_chatbot.run_api" title="react_chatbot.run_api"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_api</span></code></a>()</p></td>
@@ -340,7 +340,7 @@ It provides various commands and message handlers to interact with users and man
 
 <dl class="py function">
 <dt class="sig sig-object py" id="react_chatbot.send_hope_message">
-<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">send_hope_message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">update</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">telegram.Update</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#react_chatbot.send_hope_message" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">send_hope_message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">update</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">telegram.Update</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">telegram.Message</span></span></span><a class="headerlink" href="#react_chatbot.send_hope_message" title="Link to this definition">¶</a></dt>
 <dd><p>Send a message indicating that the alert status has been reset.</p>
 </dd></dl>
 
@@ -360,7 +360,7 @@ It provides various commands and message handlers to interact with users and man
 
 <dl class="py function">
 <dt class="sig sig-object py" id="react_chatbot.process_contacts">
-<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">process_contacts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">update</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">telegram.Update</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">action</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#react_chatbot.process_contacts" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">process_contacts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">update</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">telegram.Update</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">action</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">telegram.Message</span></span></span><a class="headerlink" href="#react_chatbot.process_contacts" title="Link to this definition">¶</a></dt>
 <dd><p>Process adding or deleting contacts.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -375,7 +375,7 @@ It provides various commands and message handlers to interact with users and man
 
 <dl class="py function">
 <dt class="sig sig-object py" id="react_chatbot.process_verifications">
-<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">process_verifications</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">update</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">telegram.Update</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">action</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#react_chatbot.process_verifications" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">process_verifications</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">update</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">telegram.Update</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">action</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">telegram.Message</span></span></span><a class="headerlink" href="#react_chatbot.process_verifications" title="Link to this definition">¶</a></dt>
 <dd><p>Process adding or deleting verifications.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -390,7 +390,7 @@ It provides various commands and message handlers to interact with users and man
 
 <dl class="py function">
 <dt class="sig sig-object py" id="react_chatbot.extract_bugreport">
-<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">extract_bugreport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">update</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">telegram.Update</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#react_chatbot.extract_bugreport" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">extract_bugreport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">update</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">telegram.Update</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">telegram.Message</span></span></span><a class="headerlink" href="#react_chatbot.extract_bugreport" title="Link to this definition">¶</a></dt>
 <dd><p>Extract and save a bug report.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -404,7 +404,7 @@ It provides various commands and message handlers to interact with users and man
 
 <dl class="py function">
 <dt class="sig sig-object py" id="react_chatbot.process_alarm">
-<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">process_alarm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">update</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">telegram.Update</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">action</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#react_chatbot.process_alarm" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">process_alarm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">update</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">telegram.Update</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">action</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">telegram.Message</span></span></span><a class="headerlink" href="#react_chatbot.process_alarm" title="Link to this definition">¶</a></dt>
 <dd><p>Process skipping or undoing skip for alarms.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -433,7 +433,7 @@ It provides various commands and message handlers to interact with users and man
 
 <dl class="py function">
 <dt class="sig sig-object py" id="react_chatbot.state_dispatcher">
-<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">state_dispatcher</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">update</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">telegram.Update</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message_body</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#react_chatbot.state_dispatcher" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">state_dispatcher</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">update</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">telegram.Update</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message_body</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">telegram.Message</span></span></span><a class="headerlink" href="#react_chatbot.state_dispatcher" title="Link to this definition">¶</a></dt>
 <dd><p>Dispatch the appropriate function based on the current state.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -448,7 +448,7 @@ It provides various commands and message handlers to interact with users and man
 
 <dl class="py function">
 <dt class="sig sig-object py" id="react_chatbot.handle_messages">
-<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">handle_messages</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">update</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">telegram.Update</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">telegram.ext.ContextTypes.DEFAULT_TYPE</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">telegram.Message</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#react_chatbot.handle_messages" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">handle_messages</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">update</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">telegram.Update</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">telegram.ext.ContextTypes.DEFAULT_TYPE</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">telegram.Message</span></span></span><a class="headerlink" href="#react_chatbot.handle_messages" title="Link to this definition">¶</a></dt>
 <dd><p>Handle incoming messages and route them to the appropriate function.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -496,7 +496,7 @@ It provides various commands and message handlers to interact with users and man
 
 <dl class="py function">
 <dt class="sig sig-object py" id="react_chatbot.button">
-<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">button</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">update</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">telegram.Update</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">telegram.ext.ContextTypes.DEFAULT_TYPE</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">telegram.Message</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bool</span></span></span><a class="headerlink" href="#react_chatbot.button" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">button</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">update</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">telegram.Update</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">telegram.ext.ContextTypes.DEFAULT_TYPE</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">telegram.Message</span></span></span><a class="headerlink" href="#react_chatbot.button" title="Link to this definition">¶</a></dt>
 <dd><p>Handle button callback queries.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>

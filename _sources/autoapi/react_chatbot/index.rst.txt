@@ -50,7 +50,7 @@ Module Contents
 
 .. py:function:: sub_debug_logger(func)
 
-.. py:function:: send_hope_message(update: telegram.Update) -> None
+.. py:function:: send_hope_message(update: telegram.Update) -> telegram.Message
    :async:
 
 
@@ -69,7 +69,7 @@ Module Contents
    :type notif_details: list
 
 
-.. py:function:: process_contacts(update: telegram.Update, content: str, action: str) -> None
+.. py:function:: process_contacts(update: telegram.Update, content: str, action: str) -> telegram.Message
    :async:
 
 
@@ -83,7 +83,7 @@ Module Contents
    :type action: str
 
 
-.. py:function:: process_verifications(update: telegram.Update, content: str, action: str) -> None
+.. py:function:: process_verifications(update: telegram.Update, content: str, action: str) -> telegram.Message
    :async:
 
 
@@ -97,7 +97,7 @@ Module Contents
    :type action: str
 
 
-.. py:function:: extract_bugreport(update: telegram.Update, content: str) -> None
+.. py:function:: extract_bugreport(update: telegram.Update, content: str) -> telegram.Message
    :async:
 
 
@@ -109,7 +109,7 @@ Module Contents
    :type content: str
 
 
-.. py:function:: process_alarm(update: telegram.Update, content: str, action: str) -> None
+.. py:function:: process_alarm(update: telegram.Update, content: str, action: str) -> telegram.Message
    :async:
 
 
@@ -135,7 +135,7 @@ Module Contents
    :type content: str
 
 
-.. py:function:: state_dispatcher(update: telegram.Update, state: str, message_body: str) -> None
+.. py:function:: state_dispatcher(update: telegram.Update, state: str, message_body: str) -> telegram.Message
    :async:
 
 
@@ -149,7 +149,7 @@ Module Contents
    :type message_body: str
 
 
-.. py:function:: handle_messages(update: telegram.Update, context: telegram.ext.ContextTypes.DEFAULT_TYPE, **kwargs) -> telegram.Message | None
+.. py:function:: handle_messages(update: telegram.Update, context: telegram.ext.ContextTypes.DEFAULT_TYPE, **kwargs) -> telegram.Message
    :async:
 
 
@@ -192,7 +192,7 @@ Module Contents
    :type username: str
 
 
-.. py:function:: button(update: telegram.Update, context: telegram.ext.ContextTypes.DEFAULT_TYPE) -> telegram.Message | bool
+.. py:function:: button(update: telegram.Update, context: telegram.ext.ContextTypes.DEFAULT_TYPE) -> telegram.Message
    :async:
 
 
