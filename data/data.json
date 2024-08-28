@@ -70,12 +70,17 @@
     "6577580728": {
         "alert_mode": false,
         "response_message": true,
-        "state": "",
+        "state": "addcontact",
         "username": "alexandre_dr",
         "contacts": [
             {
                 "id": 1939935789,
                 "tag": "Valoowaoo",
+                "pair": false
+            },
+            {
+                "id": null,
+                "tag": "test",
                 "pair": false
             }
         ],

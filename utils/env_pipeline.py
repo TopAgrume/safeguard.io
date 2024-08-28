@@ -1,11 +1,30 @@
-from datetime import datetime
-
-import logging
 import os
 import json
+import psycopg2
+from psycopg2.extras import RealDictCursor
+from datetime import datetime
+from contextlib import contextmanager
+from utils.init_database import init_database
 
+init_database()
 MAX_TIME_DIFF = 20
 
+# Database connection parameters
+DB_PARAMS = {
+    "dbname": "postgres",
+    "user": "postgres",
+    "password": "postgres",
+    "host": "localhost",
+    "port": "5432"
+}
+
+@contextmanager
+def get_db_connection():
+    conn = psycopg2.connect(**DB_PARAMS)
+    try:
+        yield conn
+    finally:
+        conn.close()
 
 def less_than_one_hour(time1: dict, time2: dict):
     # Convert time strings to datetime objects
@@ -31,9 +50,9 @@ def add_user_and_link_request(user_id: int, username: str, current_dict: list, v
             current_dict.append({"id": int(new_contact_id), "tag": new_contact, "pair": False})
 
             # Write in destination contact_request
-            request_dict = AccessEnv.on_read(int(new_contact_id), "contact_request")
+            request_dict = AccessEnv.read_user_properties(int(new_contact_id), "contact_request")
             request_dict[str(user_id)] = username
-            AccessEnv.on_write(int(new_contact_id), "contact_request", request_dict)
+            AccessEnv.update_user_properties(int(new_contact_id), "contact_request", request_dict)
 
             # Actions to take
             pair_asking = {"id": int(new_contact_id), "tag": new_contact}
@@ -75,162 +94,151 @@ def delete_user_and_request(user_id: int, current_dict: list, value: list):
                 AccessEnv.on_write_request(str(user_id), "dest_tags", dest_tags)
             continue
 
-        contact_request = AccessEnv.on_read(user_tag, "contact_request")
+        contact_request = AccessEnv.read_user_properties(user_tag, "contact_request")
         if str(user_id) in contact_request:
             del contact_request[str(user_id)]
-            AccessEnv.on_write(user_tag, "contact_request", contact_request)
+            AccessEnv.update_user_properties(user_tag, "contact_request", contact_request)
     print("test")
     return filtered_dict
 
-
+        
 class AccessEnv(object):
     users: dict = {}
 
-    @staticmethod
-    def on_write(user_id: int, key: str = None, value=None) -> None:
-        base_dict = AccessEnv.on_update()
+    @staticmethod # VALID
+    def update_user_properties(user_id: int, key: str = None, value=None) -> None:
+        with get_db_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute(f"UPDATE users SET {key} = %s WHERE id = %s", (json.dumps(value) if isinstance(value, (dict, list)) else value, user_id))
+            conn.commit()
 
-        # Write contacts to a JSON file
-        if key is not None:
-            base_dict[str(user_id)][key] = value
-
-        with open('data/data.json', 'w') as json_file:
-            json.dump(base_dict, json_file, indent=4)
 
     @staticmethod
     def on_write_contacts(user_id: int, username: str, method: str = None, value: list = None):
-        base_dict = AccessEnv.on_update()
-        special_action = []
-        current_dict = base_dict[str(user_id)]['contacts']
+        with get_db_connection() as conn:
+            with conn.cursor(cursor_factory=RealDictCursor) as cur:
+                cur.execute("SELECT contacts FROM users WHERE id = %s", (user_id,))
+                user = cur.fetchone()
+                if user:
+                    current_contacts = user['contacts'] or []
+                    special_action = []
 
-        if method == 'add':
-            current_dict, special_action = add_user_and_link_request(user_id, username, current_dict, value)
-        elif method == 'del':
-            current_dict = delete_user_and_request(user_id, current_dict, value)
+                    if method == 'add':
+                        for new_contact in value:
+                            if any(contact['tag'] == new_contact for contact in current_contacts):
+                                continue
+                            cur.execute("SELECT id FROM users WHERE username = %s", (new_contact,))
+                            contact_user = cur.fetchone()
+                            if contact_user:
+                                current_contacts.append({"id": contact_user['id'], "tag": new_contact, "pair": False})
+                                cur.execute("UPDATE users SET contact_request = contact_request || %s WHERE id = %s",
+                                            (json.dumps({str(user_id): username}), contact_user['id']))
+                                special_action.append({"id": contact_user['id'], "tag": new_contact})
+                            else:
+                                current_contacts.append({"id": None, "tag": new_contact, "pair": False})
+                    elif method == 'del':
+                        current_contacts = [contact for contact in current_contacts if contact['tag'] not in value]
 
-        base_dict = AccessEnv.on_update()
-        base_dict[str(user_id)]['contacts'] = current_dict
-        with open('data/data.json', 'w') as json_file:
-            json.dump(base_dict, json_file, indent=4)
-
-        return special_action
+                    cur.execute("UPDATE users SET contacts = %s WHERE id = %s", (json.dumps(current_contacts), user_id))
+                conn.commit()
+                return special_action
 
     @staticmethod
     def on_write_verifications(user_id: int, method: str = None, value: list = None, skip_check: bool = False):
-        base_dict = AccessEnv.on_update()
+        with get_db_connection() as conn:
+            with conn.cursor(cursor_factory=RealDictCursor) as cur:
+                cur.execute("SELECT daily_message FROM users WHERE id = %s", (user_id,))
+                user = cur.fetchone()
+                if user:
+                    current_verifications = user['daily_message'] or []
+                    not_valid = []
 
-        # Write verifications to a JSON file
-        not_valid = []
-        current_dict = base_dict[str(user_id)]['daily_message']
+                    if method == 'add':
+                        for new_check in value:
+                            if any(daily_message['time'] == new_check['time'] for daily_message in current_verifications):
+                                continue
+                            if not skip_check and any(less_than_one_hour(daily_message, new_check) for daily_message in current_verifications):
+                                not_valid.append(new_check['time'])
+                                continue
+                            current_verifications.append(new_check)
+                    elif method == 'del':
+                        current_verifications = [check for check in current_verifications if check["time"] not in value]
+                    elif method in ('skip', 'undoskip'):
+                        for check in current_verifications:
+                            if check["active"] is None:
+                                continue
+                            if check["time"] in value:
+                                check["active"] = (method == 'undoskip')
 
-        if method == 'add':
-            for new_checks in value:
-                if any(daily_message['time'] == new_checks['time'] for daily_message in current_dict):
-                    continue
+                    cur.execute("UPDATE users SET daily_message = %s WHERE id = %s", (json.dumps(current_verifications), user_id))
+                conn.commit()
+                return not_valid
 
-                if not skip_check:
-                    if any(less_than_one_hour(daily_message, new_checks) for daily_message in current_dict):
-                        not_valid.append(new_checks['time'])
-                        continue
+    @staticmethod # VALID
+    def user_information(user_id: int):
+        with get_db_connection() as conn:
+            with conn.cursor(cursor_factory=RealDictCursor) as cur:
+                cur.execute("SELECT response_message, alert_mode FROM users WHERE id = %s", (user_id,))
+                user = cur.fetchone()
+                return user['response_message'], user['alert_mode'] if user else (None, None)
 
-                current_dict.append(new_checks)
-        elif method == 'del':
-            current_dict = [dail_check for dail_check in current_dict if dail_check["time"] not in value]
-        elif method in ('skip', 'undoskip'):
-            for dail_check in current_dict:
-                if dail_check["active"] is None:
-                    continue
-                if dail_check["time"] in value:
-                    dail_check["active"] = (method == 'undoskip')
 
-        base_dict[str(user_id)]['daily_message'] = current_dict
-        with open('data/data.json', 'w') as json_file:
-            json.dump(base_dict, json_file, indent=4)
+    @staticmethod # VALID
+    def read_user_properties(user_id: int, key: str):
+        with get_db_connection() as conn:
+            with conn.cursor(cursor_factory=RealDictCursor) as cur:
+                cur.execute(f"SELECT {key} FROM users WHERE id = %s", (user_id,))
+                user = cur.fetchone()
+                return user[key] if user else None
 
-        return not_valid
-
-    @staticmethod
-    def on_read(user_id: int, key: str = None):
-        # Open and read a JSON file
-        with open('data/data.json', 'r') as json_file:
-            data = json.load(json_file)[str(user_id)]
-
-        if key is None:
-            return data["response_message"], data["alert_mode"]
-        else:
-            return data[key]
-
-    @staticmethod
-    def on_get_users(method: str = "keys"):
-        # Open and read a JSON file
-        with open('data/data.json', 'r') as json_file:
-            data = json.load(json_file)
-
-        if method == "keys":
-            return list(data.keys())
-        return list(data.items())
-
-    @staticmethod
-    def on_get_user_id_usernames():
-        # Open and read a JSON file
-        with open('data/data.json', 'r') as json_file:
-            data = json.load(json_file)
-
-        user_id_to_username = {}
-        for user_id, data in data.items():
-            username = data.get('username', '')
-            user_id_to_username[user_id] = username
-
-        return user_id_to_username
+    @staticmethod # VALID
+    def user_already_registered(user_id: int) -> bool:
+        with get_db_connection() as conn:
+            with conn.cursor(cursor_factory=RealDictCursor) as cur:
+                cur.execute("SELECT id FROM users WHERE id = %s", (user_id,))
+                users = cur.fetchall()
+                return bool(users)
 
     @staticmethod
+    def on_get_users():
+        with get_db_connection() as conn:
+            with conn.cursor(cursor_factory=RealDictCursor) as cur:
+                cur.execute("SELECT id, username FROM users")
+                users = cur.fetchall()
+                return [(str(user['id']), user) for user in users]
+
+    @staticmethod # TODO
+    def username_from_user_id():
+        with get_db_connection() as conn:
+            with conn.cursor(cursor_factory=RealDictCursor) as cur:
+                cur.execute("SELECT id, username FROM users")
+                users = cur.fetchall()
+                return {str(user['id']): user['username'] for user in users}
+
+    @staticmethod # TODO
     def on_get_user_usernames_id():
-        # Open and read a JSON file
-        with open('data/data.json', 'r') as json_file:
-            data = json.load(json_file)
+        with get_db_connection() as conn:
+            with conn.cursor(cursor_factory=RealDictCursor) as cur:
+                cur.execute("SELECT id, username FROM users")
+                users = cur.fetchall()
+                return {user['username']: str(user['id']) for user in users}
 
-        user_username_to_id = {}
-        for user_id, data in data.items():
-            username = data.get('username', '')
-            user_username_to_id[username] = user_id
-
-        return user_username_to_id
-
-    @staticmethod
-    def on_update(file_path: str = "data/data.json"):
-        # Check if the file exists
-        if not os.path.exists(file_path):
-            with open(file_path, 'w') as file:
-                json.dump({}, file, indent=4)
-
-        with open(file_path, 'r') as json_file:
-            return json.load(json_file)
-
-    @staticmethod
+    @staticmethod # VALID
     def on_kill_data(user_id: int, file_path: str = "data/data.json") -> None:
-        with open(file_path, 'r') as json_file:
-            dict_users: dict = json.load(json_file)
+        with get_db_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute("DELETE FROM users WHERE id = %s", (user_id,))
+            conn.commit()
 
-        del dict_users[str(user_id)]
-        with open(file_path, 'w') as json_file:
-            json.dump(dict_users, json_file, indent=4)
-
-    @staticmethod
+    @staticmethod # VALID
     def on_create_user(user_id: int, username: str) -> None:
-        fresh_data: dict = {
-            'alert_mode': False,
-            'response_message': True,
-            'state': '',
-            'username': username,
-            'contacts': [],
-            'daily_message': [],
-            'contact_request': {}
-        }
-
-        base_dict = AccessEnv.on_update()
-        base_dict[str(user_id)] = fresh_data
-        with open('data/data.json', 'w') as json_file:
-            json.dump(base_dict, json_file, indent=4)
+        with get_db_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute("""
+                    INSERT INTO users (id, username, alert_mode, response_message, state, contacts, daily_message, contact_request)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                """, (user_id, username, False, True, '', '[]', '[]', '{}'))
+            conn.commit()
 
     @staticmethod
     def telegram_keys() -> tuple[str, str]:
@@ -240,22 +248,6 @@ class AccessEnv(object):
             raise ValueError("One or more keys required environment variables are missing.")
         return API_TOKEN, BOT_USERNAME
 
-    # @staticmethod
-    # def client() -> Client:
-    #     account_sid = os.getenv('account_sid')
-    #     auth_token = os.getenv('auth_token')
-    #     if not account_sid or not auth_token:
-    #         raise ValueError("One or more keys required environment variables are missing.")
-    #     return Client(account_sid, auth_token)
-
-    # @staticmethod
-    # def contacts() -> tuple[str, str, str]:
-    #     server_number = os.getenv('server_number')
-    #     client_number = os.getenv('client_number')
-    #     emergency_number = os.getenv('emergency_number')
-    #     if not server_number or not client_number or not emergency_number:
-    #         raise ValueError("One or more contacts required environment variables are missing.")
-    #     return server_number, client_number, emergency_number
 
     @staticmethod
     def on_init_check_queue(user_id: str, daily_check: dict, waiting_time: int):
@@ -307,65 +299,58 @@ class AccessEnv(object):
 
     @staticmethod
     def on_get_request_user(method: str = "keys"):
-        with open('data/request.json', 'r') as json_file:
-            data = json.load(json_file)
-
-        if method == "keys":
-            return list(data.keys)
-        if method == "dict":
-            return data
-        return list(data.items())
+        with get_db_connection() as conn:
+            with conn.cursor(cursor_factory=RealDictCursor) as cur:
+                cur.execute("SELECT id, contact_request FROM users WHERE contact_request != '{}'")
+                users = cur.fetchall()
+                if method == "keys":
+                    return [str(user['id']) for user in users]
+                elif method == "dict":
+                    return {str(user['id']): user['contact_request'] for user in users}
+                return [(str(user['id']), user['contact_request']) for user in users]
 
     @staticmethod
     def on_init_request(user_id: str, daily_check: dict):
-        base_dict = AccessEnv.on_update("data/request.json")
-        base_dict[user_id] = daily_check
-
-        with open('data/request.json', 'w') as json_file:
-            json.dump(base_dict, json_file, indent=4)
+        with get_db_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute("UPDATE users SET contact_request = %s WHERE id = %s", (json.dumps(daily_check), int(user_id)))
+            conn.commit()
 
     @staticmethod
     def on_write_request(user_id: str, key: str = None, value=None) -> None:
-        base_dict = AccessEnv.on_update("data/request.json")
-
-        # Write contacts to a JSON file
-        if key is not None:
-            base_dict[str(user_id)][key] = value
-        else:
-            base_dict[str(user_id)][key] = value
-
-        with open("data/request.json", 'w') as json_file:
-            json.dump(base_dict, json_file, indent=4)
+        with get_db_connection() as conn:
+            with conn.cursor(cursor_factory=RealDictCursor) as cur:
+                cur.execute("SELECT contact_request FROM users WHERE id = %s", (int(user_id),))
+                user = cur.fetchone()
+                if user:
+                    contact_request = user['contact_request']
+                    if key is not None:
+                        contact_request[key] = value
+                    else:
+                        contact_request = value
+                    cur.execute("UPDATE users SET contact_request = %s WHERE id = %s", (json.dumps(contact_request), int(user_id)))
+            conn.commit()
 
     @staticmethod
     def on_write_all_request(all_data: dict) -> None:
-        with open("data/request.json", 'w') as json_file:
-            json.dump(all_data, json_file, indent=4)
+        with get_db_connection() as conn:
+            with conn.cursor() as cur:
+                for user_id, request_data in all_data.items():
+                    cur.execute("UPDATE users SET contact_request = %s WHERE id = %s", (json.dumps(request_data), int(user_id)))
+            conn.commit()
 
     @staticmethod
     def on_read_request(user_id: int, key: str = None):
-        # Open and read a JSON file
-        with open('data/request.json', 'r') as json_file:
-            data = json.load(json_file)[str(user_id)]
-
-        return data[key]
+        with get_db_connection() as conn:
+            with conn.cursor(cursor_factory=RealDictCursor) as cur:
+                cur.execute("SELECT contact_request FROM users WHERE id = %s", (user_id,))
+                user = cur.fetchone()
+                if user and user['contact_request']:
+                    return user['contact_request'].get(key)
 
     @staticmethod
     def on_kill_request(user_id: int, file_path: str = "data/request.json") -> None:
-        AccessEnv.on_kill_data(user_id, file_path)
-
-    # @staticmethod
-    # def emergencies() -> str:
-    #     emergency_number = os.getenv('emergency_number')
-    #     if not emergency_number:
-    #         raise ValueError("emergency numbers are missing.")
-    #     return emergency_number
-
-    @staticmethod
-    def logger(logger_name: str):
-        logging.basicConfig(
-            level=logging.INFO,
-            format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-        )
-
-        return logging.getLogger(logger_name)
+        with get_db_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute("UPDATE users SET contact_request = '{}' WHERE id = %s", (user_id,))
+            conn.commit()

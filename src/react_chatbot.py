@@ -238,28 +238,28 @@ async def handle_messages(update: Update, context: ContextTypes.DEFAULT_TYPE, **
         context (ContextTypes.DEFAULT_TYPE): The context object for the handler.
     """
     user_id = update.message.from_user.id
-    response_message, alert_mode = AccessEnv.on_read(user_id)
+    response_message, alert_mode = AccessEnv.user_information(user_id)
 
     if response_message:
-        get_state = AccessEnv.on_read(user_id, "state")
-        logger.debug(f"API: Command call {get_state=}", f"Content: {update.message.text=}")
+        get_state = AccessEnv.read_user_properties(user_id, "state")
+        logger.debug(f"API: User answer to call '{get_state}' with content: '{update.message.text}'")
+        AccessEnv.update_user_properties(user_id, "state", "")
         return await state_dispatcher(update, get_state, update.message.text)
 
     if not alert_mode:
         logger.debug('API: Response to confirmation demand')
         greeting = "Have a great day 🌞!" if datetime.now().hour < 16 else "Have a wonderful afternoon 🌅!"
         response = f"Thank you for your response! {greeting}"
-        AccessEnv.on_write(user_id, "response_message", True)
+        AccessEnv.update_user_properties(user_id, "response_message", True)
         return await update.message.reply_text(response)
 
     logger.debug('API: Response to unset the alert mode')
-    AccessEnv.on_write(user_id, "alert_mode", False)
-    AccessEnv.on_write(user_id, "response_message", True)
+    AccessEnv.update_user_properties(user_id, "alert_mode", False)
+    AccessEnv.update_user_properties(user_id, "response_message", True)
     await manual_undohelp(user_id, update.message.from_user.username)
     return await send_hope_message(update)
 
 
-@debug_logger
 async def error(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Log errors caused by updates."""
     logger.error(f'Update {update} caused error {context.error}')
@@ -277,7 +277,7 @@ async def manual_help(user_id: int, username: str) -> None:
     message = (f"🚨<b>ALERT</b>🚨. @{username} has manually triggered the call for help."
                " <b>Please take this call seriously and ensure their well-being!</b>")
 
-    for contact in AccessEnv.on_read(user_id, "contacts"):
+    for contact in AccessEnv.read_user_properties(user_id, "contacts"):
         if contact["pair"]:
             await bot.send_message(chat_id=contact["id"], text=message, parse_mode=ParseMode.HTML)
 
@@ -294,7 +294,7 @@ async def manual_undohelp(user_id: int, username: str) -> None:
     message = (f"⚠️<b>Alert disabled</b>⚠️. @{username} manually disabled the alert."
                " <b>Please confirm it was intentional or check if it was a simple mistake.</b>")
 
-    for contact in AccessEnv.on_read(user_id, "contacts"):
+    for contact in AccessEnv.read_user_properties(user_id, "contacts"):
         if contact["pair"]:
             await bot.send_message(chat_id=contact["id"], text=message, parse_mode=ParseMode.HTML)
 
@@ -317,35 +317,35 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Message 
         return await query.edit_message_text(text=f"Unknown: Query data empty ({query.data})")
 
     if query.data == "1":
-        AccessEnv.on_write(user_id, "alert_mode", True)
+        AccessEnv.update_user_properties(user_id, "alert_mode", True)
         message = ("OK. Emergency contacts have received your request for help! 🆘\n"
                    "Type /undohelp to cancel the alert.")
         await manual_help(user_id, query.from_user.username)
     elif query.data == "2":
         message = "OK 😅. Glad to hear it was a mistake!"
     elif query.data == "3":
-        AccessEnv.on_write(user_id, "alert_mode", False)
+        AccessEnv.update_user_properties(user_id, "alert_mode", False)
         message = "OK. Your emergency contacts have received information that the alert has been disabled. 📢"
         await manual_undohelp(user_id, query.from_user.username)
     elif query.data == "4":
         message = "OK. Operation canceled."
     elif query.data[0] == "-":
-        contact_request = AccessEnv.on_read(user_id, "contact_request")
+        contact_request = AccessEnv.read_user_properties(user_id, "contact_request")
         del contact_request[query.data[1:]]
-        AccessEnv.on_write(user_id, "contact_request", contact_request)
+        AccessEnv.update_user_properties(user_id, "contact_request", contact_request)
         message = "<b>OK. Association request declined. ❌</b>"
     else:
         origin_id = int(query.data[1:])
-        contacts_pairing = AccessEnv.on_read(origin_id, "contacts")
+        contacts_pairing = AccessEnv.read_user_properties(origin_id, "contacts")
         updated_pairing = [{"id": contact['id'], "pair": True if contact['id'] == user_id else contact['pair']}
                            for contact in contacts_pairing]
 
-        AccessEnv.on_write(origin_id, "contacts", updated_pairing)
-        users_data = AccessEnv.on_get_user_id_usernames()
+        AccessEnv.update_user_properties(origin_id, "contacts", updated_pairing)
+        users_data = AccessEnv.username_from_user_id()
 
-        contact_request = AccessEnv.on_read(user_id, "contact_request")
+        contact_request = AccessEnv.read_user_properties(user_id, "contact_request")
         del contact_request[query.data[1:]]
-        AccessEnv.on_write(user_id, "contact_request", contact_request)
+        AccessEnv.update_user_properties(user_id, "contact_request", contact_request)
 
         logger.debug(f"API: Response message to association with {origin_id}")
         await bot.send_message(
@@ -405,3 +405,6 @@ def run_api():
     # Polls the bot
     logger.info('API: Bot is running...')
     app.run_polling()
+
+if __name__ == "__main__":
+    run_api()

@@ -57,7 +57,7 @@ async def run_schedule():
                     AccessEnv.on_write_verifications(user_id, "del", [unique_check["time"]])
                     print('SCHEDULER:', f"kill fast check: {state}")
 
-                AccessEnv.on_write(user_id, "response_message", False)
+                AccessEnv.update_user_properties(user_id, "response_message", False)
                 AccessEnv.on_init_check_queue(str(user_id), unique_check, WAITING_TIME)
                 await send_daily_message(user_id, unique_check["desc"])
 

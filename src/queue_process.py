@@ -39,7 +39,7 @@ async def send_reminder(user_id: str, user_data: dict):
 
 async def send_alert_message(user_id):
     print('WORKING QUEUE:', f"Send Alert Message to/from {user_id=}")
-    username = AccessEnv.on_get_user_id_usernames()[user_id]
+    username = AccessEnv.username_from_user_id()[user_id]
     user_data = AccessEnv.on_get_check_users("dict")[user_id]
     time = user_data['time']
     desc = user_data['desc']
@@ -47,7 +47,7 @@ async def send_alert_message(user_id):
                "<b>Don't take this call lightly and make sure she/he is okay! It might be urgent!</b>\n"
                f"This could be important, here is the description that was given to this recall:\n\n {desc}")
 
-    for contact in AccessEnv.on_read(user_id, "contacts"):
+    for contact in AccessEnv.read_user_properties(user_id, "contacts"):
         if not contact["pair"]:
             continue
 
@@ -72,7 +72,7 @@ async def check_for_response():
 
         for user_id, user_data in AccessEnv.on_get_check_users("items"):
             # Check for response message
-            if AccessEnv.on_read(user_id, "response_message"):
+            if AccessEnv.read_user_properties(user_id, "response_message"):
                 AccessEnv.on_kill_queue_data(user_id)
                 continue
 
@@ -85,7 +85,7 @@ async def check_for_response():
             if user_data["reminder_count"] >= 5:
                 await send_alert_message(user_id)
                 AccessEnv.on_kill_queue_data(user_id)
-                AccessEnv.on_write(user_id, "alert_mode", True)
+                AccessEnv.update_user_properties(user_id, "alert_mode", True)
                 continue
 
             user_data['waiting_time'] -= 1

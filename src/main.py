@@ -1,6 +1,6 @@
 import multiprocessing
 
-from src.api import run_api
+from src.react_chatbot import run_api
 from schedule_appeal import run_schedule_process
 from queue_process import run_queue_process
 
