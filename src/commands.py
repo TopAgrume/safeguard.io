@@ -4,12 +4,13 @@ from utils.env_pipeline import AccessEnv
 import telegram
 from logzero import logger
 from functools import wraps
+from typing import Any, Callable
 
 TOKEN, BOT_USERNAME = AccessEnv.telegram_keys()
 P_HTML = telegram.constants.ParseMode.HTML
 
 
-def verify_condition(func): # VALID
+def verify_condition(func: Callable) -> Callable: # VALID
     """
     Decorator to verify conditions before executing bot commands.
 
@@ -26,30 +27,27 @@ def verify_condition(func): # VALID
         Callable: The wrapped function.
     """
     @wraps(func)
-    async def wrapper(update, context, **kwargs) -> Message | None:
-        if func.__name__ == "handle_messages":
-            logger.debug(f"API: {func.__name__} call")
-        else:
-            logger.debug(f"COMMAND: {func.__name__} call")
+    async def wrapper(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs: Any) -> Any:
+        logger.debug(f"{'API' if func.__name__ == 'handle_messages' else 'COMMAND'}: {func.__name__} call")
 
-        message_type: str = update.message.chat.type
-        message_body: str = update.message.text
+        message = update.message
+        chat_type = message.chat.type
 
-        if message_type == 'group':
-            message_body: str = message_body.lower()
-            if BOT_USERNAME in message_body:
-                # new_text: str = message_body.replace(BOT_USERNAME, '').strip()
-                response = 'This bot does not support groups for now. 🚫'
-                await update.message.reply_text(response)
-            else:
-                return
-        username = update.message.from_user.username
-        if username is None or username == "":
-            message = ("Please <b>create a username</b> in your Telegram profile in order to use my features."
-                       " Then use <b>/start</b> if you are not already registered 📲✨.")
-            await update.message.reply_text(message, parse_mode=P_HTML)
-        else:
-            await func(update, context, **kwargs)
+        if chat_type == 'group':
+            if BOT_USERNAME.lower() in message.text.lower():
+                await message.reply_text('This bot does not support groups for now. 🚫')
+            return
+
+        username = message.from_user.username
+        if not username:
+            await message.reply_text(
+                "Please <b>create a username</b> in your Telegram profile to use my features. "
+                "Then use <b>/start</b> if you are not already registered 📲✨.",
+                parse_mode=P_HTML
+            )
+            return
+
+        return await func(update, context, **kwargs)
 
     return wrapper
 
@@ -73,9 +71,8 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kw
     Returns:
         Message: Response message from the bot.
     """
-    user_id = update.message.from_user.id
-    user_first_name = str(update.message.chat.first_name)
-    username = update.message.from_user.username
+    user = update.message.from_user
+    user_id, username = user.id, user.username
 
     if AccessEnv.user_already_registered(user_id):
         logger.debug(f"└── User @{username} already registered")
@@ -84,7 +81,8 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kw
 
     AccessEnv.on_create_user(user_id, username)
     logger.debug(f"└── New user @{username} registered")
-    message = f"Hello {user_first_name} 🌟! Thanks for chatting with me! I am Safeguard.io 😊."
+
+    message = f"Hello {user.first_name} 🌟! Thanks for chatting with me! I am Safeguard.io 😊."
     await update.message.reply_text(message)
 
     exploit_data = {} # TODO: Move request JSON to Postgres
@@ -217,11 +215,9 @@ async def showcontacts_command(update: Update, context: ContextTypes.DEFAULT_TYP
     message = "Sure thing! Here is your list of contacts:\n\n"
 
     for contact in contact_list:
-        if contact['pair']:
-            message += f"👤 <b>@{contact['tag']}</b>\n"
-            continue
-
-        message += f"🚫 <b>@{contact['tag']}</b> - Waiting for pairing.\n"
+        status = "👤" if contact['pair'] else "🚫"
+        pair_status = "" if contact['pair'] else " - Waiting for pairing."
+        message += f"{status} <b>@{contact['tag']}</b>{pair_status}\n"
 
     return await update.message.reply_text(message, parse_mode=P_HTML)
 
@@ -312,27 +308,24 @@ async def showverifs_command(update: Update, context: ContextTypes.DEFAULT_TYPE,
 
     sorted_list = sorted(verif_list, key=lambda x: x["time"])
 
-    message = "OK. Here is you list of daily verifications:\n\n"
-    skipped_verif = "\n<b>Skipped today:</b>\n\n"
-    skip_bool, active = False, True
+    message = "OK. Here is your list of daily verifications:\n\n"
+    skipped_verif = "\n\n<b>Skipped today:</b>\n\n"
+    active_verifs = []
+    skipped_verifs = []
 
     for verif in sorted_list:
-        if verif["active"]:
-            message += f"🕗 <b>{verif['time']}</b> - {verif['desc']}\n"
-            active = False
-            continue
+        if verif["active"] is True:
+            active_verifs.append(f"🕗 <b>{verif['time']}</b> - {verif['desc']}")
+        elif verif["active"] is None:
+            active_verifs.append(f"⏭️ <b>{verif['time']}</b> - {verif['desc']}")
+        else:
+            skipped_verifs.append(f"🚫 <b>{verif['time']}</b> - {verif['desc']}")
 
-        if verif["active"] is None:
-            message += f"⏭️ <b>{verif['time']}</b> - {verif['desc']}\n"
-            active = False
-            continue
+    message += "\n".join(active_verifs)
+    message += "<b>No daily checks for the next 24 hours.</b> 📅" if not active_verifs else ""
+    message += skipped_verif + "\n".join(skipped_verifs) if skipped_verifs else ""
 
-        skipped_verif += f"🚫 <b>{verif['time']}</b> - {verif['desc']}\n"
-        skip_bool = True
-
-    message += "<b>No daily check for the next 24 hours.</b>  📅\n" if active else ""
-    message += skipped_verif if skip_bool else ""
-    return await update.message.reply_text(message, parse_mode=P_HTML)
+    await update.message.reply_text(message, parse_mode=P_HTML)
 
 
 @verify_condition # VALID
