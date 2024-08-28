@@ -1,0 +1,52 @@
+queue_process
+=============
+
+.. py:module:: queue_process
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   queue_process.WAITING_TIME
+   queue_process.P_HTML
+   queue_process.bot
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   queue_process.send_reminder
+   queue_process.send_alert_message
+   queue_process.check_for_response
+   queue_process.run_queue_process
+
+
+Module Contents
+---------------
+
+.. py:data:: WAITING_TIME
+   :value: 9
+
+
+.. py:data:: P_HTML
+
+.. py:data:: bot
+
+.. py:function:: send_reminder(user_id: str, user_data: dict)
+   :async:
+
+
+.. py:function:: send_alert_message(user_id)
+   :async:
+
+
+.. py:function:: check_for_response()
+   :async:
+
+
+.. py:function:: run_queue_process()
+

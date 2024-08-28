@@ -1,0 +1,341 @@
+commands
+========
+
+.. py:module:: commands
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   commands.P_HTML
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   commands.verify_condition
+   commands.start_command
+   commands.info_command
+   commands.addcontact_command
+   commands.showcontacts_command
+   commands.delcontact_command
+   commands.addverif_command
+   commands.showverifs_command
+   commands.delverif_command
+   commands.skip_command
+   commands.undoskip_command
+   commands.bugreport_command
+   commands.request_command
+   commands.fastcheck_command
+   commands.help_command
+   commands.undohelp_command
+   commands.empty_command
+   commands.kill_user_data
+
+
+Module Contents
+---------------
+
+.. py:data:: P_HTML
+
+.. py:function:: verify_condition(func: Callable) -> Callable
+
+   Decorator to verify conditions before executing bot commands.
+
+   This decorator checks if:
+   1. The message is from a group (not supported)
+   2. The user has a username (required)
+
+   If conditions are not met, appropriate messages are sent to the user.
+
+   :param func: The function to be decorated.
+   :type func: Callable
+
+   :returns: The wrapped function.
+   :rtype: Callable
+
+
+.. py:function:: start_command(update: telegram.Update, context: telegram.ext.ContextTypes.DEFAULT_TYPE, **kwargs) -> telegram.Message
+   :async:
+
+
+   Handle the /start command for the Telegram bot.
+
+   This function:
+   1. Checks if the user is already registered
+   2. Registers new users
+   3. Processes any pending contact requests for the user
+   4. Sends a welcome message
+
+   :param update: The incoming update.
+   :type update: Update
+   :param context: The context object for the update.
+   :type context: ContextTypes.DEFAULT_TYPE
+   :param \*\*kwargs: Additional keyword arguments.
+
+   :returns: Response message from the bot.
+   :rtype: Message
+
+
+.. py:function:: info_command(update: telegram.Update, context: telegram.ext.ContextTypes.DEFAULT_TYPE, **kwargs) -> telegram.Message
+   :async:
+
+
+   Handle the /info command, providing information about bot usage.
+
+   :param update: The incoming update.
+   :type update: Update
+   :param context: The context object for the update.
+   :type context: ContextTypes.DEFAULT_TYPE
+   :param \*\*kwargs: Additional keyword arguments.
+
+   :returns: Response message from the bot.
+   :rtype: Message
+
+
+.. py:function:: addcontact_command(update: telegram.Update, context: telegram.ext.ContextTypes.DEFAULT_TYPE, **kwargs) -> telegram.Message
+   :async:
+
+
+   Handle the /addcontact command, allowing users to add emergency contacts.
+
+   :param update: The incoming update.
+   :type update: Update
+   :param context: The context object for the update.
+   :type context: ContextTypes.DEFAULT_TYPE
+   :param \*\*kwargs: Additional keyword arguments.
+
+   :returns: Response message from the bot.
+   :rtype: Message
+
+
+.. py:function:: showcontacts_command(update: telegram.Update, context: telegram.ext.ContextTypes.DEFAULT_TYPE, **kwargs) -> telegram.Message
+   :async:
+
+
+   Handle the /showcontacts command, displaying the user's emergency contacts.
+
+   :param update: The incoming update.
+   :type update: Update
+   :param context: The context object for the update.
+   :type context: ContextTypes.DEFAULT_TYPE
+   :param \*\*kwargs: Additional keyword arguments.
+
+   :returns: Response message from the bot.
+   :rtype: Message
+
+
+.. py:function:: delcontact_command(update: telegram.Update, context: telegram.ext.ContextTypes.DEFAULT_TYPE, **kwargs) -> telegram.Message
+   :async:
+
+
+   Handle the /delcontact command, allowing users to delete emergency contacts.
+
+   :param update: The incoming update.
+   :type update: Update
+   :param context: The context object for the update.
+   :type context: ContextTypes.DEFAULT_TYPE
+   :param \*\*kwargs: Additional keyword arguments.
+
+   :returns: Response message from the bot.
+   :rtype: Message
+
+
+.. py:function:: addverif_command(update: telegram.Update, context: telegram.ext.ContextTypes.DEFAULT_TYPE, **kwargs) -> telegram.Message
+   :async:
+
+
+   Handle the /addverif command, allowing users to add daily verification messages.
+
+   :param update: The incoming update.
+   :type update: Update
+   :param context: The context object for the update.
+   :type context: ContextTypes.DEFAULT_TYPE
+   :param \*\*kwargs: Additional keyword arguments.
+
+   :returns: Response message from the bot.
+   :rtype: Message
+
+
+.. py:function:: showverifs_command(update: telegram.Update, context: telegram.ext.ContextTypes.DEFAULT_TYPE, **kwargs) -> telegram.Message
+   :async:
+
+
+   Handle the /showverifs command, displaying the user's daily verification messages.
+
+   :param update: The incoming update.
+   :type update: Update
+   :param context: The context object for the update.
+   :type context: ContextTypes.DEFAULT_TYPE
+   :param \*\*kwargs: Additional keyword arguments.
+
+   :returns: Response message from the bot.
+   :rtype: Message
+
+
+.. py:function:: delverif_command(update: telegram.Update, context: telegram.ext.ContextTypes.DEFAULT_TYPE, **kwargs) -> telegram.Message
+   :async:
+
+
+   Handle the /delverif command, allowing users to delete daily verification messages.
+
+   :param update: The incoming update.
+   :type update: Update
+   :param context: The context object for the update.
+   :type context: ContextTypes.DEFAULT_TYPE
+   :param \*\*kwargs: Additional keyword arguments.
+
+   :returns: Response message from the bot.
+   :rtype: Message
+
+
+.. py:function:: skip_command(update: telegram.Update, context: telegram.ext.ContextTypes.DEFAULT_TYPE, **kwargs) -> telegram.Message
+   :async:
+
+
+   Handle the /skip command, allowing users to skip the next daily verification.
+
+   :param update: The incoming update.
+   :type update: Update
+   :param context: The context object for the update.
+   :type context: ContextTypes.DEFAULT_TYPE
+   :param \*\*kwargs: Additional keyword arguments.
+
+   :returns: Response message from the bot.
+   :rtype: Message
+
+
+.. py:function:: undoskip_command(update: telegram.Update, context: telegram.ext.ContextTypes.DEFAULT_TYPE, **kwargs) -> telegram.Message
+   :async:
+
+
+   Handle the /undoskip command, allowing users to undo skipped daily verifications.
+
+   :param update: The incoming update.
+   :type update: Update
+   :param context: The context object for the update.
+   :type context: ContextTypes.DEFAULT_TYPE
+   :param \*\*kwargs: Additional keyword arguments.
+
+   :returns: Response message from the bot.
+   :rtype: Message
+
+
+.. py:function:: bugreport_command(update: telegram.Update, context: telegram.ext.ContextTypes.DEFAULT_TYPE, **kwargs) -> telegram.Message
+   :async:
+
+
+   Handle the /bugreport command, allowing users to report bugs or suggest improvements.
+
+   :param update: The incoming update.
+   :type update: Update
+   :param context: The context object for the update.
+   :type context: ContextTypes.DEFAULT_TYPE
+   :param \*\*kwargs: Additional keyword arguments.
+
+   :returns: Response message from the bot.
+   :rtype: Message
+
+
+.. py:function:: request_command(update: telegram.Update, context: telegram.ext.ContextTypes.DEFAULT_TYPE, quiet: bool = False, **kwargs) -> telegram.Message
+   :async:
+
+
+   Handle the /request command, showing and processing association requests.
+
+   :param update: The incoming update.
+   :type update: Update
+   :param context: The context object for the update.
+   :type context: ContextTypes.DEFAULT_TYPE
+   :param quiet: If True, don't send a message if there are no requests.
+   :type quiet: bool
+   :param \*\*kwargs: Additional keyword arguments.
+
+   :returns: Response message from the bot.
+   :rtype: Message
+
+
+.. py:function:: fastcheck_command(update: telegram.Update, context: telegram.ext.ContextTypes.DEFAULT_TYPE, **kwargs) -> telegram.Message
+   :async:
+
+
+   Handle the /fastcheck command, allowing users to set up a quick verification.
+
+   :param update: The incoming update.
+   :type update: Update
+   :param context: The context object for the update.
+   :type context: ContextTypes.DEFAULT_TYPE
+   :param \*\*kwargs: Additional keyword arguments.
+
+   :returns: Response message from the bot.
+   :rtype: Message
+
+
+.. py:function:: help_command(update: telegram.Update, context: telegram.ext.ContextTypes.DEFAULT_TYPE, **kwargs) -> telegram.Message
+   :async:
+
+
+   Handle the /help command, allowing users to notify emergency contacts.
+
+   :param update: The incoming update.
+   :type update: Update
+   :param context: The context object for the update.
+   :type context: ContextTypes.DEFAULT_TYPE
+   :param \*\*kwargs: Additional keyword arguments.
+
+   :returns: Response message from the bot.
+   :rtype: Message
+
+
+.. py:function:: undohelp_command(update: telegram.Update, context: telegram.ext.ContextTypes.DEFAULT_TYPE, **kwargs) -> telegram.Message
+   :async:
+
+
+   Handle the /undohelp command, allowing users to cancel the alert state.
+
+   :param update: The incoming update.
+   :type update: Update
+   :param context: The context object for the update.
+   :type context: ContextTypes.DEFAULT_TYPE
+   :param \*\*kwargs: Additional keyword arguments.
+
+   :returns: Response message from the bot.
+   :rtype: Message
+
+
+.. py:function:: empty_command(update: telegram.Update, context: telegram.ext.ContextTypes.DEFAULT_TYPE, **kwargs) -> telegram.Message
+   :async:
+
+
+   Handle the /empty command, canceling the current operation.
+
+   :param update: The incoming update.
+   :type update: Update
+   :param context: The context object for the update.
+   :type context: ContextTypes.DEFAULT_TYPE
+   :param \*\*kwargs: Additional keyword arguments.
+
+   :returns: Response message from the bot.
+   :rtype: Message
+
+
+.. py:function:: kill_user_data(update: telegram.Update, context: telegram.ext.ContextTypes.DEFAULT_TYPE, **kwargs) -> telegram.Message
+   :async:
+
+
+   Handle the command to delete all user data.
+
+   :param update: The incoming update.
+   :type update: Update
+   :param context: The context object for the update.
+   :type context: ContextTypes.DEFAULT_TYPE
+   :param \*\*kwargs: Additional keyword arguments.
+
+   :returns: Response message from the bot.
+   :rtype: Message
+
+

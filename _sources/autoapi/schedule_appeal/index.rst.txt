@@ -1,0 +1,44 @@
+schedule_appeal
+===============
+
+.. py:module:: schedule_appeal
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   schedule_appeal.WAITING_TIME
+   schedule_appeal.bot
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   schedule_appeal.send_daily_message
+   schedule_appeal.run_schedule
+   schedule_appeal.run_schedule_process
+
+
+Module Contents
+---------------
+
+.. py:data:: WAITING_TIME
+   :value: 9
+
+
+.. py:data:: bot
+
+.. py:function:: send_daily_message(user_id: int, description: str)
+   :async:
+
+
+.. py:function:: run_schedule()
+   :async:
+
+
+.. py:function:: run_schedule_process()
+
