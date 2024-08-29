@@ -287,12 +287,6 @@
 <tr class="row-even"><td><p><a class="reference internal" href="#env_pipeline.less_than_one_hour" title="env_pipeline.less_than_one_hour"><code class="xref py py-obj docutils literal notranslate"><span class="pre">less_than_one_hour</span></code></a>(time1, time2)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#env_pipeline.add_user_and_link_request" title="env_pipeline.add_user_and_link_request"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_user_and_link_request</span></code></a>(user_id, username, ...)</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#env_pipeline.delete_user_and_request" title="env_pipeline.delete_user_and_request"><code class="xref py py-obj docutils literal notranslate"><span class="pre">delete_user_and_request</span></code></a>(user_id, current_dict, value)</p></td>
-<td><p></p></td>
-</tr>
 </tbody>
 </table>
 </div>
@@ -319,16 +313,6 @@
 <span class="sig-name descname"><span class="pre">less_than_one_hour</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#env_pipeline.less_than_one_hour" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="py function">
-<dt class="sig sig-object py" id="env_pipeline.add_user_and_link_request">
-<span class="sig-name descname"><span class="pre">add_user_and_link_request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">username</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#env_pipeline.add_user_and_link_request" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="env_pipeline.delete_user_and_request">
-<span class="sig-name descname"><span class="pre">delete_user_and_request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#env_pipeline.delete_user_and_request" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
 <dl class="py class">
 <dt class="sig sig-object py" id="env_pipeline.RequestManager">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RequestManager</span></span><a class="headerlink" href="#env_pipeline.RequestManager" title="Link to this definition">¶</a></dt>
@@ -337,6 +321,23 @@
 <dt class="sig sig-object py" id="env_pipeline.RequestManager.users">
 <span class="sig-name descname"><span class="pre">users</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></em><a class="headerlink" href="#env_pipeline.RequestManager.users" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="env_pipeline.RequestManager.user_exists">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">user_exists</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#env_pipeline.RequestManager.user_exists" title="Link to this definition">¶</a></dt>
+<dd><p>Check if a user with the given ID exists in the ‘users’ table.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>user_id</strong> (<em>int</em>) – The ID of the user to check.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if the user exists, False otherwise.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="env_pipeline.RequestManager.update_user_properties">
@@ -375,6 +376,23 @@
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="env_pipeline.RequestManager.update_contacts_reload">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">update_contacts_reload</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">username</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#env_pipeline.RequestManager.update_contacts_reload" title="Link to this definition">¶</a></dt>
+<dd><p>Reload the contact_id property when a user reconnects.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>username</strong> (<em>str</em>) – The username of the user that just reconnected.</p></li>
+<li><p><strong>user_id</strong> (<em>int</em>) – The contact_id of the user that just reconnected.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="env_pipeline.RequestManager.add_contacts">
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">add_contacts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">username</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_usernames</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#env_pipeline.RequestManager.add_contacts" title="Link to this definition">¶</a></dt>
 <dd><p>Add new contacts for a user and handle contact requests.</p>
@@ -404,6 +422,23 @@
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>user_id</strong> (<em>int</em>) – The ID of the user from whom contacts will be deleted.</p></li>
 <li><p><strong>target_usernames</strong> (<em>list</em><em>[</em><em>str</em><em>]</em>) – A list of usernames to delete from the contacts.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="env_pipeline.RequestManager.del_contact_requests">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">del_contact_requests</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">requester_user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#env_pipeline.RequestManager.del_contact_requests" title="Link to this definition">¶</a></dt>
+<dd><p>Delete contacts requests from the user’s contact requests list.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>user_id</strong> (<em>int</em>) – The ID of the user from whom contact requests will be deleted.</p></li>
+<li><p><strong>requester_user_id</strong> (<em>int</em>) – The ID of the user whose will be deleted from the contact requests.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -629,33 +664,93 @@
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="env_pipeline.RequestManager.on_get_users">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">on_get_users</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#env_pipeline.RequestManager.on_get_users" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="env_pipeline.RequestManager.username_from_user_id">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">username_from_user_id</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#env_pipeline.RequestManager.username_from_user_id" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="env_pipeline.RequestManager.on_get_user_usernames_id">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">on_get_user_usernames_id</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#env_pipeline.RequestManager.on_get_user_usernames_id" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="env_pipeline.RequestManager.on_kill_data">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">on_kill_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'data/data.json'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#env_pipeline.RequestManager.on_kill_data" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">on_kill_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#env_pipeline.RequestManager.on_kill_data" title="Link to this definition">¶</a></dt>
+<dd><p>Delete a user from the ‘users’ table and all its relative data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>user_id</strong> (<em>int</em>) – The ID of the user to delete.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="env_pipeline.RequestManager.on_create_user">
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">on_create_user</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">username</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#env_pipeline.RequestManager.on_create_user" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Create a new user in the ‘users’ table with default values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>user_id</strong> (<em>int</em>) – The ID of the new user.</p></li>
+<li><p><strong>username</strong> (<em>str</em>) – The username of the new user.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="env_pipeline.RequestManager.transfer_pending_requests">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">transfer_pending_requests</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_username</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#env_pipeline.RequestManager.transfer_pending_requests" title="Link to this definition">¶</a></dt>
+<dd><p>Transfer pending requests to the ‘contact_requests’ table and delete them from the ‘pending_requests’ table.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>user_id</strong> (<em>int</em>) – The ID of the user receiving the pending requests.</p></li>
+<li><p><strong>target_username</strong> (<em>str</em>) – The username associated with the pending requests.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of requester IDs whose requests were transferred.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[int]</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="env_pipeline.RequestManager.telegram_keys">
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">telegram_keys</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#env_pipeline.RequestManager.telegram_keys" title="Link to this definition">¶</a></dt>
+<dd><p>Retrieve Telegram bot API token and bot username from environment variables.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A tuple containing the API token and bot username.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple[str, str]</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ValueError</strong> – If one or more required environment variables are missing.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="env_pipeline.RequestManager.username_from_user_id">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">username_from_user_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#env_pipeline.RequestManager.username_from_user_id" title="Link to this definition">¶</a></dt>
+<dd><p>Retrieve the username associated with a user ID.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>user_id</strong> (<em>int</em>) – The ID of the user to look up.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The username associated with the given user ID, or None if no user</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="env_pipeline.RequestManager.on_get_users">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">on_get_users</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#env_pipeline.RequestManager.on_get_users" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -669,11 +764,6 @@
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="env_pipeline.RequestManager.on_read_check_queue">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">on_read_check_queue</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#env_pipeline.RequestManager.on_read_check_queue" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="env_pipeline.RequestManager.on_get_check_users">
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">on_get_check_users</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#env_pipeline.RequestManager.on_get_check_users" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -681,41 +771,6 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="env_pipeline.RequestManager.on_kill_queue_data">
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">on_kill_queue_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'data/queue.json'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#env_pipeline.RequestManager.on_kill_queue_data" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="env_pipeline.RequestManager.on_get_request_user">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">on_get_request_user</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'keys'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#env_pipeline.RequestManager.on_get_request_user" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="env_pipeline.RequestManager.transfer_pending_requests">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">transfer_pending_requests</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_username</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#env_pipeline.RequestManager.transfer_pending_requests" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="env_pipeline.RequestManager.on_init_request">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">on_init_request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">daily_check</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#env_pipeline.RequestManager.on_init_request" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="env_pipeline.RequestManager.on_write_request">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">on_write_request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#env_pipeline.RequestManager.on_write_request" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="env_pipeline.RequestManager.on_write_all_request">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">on_write_all_request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">all_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#env_pipeline.RequestManager.on_write_all_request" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="env_pipeline.RequestManager.on_read_request">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">on_read_request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#env_pipeline.RequestManager.on_read_request" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="env_pipeline.RequestManager.on_kill_request">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">on_kill_request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'data/request.json'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#env_pipeline.RequestManager.on_kill_request" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -779,14 +834,15 @@
 <li><a class="reference internal" href="#env_pipeline.DB_PARAMS"><code class="docutils literal notranslate"><span class="pre">DB_PARAMS</span></code></a></li>
 <li><a class="reference internal" href="#env_pipeline.get_db_connection"><code class="docutils literal notranslate"><span class="pre">get_db_connection()</span></code></a></li>
 <li><a class="reference internal" href="#env_pipeline.less_than_one_hour"><code class="docutils literal notranslate"><span class="pre">less_than_one_hour()</span></code></a></li>
-<li><a class="reference internal" href="#env_pipeline.add_user_and_link_request"><code class="docutils literal notranslate"><span class="pre">add_user_and_link_request()</span></code></a></li>
-<li><a class="reference internal" href="#env_pipeline.delete_user_and_request"><code class="docutils literal notranslate"><span class="pre">delete_user_and_request()</span></code></a></li>
 <li><a class="reference internal" href="#env_pipeline.RequestManager"><code class="docutils literal notranslate"><span class="pre">RequestManager</span></code></a><ul>
 <li><a class="reference internal" href="#env_pipeline.RequestManager.users"><code class="docutils literal notranslate"><span class="pre">RequestManager.users</span></code></a></li>
+<li><a class="reference internal" href="#env_pipeline.RequestManager.user_exists"><code class="docutils literal notranslate"><span class="pre">RequestManager.user_exists()</span></code></a></li>
 <li><a class="reference internal" href="#env_pipeline.RequestManager.update_user_properties"><code class="docutils literal notranslate"><span class="pre">RequestManager.update_user_properties()</span></code></a></li>
 <li><a class="reference internal" href="#env_pipeline.RequestManager.update_contacts_properties"><code class="docutils literal notranslate"><span class="pre">RequestManager.update_contacts_properties()</span></code></a></li>
+<li><a class="reference internal" href="#env_pipeline.RequestManager.update_contacts_reload"><code class="docutils literal notranslate"><span class="pre">RequestManager.update_contacts_reload()</span></code></a></li>
 <li><a class="reference internal" href="#env_pipeline.RequestManager.add_contacts"><code class="docutils literal notranslate"><span class="pre">RequestManager.add_contacts()</span></code></a></li>
 <li><a class="reference internal" href="#env_pipeline.RequestManager.del_contacts"><code class="docutils literal notranslate"><span class="pre">RequestManager.del_contacts()</span></code></a></li>
+<li><a class="reference internal" href="#env_pipeline.RequestManager.del_contact_requests"><code class="docutils literal notranslate"><span class="pre">RequestManager.del_contact_requests()</span></code></a></li>
 <li><a class="reference internal" href="#env_pipeline.RequestManager.add_verifications"><code class="docutils literal notranslate"><span class="pre">RequestManager.add_verifications()</span></code></a></li>
 <li><a class="reference internal" href="#env_pipeline.RequestManager.del_verifications"><code class="docutils literal notranslate"><span class="pre">RequestManager.del_verifications()</span></code></a></li>
 <li><a class="reference internal" href="#env_pipeline.RequestManager.update_verification_status"><code class="docutils literal notranslate"><span class="pre">RequestManager.update_verification_status()</span></code></a></li>
@@ -799,24 +855,16 @@
 <li><a class="reference internal" href="#env_pipeline.RequestManager.read_verifications_properties"><code class="docutils literal notranslate"><span class="pre">RequestManager.read_verifications_properties()</span></code></a></li>
 <li><a class="reference internal" href="#env_pipeline.RequestManager.user_already_registered"><code class="docutils literal notranslate"><span class="pre">RequestManager.user_already_registered()</span></code></a></li>
 <li><a class="reference internal" href="#env_pipeline.RequestManager.write_bug_report"><code class="docutils literal notranslate"><span class="pre">RequestManager.write_bug_report()</span></code></a></li>
-<li><a class="reference internal" href="#env_pipeline.RequestManager.on_get_users"><code class="docutils literal notranslate"><span class="pre">RequestManager.on_get_users()</span></code></a></li>
-<li><a class="reference internal" href="#env_pipeline.RequestManager.username_from_user_id"><code class="docutils literal notranslate"><span class="pre">RequestManager.username_from_user_id()</span></code></a></li>
-<li><a class="reference internal" href="#env_pipeline.RequestManager.on_get_user_usernames_id"><code class="docutils literal notranslate"><span class="pre">RequestManager.on_get_user_usernames_id()</span></code></a></li>
 <li><a class="reference internal" href="#env_pipeline.RequestManager.on_kill_data"><code class="docutils literal notranslate"><span class="pre">RequestManager.on_kill_data()</span></code></a></li>
 <li><a class="reference internal" href="#env_pipeline.RequestManager.on_create_user"><code class="docutils literal notranslate"><span class="pre">RequestManager.on_create_user()</span></code></a></li>
+<li><a class="reference internal" href="#env_pipeline.RequestManager.transfer_pending_requests"><code class="docutils literal notranslate"><span class="pre">RequestManager.transfer_pending_requests()</span></code></a></li>
 <li><a class="reference internal" href="#env_pipeline.RequestManager.telegram_keys"><code class="docutils literal notranslate"><span class="pre">RequestManager.telegram_keys()</span></code></a></li>
+<li><a class="reference internal" href="#env_pipeline.RequestManager.username_from_user_id"><code class="docutils literal notranslate"><span class="pre">RequestManager.username_from_user_id()</span></code></a></li>
+<li><a class="reference internal" href="#env_pipeline.RequestManager.on_get_users"><code class="docutils literal notranslate"><span class="pre">RequestManager.on_get_users()</span></code></a></li>
 <li><a class="reference internal" href="#env_pipeline.RequestManager.on_init_check_queue"><code class="docutils literal notranslate"><span class="pre">RequestManager.on_init_check_queue()</span></code></a></li>
 <li><a class="reference internal" href="#env_pipeline.RequestManager.on_write_check_queue"><code class="docutils literal notranslate"><span class="pre">RequestManager.on_write_check_queue()</span></code></a></li>
-<li><a class="reference internal" href="#env_pipeline.RequestManager.on_read_check_queue"><code class="docutils literal notranslate"><span class="pre">RequestManager.on_read_check_queue()</span></code></a></li>
 <li><a class="reference internal" href="#env_pipeline.RequestManager.on_get_check_users"><code class="docutils literal notranslate"><span class="pre">RequestManager.on_get_check_users()</span></code></a></li>
 <li><a class="reference internal" href="#env_pipeline.RequestManager.on_kill_queue_data"><code class="docutils literal notranslate"><span class="pre">RequestManager.on_kill_queue_data()</span></code></a></li>
-<li><a class="reference internal" href="#env_pipeline.RequestManager.on_get_request_user"><code class="docutils literal notranslate"><span class="pre">RequestManager.on_get_request_user()</span></code></a></li>
-<li><a class="reference internal" href="#env_pipeline.RequestManager.transfer_pending_requests"><code class="docutils literal notranslate"><span class="pre">RequestManager.transfer_pending_requests()</span></code></a></li>
-<li><a class="reference internal" href="#env_pipeline.RequestManager.on_init_request"><code class="docutils literal notranslate"><span class="pre">RequestManager.on_init_request()</span></code></a></li>
-<li><a class="reference internal" href="#env_pipeline.RequestManager.on_write_request"><code class="docutils literal notranslate"><span class="pre">RequestManager.on_write_request()</span></code></a></li>
-<li><a class="reference internal" href="#env_pipeline.RequestManager.on_write_all_request"><code class="docutils literal notranslate"><span class="pre">RequestManager.on_write_all_request()</span></code></a></li>
-<li><a class="reference internal" href="#env_pipeline.RequestManager.on_read_request"><code class="docutils literal notranslate"><span class="pre">RequestManager.on_read_request()</span></code></a></li>
-<li><a class="reference internal" href="#env_pipeline.RequestManager.on_kill_request"><code class="docutils literal notranslate"><span class="pre">RequestManager.on_kill_request()</span></code></a></li>
 </ul>
 </li>
 </ul>

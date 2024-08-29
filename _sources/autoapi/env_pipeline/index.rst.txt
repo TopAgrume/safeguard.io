@@ -28,8 +28,6 @@ Functions
 
    env_pipeline.get_db_connection
    env_pipeline.less_than_one_hour
-   env_pipeline.add_user_and_link_request
-   env_pipeline.delete_user_and_request
 
 
 Module Contents
@@ -45,10 +43,6 @@ Module Contents
 
 .. py:function:: less_than_one_hour(time1: dict, time2: dict)
 
-.. py:function:: add_user_and_link_request(user_id: int, username: str, current_dict: list, value: list)
-
-.. py:function:: delete_user_and_request(user_id: int, current_dict: list, value: list)
-
 .. py:class:: RequestManager
 
    Bases: :py:obj:`object`
@@ -56,6 +50,20 @@ Module Contents
 
    .. py:attribute:: users
       :type:  dict
+
+
+   .. py:method:: user_exists(user_id: int) -> bool
+      :staticmethod:
+
+
+      Check if a user with the given ID exists in the 'users' table.
+
+      :param user_id: The ID of the user to check.
+      :type user_id: int
+
+      :returns: True if the user exists, False otherwise.
+      :rtype: bool
+
 
 
    .. py:method:: update_user_properties(user_id: int, key: str, value: str | bool) -> None
@@ -92,6 +100,21 @@ Module Contents
 
 
 
+   .. py:method:: update_contacts_reload(username: str, user_id: int) -> None
+      :staticmethod:
+
+
+      Reload the contact_id property when a user reconnects.
+
+      :param username: The username of the user that just reconnected.
+      :type username: str
+      :param user_id: The contact_id of the user that just reconnected.
+      :type user_id: int
+
+      :returns: None
+
+
+
    .. py:method:: add_contacts(user_id: int, username: str, target_usernames: list[str]) -> list[dict]
       :staticmethod:
 
@@ -120,6 +143,21 @@ Module Contents
       :type user_id: int
       :param target_usernames: A list of usernames to delete from the contacts.
       :type target_usernames: list[str]
+
+      :returns: None
+
+
+
+   .. py:method:: del_contact_requests(user_id: int, requester_user_id: int) -> None
+      :staticmethod:
+
+
+      Delete contacts requests from the user's contact requests list.
+
+      :param user_id: The ID of the user from whom contact requests will be deleted.
+      :type user_id: int
+      :param requester_user_id: The ID of the user whose will be deleted from the contact requests.
+      :type requester_user_id: int
 
       :returns: None
 
@@ -309,23 +347,16 @@ Module Contents
 
 
 
-   .. py:method:: on_get_users()
+   .. py:method:: on_kill_data(user_id: int) -> None
       :staticmethod:
 
 
+      Delete a user from the 'users' table and all its relative data.
 
-   .. py:method:: username_from_user_id()
-      :staticmethod:
+      :param user_id: The ID of the user to delete.
+      :type user_id: int
 
-
-
-   .. py:method:: on_get_user_usernames_id()
-      :staticmethod:
-
-
-
-   .. py:method:: on_kill_data(user_id: int, file_path: str = 'data/data.json') -> None
-      :staticmethod:
+      :returns: None
 
 
 
@@ -333,8 +364,61 @@ Module Contents
       :staticmethod:
 
 
+      Create a new user in the 'users' table with default values.
+
+      :param user_id: The ID of the new user.
+      :type user_id: int
+      :param username: The username of the new user.
+      :type username: str
+
+      :returns: None
+
+
+
+   .. py:method:: transfer_pending_requests(user_id: int, target_username: str) -> list[int]
+      :staticmethod:
+
+
+      Transfer pending requests to the 'contact_requests' table and delete them from the 'pending_requests' table.
+
+      :param user_id: The ID of the user receiving the pending requests.
+      :type user_id: int
+      :param target_username: The username associated with the pending requests.
+      :type target_username: str
+
+      :returns: A list of requester IDs whose requests were transferred.
+      :rtype: list[int]
+
+
 
    .. py:method:: telegram_keys() -> tuple[str, str]
+      :staticmethod:
+
+
+      Retrieve Telegram bot API token and bot username from environment variables.
+
+      :returns: A tuple containing the API token and bot username.
+      :rtype: tuple[str, str]
+
+      :raises ValueError: If one or more required environment variables are missing.
+
+
+
+   .. py:method:: username_from_user_id(user_id: int) -> str
+      :staticmethod:
+
+
+      Retrieve the username associated with a user ID.
+
+      :param user_id: The ID of the user to look up.
+      :type user_id: int
+
+      :returns: The username associated with the given user ID, or None if no user
+      :rtype: str
+
+
+
+   .. py:method:: on_get_users()
       :staticmethod:
 
 
@@ -349,52 +433,12 @@ Module Contents
 
 
 
-   .. py:method:: on_read_check_queue(user_id: int, key: str = None)
-      :staticmethod:
-
-
-
    .. py:method:: on_get_check_users(method: str)
       :staticmethod:
 
 
 
    .. py:method:: on_kill_queue_data(user_id: int, file_path: str = 'data/queue.json') -> None
-      :staticmethod:
-
-
-
-   .. py:method:: on_get_request_user(method: str = 'keys')
-      :staticmethod:
-
-
-
-   .. py:method:: transfer_pending_requests(user_id: int, target_username: str)
-      :staticmethod:
-
-
-
-   .. py:method:: on_init_request(user_id: str, daily_check: dict)
-      :staticmethod:
-
-
-
-   .. py:method:: on_write_request(user_id: str, key: str = None, value=None) -> None
-      :staticmethod:
-
-
-
-   .. py:method:: on_write_all_request(all_data: dict) -> None
-      :staticmethod:
-
-
-
-   .. py:method:: on_read_request(user_id: int, key: str = None)
-      :staticmethod:
-
-
-
-   .. py:method:: on_kill_request(user_id: int, file_path: str = 'data/request.json') -> None
       :staticmethod:
 
 
