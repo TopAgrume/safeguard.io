@@ -1,0 +1,19 @@
+init_database
+=============
+
+.. py:module:: init_database
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   init_database.init_database
+
+
+Module Contents
+---------------
+
+.. py:function:: init_database()
+

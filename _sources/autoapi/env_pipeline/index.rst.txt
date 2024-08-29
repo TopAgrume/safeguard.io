@@ -1,0 +1,401 @@
+env_pipeline
+============
+
+.. py:module:: env_pipeline
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   env_pipeline.MAX_TIME_DIFF
+   env_pipeline.DB_PARAMS
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   env_pipeline.RequestManager
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   env_pipeline.get_db_connection
+   env_pipeline.less_than_one_hour
+   env_pipeline.add_user_and_link_request
+   env_pipeline.delete_user_and_request
+
+
+Module Contents
+---------------
+
+.. py:data:: MAX_TIME_DIFF
+   :value: 20
+
+
+.. py:data:: DB_PARAMS
+
+.. py:function:: get_db_connection()
+
+.. py:function:: less_than_one_hour(time1: dict, time2: dict)
+
+.. py:function:: add_user_and_link_request(user_id: int, username: str, current_dict: list, value: list)
+
+.. py:function:: delete_user_and_request(user_id: int, current_dict: list, value: list)
+
+.. py:class:: RequestManager
+
+   Bases: :py:obj:`object`
+
+
+   .. py:attribute:: users
+      :type:  dict
+
+
+   .. py:method:: update_user_properties(user_id: int, key: str, value: str | bool) -> None
+      :staticmethod:
+
+
+      Update a specific property of a user in the 'users' table.
+
+      :param user_id: The ID of the user whose property is to be updated.
+      :type user_id: int
+      :param key: The column name in the 'users' table to update.
+      :type key: str
+      :param value: The new value for the property.
+      :type value: str | bool
+
+      :returns: None
+
+
+
+   .. py:method:: update_contacts_properties(user_id: int, key: str, value: int | bool) -> None
+      :staticmethod:
+
+
+      Update a specific property of a contact in the 'contacts' table.
+
+      :param user_id: The ID of the user who owns the contact.
+      :type user_id: int
+      :param key: The column name in the 'contacts' table to update.
+      :type key: str
+      :param value: The new value for the property.
+      :type value: int | bool
+
+      :returns: None
+
+
+
+   .. py:method:: add_contacts(user_id: int, username: str, target_usernames: list[str]) -> list[dict]
+      :staticmethod:
+
+
+      Add new contacts for a user and handle contact requests.
+
+      :param user_id: The ID of the user adding contacts.
+      :type user_id: int
+      :param username: The username of the user adding contacts.
+      :type username: str
+      :param target_usernames: A list of usernames to add as contacts.
+      :type target_usernames: list[str]
+
+      :returns: A list of notifications with contact IDs and tags for successfully added contacts.
+      :rtype: list[dict]
+
+
+
+   .. py:method:: del_contacts(user_id: int, target_usernames: list[str]) -> None
+      :staticmethod:
+
+
+      Delete contacts from the user's contact list.
+
+      :param user_id: The ID of the user from whom contacts will be deleted.
+      :type user_id: int
+      :param target_usernames: A list of usernames to delete from the contacts.
+      :type target_usernames: list[str]
+
+      :returns: None
+
+
+
+   .. py:method:: add_verifications(user_id: int, new_verifications: list, skip_check: bool = False) -> list[str]
+      :staticmethod:
+
+
+      Add new verifications for a user.
+
+      :param user_id: The ID of the user for whom verifications are being added.
+      :type user_id: int
+      :param new_verifications: A list of new verification entries to add.
+      :type new_verifications: list
+      :param skip_check: Whether to skip validation checks for existing verifications.
+      :type skip_check: bool
+
+      :returns: A list of times for which verifications were not valid.
+      :rtype: list
+
+
+
+   .. py:method:: del_verifications(user_id: int, times_to_delete: list) -> None
+      :staticmethod:
+
+
+      Delete specific verifications for a user.
+
+      :param user_id: The ID of the user from whom verifications will be deleted.
+      :type user_id: int
+      :param times_to_delete: A list of times specifying which verifications to delete.
+      :type times_to_delete: list
+
+      :returns: None
+
+
+
+   .. py:method:: update_verification_status(user_id: int, times_to_update: list, active: bool) -> None
+      :staticmethod:
+
+
+      Update the status of specific verifications for a user.
+
+      :param user_id: The ID of the user whose verification statuses are being updated.
+      :type user_id: int
+      :param times_to_update: A list of times specifying which verifications to update.
+      :type times_to_update: list
+      :param active: The new status for the verifications (active or inactive).
+      :type active: bool
+
+      :returns: None
+
+
+
+   .. py:method:: skip_verifications(user_id: int, times_to_skip: list) -> None
+      :staticmethod:
+
+
+      Mark specific verifications as skipped (inactive).
+
+      :param user_id: The ID of the user whose verifications are being skipped.
+      :type user_id: int
+      :param times_to_skip: A list of times specifying which verifications to skip.
+      :type times_to_skip: list
+
+      :returns: None
+
+
+
+   .. py:method:: undoskip_verifications(user_id: int, times_to_undoskip: list) -> None
+      :staticmethod:
+
+
+      Revert the status of specific verifications to active.
+
+      :param user_id: The ID of the user whose verifications are being reverted.
+      :type user_id: int
+      :param times_to_undoskip: A list of times specifying which verifications to reactivate.
+      :type times_to_undoskip: list
+
+      :returns: None
+
+
+
+   .. py:method:: user_information(user_id: int) -> tuple[bool, bool]
+      :staticmethod:
+
+
+      Retrieve specific information about a user.
+
+      :param user_id: The ID of the user whose information is being retrieved.
+      :type user_id: int
+
+      :returns: A tuple containing the response message and alert mode for the user, or (None, None) if the user is not found.
+      :rtype: tuple
+
+
+
+   .. py:method:: read_user_properties(user_id: int, key: str) -> str | bool
+      :staticmethod:
+
+
+      Read a specific property of a user from the 'users' table.
+
+      :param user_id: The ID of the user whose property is being read.
+      :type user_id: int
+      :param key: The column name in the 'users' table to retrieve.
+      :type key: str
+
+      :returns: The value of the specified property for the user, or None if the user is not found.
+      :rtype: str | bool
+
+
+
+   .. py:method:: read_contact_requests_properties(user_id: int) -> list[tuple[int, str]]
+      :staticmethod:
+
+
+      Retrieve the contact requests for a user.
+
+      :param user_id: The ID of the user whose contact requests are being retrieved.
+      :type user_id: int
+
+      :returns: A list of tuples containing the requester ID and requester tag for each contact request.
+      :rtype: list[tuple[int, str]]
+
+
+
+   .. py:method:: read_contacts_properties(user_id: int) -> list[tuple[int, str, bool]]
+      :staticmethod:
+
+
+      Retrieve the contact information for a user.
+
+      :param user_id: The ID of the user whose contacts are being retrieved.
+      :type user_id: int
+
+      :returns: A list of tuples containing the contact ID, tag, and pair status for each contact.
+      :rtype: list[tuple[int, str, bool]]
+
+
+
+   .. py:method:: read_verifications_properties(user_id: int) -> list[tuple[str, str, bool]]
+      :staticmethod:
+
+
+      Retrieve the verifications for a user.
+
+      :param user_id: The ID of the user whose verifications are being retrieved.
+      :type user_id: int
+
+      :returns: A list of tuples containing the time, description, and active status for each verification.
+      :rtype: list
+
+
+
+   .. py:method:: user_already_registered(user_id: int) -> bool
+      :staticmethod:
+
+
+      Check if a user is already registered in the 'users' table.
+
+      :param user_id: The ID of the user to check.
+      :type user_id: int
+
+      :returns: True if the user is registered, False otherwise.
+      :rtype: bool
+
+
+
+   .. py:method:: write_bug_report(user_id: int, username: str, message: str) -> int
+      :staticmethod:
+
+
+      Write a bug report for a user.
+
+      :param user_id: The ID of the user submitting the bug report.
+      :type user_id: int
+      :param username: The username of the user submitting the bug report.
+      :type username: str
+      :param message: The content of the bug report.
+      :type message: str
+
+      :returns: The ID of the newly created bug report.
+      :rtype: int
+
+
+
+   .. py:method:: on_get_users()
+      :staticmethod:
+
+
+
+   .. py:method:: username_from_user_id()
+      :staticmethod:
+
+
+
+   .. py:method:: on_get_user_usernames_id()
+      :staticmethod:
+
+
+
+   .. py:method:: on_kill_data(user_id: int, file_path: str = 'data/data.json') -> None
+      :staticmethod:
+
+
+
+   .. py:method:: on_create_user(user_id: int, username: str) -> None
+      :staticmethod:
+
+
+
+   .. py:method:: telegram_keys() -> tuple[str, str]
+      :staticmethod:
+
+
+
+   .. py:method:: on_init_check_queue(user_id: str, daily_check: dict, waiting_time: int)
+      :staticmethod:
+
+
+
+   .. py:method:: on_write_check_queue(user_id: str, key: str = None, value=None) -> None
+      :staticmethod:
+
+
+
+   .. py:method:: on_read_check_queue(user_id: int, key: str = None)
+      :staticmethod:
+
+
+
+   .. py:method:: on_get_check_users(method: str)
+      :staticmethod:
+
+
+
+   .. py:method:: on_kill_queue_data(user_id: int, file_path: str = 'data/queue.json') -> None
+      :staticmethod:
+
+
+
+   .. py:method:: on_get_request_user(method: str = 'keys')
+      :staticmethod:
+
+
+
+   .. py:method:: transfer_pending_requests(user_id: int, target_username: str)
+      :staticmethod:
+
+
+
+   .. py:method:: on_init_request(user_id: str, daily_check: dict)
+      :staticmethod:
+
+
+
+   .. py:method:: on_write_request(user_id: str, key: str = None, value=None) -> None
+      :staticmethod:
+
+
+
+   .. py:method:: on_write_all_request(all_data: dict) -> None
+      :staticmethod:
+
+
+
+   .. py:method:: on_read_request(user_id: int, key: str = None)
+      :staticmethod:
+
+
+
+   .. py:method:: on_kill_request(user_id: int, file_path: str = 'data/request.json') -> None
+      :staticmethod:
+
+
+
