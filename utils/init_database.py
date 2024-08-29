@@ -27,11 +27,12 @@ def init_database():
     );
     
     CREATE TABLE IF NOT EXISTS contacts (
+        id SERIAL PRIMARY KEY,
         user_id BIGINT REFERENCES users(id) ON DELETE CASCADE,
-        contact_id BIGINT REFERENCES users(id) ON DELETE CASCADE,
+        contact_id BIGINT REFERENCES users(id) ON DELETE SET NULL,
         tag VARCHAR(255),
         pair BOOLEAN DEFAULT FALSE,
-        PRIMARY KEY (user_id, contact_id)
+        UNIQUE (user_id, contact_id, tag)
     );
     
     CREATE TABLE IF NOT EXISTS daily_messages (
@@ -47,6 +48,22 @@ def init_database():
         requester_id BIGINT REFERENCES users(id) ON DELETE CASCADE,
         requester_tag VARCHAR(255),
         PRIMARY KEY (user_id, requester_id)
+    );
+    
+    CREATE TABLE IF NOT EXISTS pending_requests (
+        requester_id BIGINT REFERENCES users(id) ON DELETE CASCADE,
+        target_username VARCHAR(255),
+        tag VARCHAR(255),
+        PRIMARY KEY (requester_id, target_username),
+        UNIQUE (requester_id, target_username, tag)
+    );
+    
+    CREATE TABLE IF NOT EXISTS bug_reports (
+        id SERIAL PRIMARY KEY,
+        user_id BIGINT,
+        username VARCHAR(255),
+        content TEXT,
+        reported_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
     );
     """)
 

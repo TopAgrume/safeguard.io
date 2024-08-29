@@ -1,12 +1,12 @@
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup, Message
 from telegram.ext import ContextTypes
-from utils.env_pipeline import AccessEnv
+from utils.env_pipeline import RequestManager
 import telegram
 from logzero import logger
 from functools import wraps
 from typing import Any, Callable
 
-TOKEN, BOT_USERNAME = AccessEnv.telegram_keys()
+TOKEN, BOT_USERNAME = RequestManager.telegram_keys()
 P_HTML = telegram.constants.ParseMode.HTML
 
 
@@ -74,47 +74,21 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kw
     user = update.message.from_user
     user_id, username = user.id, user.username
 
-    if AccessEnv.user_already_registered(user_id):
+    if RequestManager.user_already_registered(user_id):
         logger.debug(f"└── User @{username} already registered")
         message = "Your profile is already linked with Safeguard.io!"
         return await update.message.reply_text(message)
 
-    AccessEnv.on_create_user(user_id, username)
+    RequestManager.on_create_user(user_id, username)
     logger.debug(f"└── New user @{username} registered")
 
     message = f"Hello {user.first_name} 🌟! Thanks for chatting with me! I am Safeguard.io 😊."
     await update.message.reply_text(message)
 
-    exploit_data = {} # TODO: Move request JSON to Postgres
-    remove_user_id = []
-    request_data = AccessEnv.on_get_request_user("dict")
-    for origin_id, content in request_data.items():
-        remove_tag = []
-        for dest_tag in content["dest_tags"]:
-            if username == dest_tag:
-                logger.debug('COMMANDS:', f"Send new user request from @{username}")
-                remove_tag.append(username)
-                exploit_data[origin_id] = content['tag']
-
-        content["dest_tags"] = [element for element in content["dest_tags"] if element not in remove_tag]
-
-        if len(content["dest_tags"]) == 0:
-            remove_user_id.append(origin_id)
-
-    # Del request data
-    for key in remove_user_id:
-        if key in request_data:
-            del request_data[key]
-
-    AccessEnv.on_write_all_request(request_data)
-    AccessEnv.update_user_properties(user_id, "contact_request", exploit_data)
-
-    for contact_key in exploit_data.keys():
-        old_contacts = AccessEnv.read_user_properties(int(contact_key), "contacts")
-        for old_contact in old_contacts:
-            if old_contact['tag'] == username:
-                old_contact['id'] = user_id
-        AccessEnv.update_user_properties(int(contact_key), "contacts", old_contacts)
+    requester_keys = RequestManager.transfer_pending_requests(user_id, username)
+    logger.debug(f"└── New user @{username} has {len(requester_keys)} pending contact requests")
+    for contact_key in requester_keys:
+        RequestManager.update_contacts_properties(contact_key, "contact_id", user_id)
 
     return await request_command(update, context, quiet=True)
 
@@ -175,12 +149,12 @@ async def addcontact_command(update: Update, context: ContextTypes.DEFAULT_TYPE,
     user_id = update.message.from_user.id
     username = update.message.from_user.username
 
-    if len(AccessEnv.read_user_properties(user_id, "contacts")) > 9:
+    if len(RequestManager.read_contacts_properties(user_id)) > 9:
         logger.debug(f"└── User @{username} already have 10 contacts")
         message = "You cannot add an additional contacts (10 max). 🛑"
         return await update.message.reply_text(message)
 
-    AccessEnv.update_user_properties(user_id, "state", "addcontact")
+    RequestManager.update_user_properties(user_id, "state", "addcontact")
 
     message = ("Sure thing! Please provide me with a list of contacts you'd like to add. 📋\n"
                "<b>Make sure to use the following format:</b>\n\n"
@@ -204,7 +178,7 @@ async def showcontacts_command(update: Update, context: ContextTypes.DEFAULT_TYP
         Message: Response message from the bot.
     """
     user_id = update.message.from_user.id
-    contact_list = AccessEnv.read_user_properties(user_id, "contacts")
+    contact_list = RequestManager.read_contacts_properties(user_id)
     username = update.message.from_user.username
 
     if len(contact_list) == 0:
@@ -214,10 +188,10 @@ async def showcontacts_command(update: Update, context: ContextTypes.DEFAULT_TYP
 
     message = "Sure thing! Here is your list of contacts:\n\n"
 
-    for contact in contact_list:
-        status = "👤" if contact['pair'] else "🚫"
-        pair_status = "" if contact['pair'] else " - Waiting for pairing."
-        message += f"{status} <b>@{contact['tag']}</b>{pair_status}\n"
+    for contact_id, tag, pair in contact_list:
+        status = "👤" if contact_id else "🚫"
+        pair_status = "" if pair else " - Waiting for pairing."
+        message += f"{status} <b>@{tag}</b>{pair_status}\n"
 
     return await update.message.reply_text(message, parse_mode=P_HTML)
 
@@ -236,7 +210,7 @@ async def delcontact_command(update: Update, context: ContextTypes.DEFAULT_TYPE,
         Message: Response message from the bot.
     """
     user_id = update.message.from_user.id
-    user_contacts = AccessEnv.read_user_properties(user_id, "contacts")
+    user_contacts = RequestManager.read_contacts_properties(user_id)
     username = update.message.from_user.username
 
     if len(user_contacts) == 0:
@@ -244,10 +218,10 @@ async def delcontact_command(update: Update, context: ContextTypes.DEFAULT_TYPE,
         message = "<b>No contact to delete. 📭</b>"
         return await update.message.reply_text(message, parse_mode=P_HTML)
 
-    display = ['@' + contact['tag'] for contact in user_contacts]
+    display = ['@' + tag for _, tag, _ in user_contacts]
     reply_markup = ReplyKeyboardMarkup([display], resize_keyboard=True, one_time_keyboard=True)
 
-    AccessEnv.update_user_properties(user_id, "state", "delcontact")
+    RequestManager.update_user_properties(user_id, "state", "delcontact")
 
     message = "Sure! Chose the contact to delete.🗑️\n"
     return await update.message.reply_text(message, reply_markup=reply_markup, parse_mode=P_HTML)
@@ -269,12 +243,12 @@ async def addverif_command(update: Update, context: ContextTypes.DEFAULT_TYPE, *
     user_id = update.message.from_user.id
     username = update.message.from_user.username
 
-    if len(AccessEnv.read_user_properties(user_id, "daily_message")) > 5:
+    if len(RequestManager.read_verifications_properties(user_id)) > 5:
         logger.debug(f"└── User @{username} already have 6 verifications")
         message = "<b>You cannot add an additional daily check (6 max). 🛑</b>"
         return await update.message.reply_text(message, parse_mode=P_HTML)
 
-    AccessEnv.update_user_properties(user_id, "state", "addverif")
+    RequestManager.update_user_properties(user_id, "state", "addverif")
 
     message = ("OK. Send me a list of daily verifications to add. 📅⏰\n"
                "<b>Please use this format</b>:\n\n"
@@ -298,7 +272,7 @@ async def showverifs_command(update: Update, context: ContextTypes.DEFAULT_TYPE,
         Message: Response message from the bot.
     """
     user_id = update.message.from_user.id
-    verif_list = AccessEnv.read_user_properties(user_id, "daily_message")
+    verif_list = RequestManager.read_verifications_properties(user_id)
     username = update.message.from_user.username
 
     if len(verif_list) == 0:
@@ -306,20 +280,20 @@ async def showverifs_command(update: Update, context: ContextTypes.DEFAULT_TYPE,
         message = "<b>There is no daily check to display. 📅</b>"
         return await update.message.reply_text(message, parse_mode=P_HTML)
 
-    sorted_list = sorted(verif_list, key=lambda x: x["time"])
+    sorted_list = sorted(verif_list, key=lambda x: x[0])
 
     message = "OK. Here is your list of daily verifications:\n\n"
     skipped_verif = "\n\n<b>Skipped today:</b>\n\n"
     active_verifs = []
     skipped_verifs = []
 
-    for verif in sorted_list:
-        if verif["active"] is True:
-            active_verifs.append(f"🕗 <b>{verif['time']}</b> - {verif['desc']}")
-        elif verif["active"] is None:
-            active_verifs.append(f"⏭️ <b>{verif['time']}</b> - {verif['desc']}")
+    for time, desc, active in sorted_list:
+        if active:
+            active_verifs.append(f"🕗 <b>{time.hour:02}:{time.minute:02}</b> - {desc}")
+        elif active is None:
+            active_verifs.append(f"⏭️ <b>{time.hour:02}:{time.minute:02}</b> - {desc}")
         else:
-            skipped_verifs.append(f"🚫 <b>{verif['time']}</b> - {verif['desc']}")
+            skipped_verifs.append(f"🚫 <b>{time.hour:02}:{time.minute:02}</b> - {desc}")
 
     message += "\n".join(active_verifs)
     message += "<b>No daily checks for the next 24 hours.</b> 📅" if not active_verifs else ""
@@ -343,19 +317,19 @@ async def delverif_command(update: Update, context: ContextTypes.DEFAULT_TYPE, *
     """
     user_id = update.message.from_user.id
     username = update.message.from_user.username
-    verif_list = AccessEnv.read_user_properties(user_id, "daily_message")
+    verif_list = RequestManager.read_verifications_properties(user_id)
 
     if len(verif_list) == 0:
         logger.debug(f"└── User @{username} does not have any verification to delete")
         message = "<b>No daily message to delete. 📅</b>"
         return await update.message.reply_text(message, parse_mode=P_HTML)
 
-    sorted_list = sorted(verif_list, key=lambda x: x["time"])
+    sorted_list = sorted(verif_list, key=lambda x: x[0])
 
-    keyboard =[f"{elt['time']}" for elt in sorted_list]
+    keyboard =[f"{time.hour:02}:{time.minute:02}" for time, _, _ in sorted_list]
     reply_markup = ReplyKeyboardMarkup([keyboard], resize_keyboard=True, one_time_keyboard=True)
 
-    AccessEnv.update_user_properties(user_id, "state", "delverif")
+    RequestManager.update_user_properties(user_id, "state", "delverif")
 
     message = ("Alright! Please choose the daily verifications you'd like to delete. ❌🕒\n"
                "Click /empty to cancel the operation.")
@@ -378,20 +352,20 @@ async def skip_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwa
     user_id = update.message.from_user.id
     username = update.message.from_user.username
 
-    verif_list = AccessEnv.read_user_properties(user_id, "daily_message")
-    verif_list = list(filter(lambda x: x["active"], verif_list))
+    verif_list = RequestManager.read_verifications_properties(user_id)
+    verif_list = list(filter(lambda x: x[2], verif_list))
 
     if len(verif_list) == 0:
         logger.debug(f"└── User @{username} does not have daily message to skip")
         message = "<b>No daily message to skip. 📅</b>"
         return await update.message.reply_text(message, parse_mode=P_HTML)
 
-    sorted_list = sorted(verif_list, key=lambda x: x['time'])
+    sorted_list = sorted(verif_list, key=lambda x: x[0])
 
-    keyboard = [f"{elt['time']}" for elt in sorted_list]
+    keyboard = [f"{time.hour:02}:{time.minute:02}" for time, _, _ in sorted_list]
     reply_markup = ReplyKeyboardMarkup([keyboard], resize_keyboard=True, one_time_keyboard=True)
 
-    AccessEnv.update_user_properties(user_id, "state", "skip")
+    RequestManager.update_user_properties(user_id, "state", "skip")
 
     message = ("Sure! Please choose the daily verifications you'd like to skip. 🚫🕒\n"
                "Click /empty to cancel the operation.")
@@ -413,20 +387,20 @@ async def undoskip_command(update: Update, context: ContextTypes.DEFAULT_TYPE, *
     """
     user_id = update.message.from_user.id
     username = update.message.from_user.username
-    verif_list = AccessEnv.read_user_properties(user_id, "daily_message")
-    verif_list = list(filter(lambda x: not x['active'], verif_list))
+    verif_list = RequestManager.read_verifications_properties(user_id)
+    verif_list = list(filter(lambda x: not x[2], verif_list))
 
     if len(verif_list) == 0:
         logger.debug(f"└── User @{username} does not have daily message skip to undo")
         message = "<b>No daily message skip to undo. 📅</b>"
         return await update.message.reply_text(message, parse_mode=P_HTML)
 
-    sorted_list = sorted(verif_list, key=lambda x: x['time'])
+    sorted_list = sorted(verif_list, key=lambda x: x[0])
 
-    keyboard =[f"{elt['time']}" for elt in sorted_list if elt['active'] is not None]
+    keyboard =[f"{time.hour:02}:{time.minute:02}" for time, _, active in sorted_list if active is not None]
     reply_markup = ReplyKeyboardMarkup([keyboard], resize_keyboard=True, one_time_keyboard=True)
 
-    AccessEnv.update_user_properties(user_id, "state", "undoskip")
+    RequestManager.update_user_properties(user_id, "state", "undoskip")
 
     message = ("OK. Please choose the daily verifications you'd like to undo skip for. 🔄🕒\n"
                "Click /empty to cancel the operation.")
@@ -447,7 +421,7 @@ async def bugreport_command(update: Update, context: ContextTypes.DEFAULT_TYPE, 
         Message: Response message from the bot.
     """
     user_id = update.message.from_user.id
-    AccessEnv.update_user_properties(user_id, "state", "bugreport")
+    RequestManager.update_user_properties(user_id, "state", "bugreport")
 
     message = ("Sure! Please describe the bug and the steps you took to encounter it. 🐞📝\n"
                "Click /empty to cancel the operation.")
@@ -470,14 +444,14 @@ async def request_command(update: Update, context: ContextTypes.DEFAULT_TYPE, qu
     """
     user_id = update.message.from_user.id
     username = update.message.from_user.username
-    contact_request = AccessEnv.read_user_properties(user_id, "contact_request")
+    contact_request = RequestManager.read_contact_requests_properties(user_id)
 
     if len(contact_request) == 0 and not quiet:
         logger.debug(f"└── User @{username} does not have any association request")
         message = "<b>There is no association request. 🤷‍♂️</b>"
         return await update.message.reply_text(message, parse_mode=P_HTML)
 
-    for id, username in contact_request.items():
+    for id, username in contact_request:
         message = f"<b>Do you want to accept the pairing invitation from @{username} 🤝?</b>"
 
         keyboard = [
@@ -507,7 +481,7 @@ async def fastcheck_command(update: Update, context: ContextTypes.DEFAULT_TYPE, 
     reply_markup = ReplyKeyboardMarkup([keyboard], resize_keyboard=True, one_time_keyboard=True)
 
     user_id = update.message.from_user.id
-    AccessEnv.update_user_properties(user_id, "state", "fastcheck")
+    RequestManager.update_user_properties(user_id, "state", "fastcheck")
 
     message = ("Alright! When would you like to have the quick check? 🕒🚀 "
                "<b>(less than 20 minutes)</b>\n"
@@ -530,15 +504,15 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwa
     """
     user_id = update.message.from_user.id
     username = update.message.from_user.username
-    alert_mode = AccessEnv.read_user_properties(user_id, "alert_mode")
+    alert_mode = RequestManager.read_user_properties(user_id, "alert_mode")
 
     if alert_mode:
         logger.debug(f"└── User @{username} already in alert mode")
         message = "<b>You are already in alert mode! 🚨</b>"
         return await update.message.reply_text(message, parse_mode=P_HTML)
 
-    if not AccessEnv.read_user_properties(user_id, "response_message"):
-        AccessEnv.update_user_properties(user_id, "response_message", True)
+    if not RequestManager.read_user_properties(user_id, "response_message"):
+        RequestManager.update_user_properties(user_id, "response_message", True)
         await update.message.reply_text("Answer received, daily verification has been turned off.")
 
     message = "<b>Do you want to notify emergency contacts? 🚨</b>"
@@ -569,7 +543,7 @@ async def undohelp_command(update: Update, context: ContextTypes.DEFAULT_TYPE, *
     user_id = update.message.from_user.id
     username = update.message.from_user.username
 
-    if not AccessEnv.read_user_properties(user_id, "alert_mode"):
+    if not RequestManager.read_user_properties(user_id, "alert_mode"):
         logger.debug(f"└── User @{username} already in safe mode")
         message = "<b>This operation can only be used in alert state! ⚠️</b>"
         return await update.message.reply_text(message, parse_mode=P_HTML)
@@ -599,7 +573,7 @@ async def empty_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kw
         Message: Response message from the bot.
     """
     user_id = update.message.from_user.id
-    AccessEnv.update_user_properties(user_id, "state", "")
+    RequestManager.update_user_properties(user_id, "state", "")
     message = "Sure thing! Operation canceled. ✅"
     return await update.message.reply_text(message)
 
@@ -618,6 +592,6 @@ async def kill_user_data(update: Update, context: ContextTypes.DEFAULT_TYPE, **k
         Message: Response message from the bot.
     """
     user_id = update.message.from_user.id
-    AccessEnv.on_kill_data(user_id)
+    RequestManager.on_kill_data(user_id)
     message = "<b>Your personal data has been deleted.🗑️</b>"
     return await update.message.reply_text(message, parse_mode=P_HTML)

@@ -2,12 +2,12 @@ from datetime import datetime
 
 from telegram import Bot, KeyboardButton
 from telegram import ReplyKeyboardMarkup
-from utils.env_pipeline import AccessEnv
+from utils.env_pipeline import RequestManager
 
 import asyncio
 import time
 
-TOKEN, BOT_USERNAME = AccessEnv.telegram_keys()
+TOKEN, BOT_USERNAME = RequestManager.telegram_keys()
 WAITING_TIME = 9
 bot = Bot(TOKEN)
 
@@ -33,7 +33,7 @@ async def run_schedule():
             current_hour = datetime.now().hour
             print('SCHEDULER:', f"--- REFRESH {current_hour}h ---")
 
-        for user_id, user_data in AccessEnv.on_get_users("items"):
+        for user_id, user_data in RequestManager.on_get_users("items"):
             # If alert mode, do nothing
             if not user_data["response_message"]:
                 continue
@@ -49,16 +49,16 @@ async def run_schedule():
                 state = unique_check["active"]
                 if not state:
                     if isinstance(state, bool):
-                        AccessEnv.on_write_verifications(user_id, "undoskip", [unique_check["time"]])
+                        RequestManager.on_write_verifications(user_id, "undoskip", [unique_check["time"]])
                         print('SCHEDULER:', f"undo skip for: {state}")
                         continue
 
                     # Fast-check -> delete the created check
-                    AccessEnv.on_write_verifications(user_id, "del", [unique_check["time"]])
+                    RequestManager.on_write_verifications(user_id, "del", [unique_check["time"]])
                     print('SCHEDULER:', f"kill fast check: {state}")
 
-                AccessEnv.update_user_properties(user_id, "response_message", False)
-                AccessEnv.on_init_check_queue(str(user_id), unique_check, WAITING_TIME)
+                RequestManager.update_user_properties(user_id, "response_message", False)
+                RequestManager.on_init_check_queue(str(user_id), unique_check, WAITING_TIME)
                 await send_daily_message(user_id, unique_check["desc"])
 
         current_minute = datetime.now().minute

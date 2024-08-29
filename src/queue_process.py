@@ -2,12 +2,12 @@ from datetime import datetime
 
 from telegram import Bot, KeyboardButton
 from telegram import ReplyKeyboardMarkup
-from utils.env_pipeline import AccessEnv
+from utils.env_pipeline import RequestManager
 import random
 import telegram
 import asyncio
 
-TOKEN, BOT_USERNAME = AccessEnv.telegram_keys()
+TOKEN, BOT_USERNAME = RequestManager.telegram_keys()
 WAITING_TIME = 9
 P_HTML = telegram.constants.ParseMode.HTML
 bot = Bot(TOKEN)
@@ -15,7 +15,7 @@ bot = Bot(TOKEN)
 
 async def send_reminder(user_id: str, user_data: dict):
     user_data["reminder_count"] += 1
-    AccessEnv.on_write_check_queue(user_id, "reminder_count", user_data["reminder_count"])
+    RequestManager.on_write_check_queue(user_id, "reminder_count", user_data["reminder_count"])
 
     # 5th reminder = set alert mode
     reminder_count = user_data["reminder_count"]
@@ -39,15 +39,15 @@ async def send_reminder(user_id: str, user_data: dict):
 
 async def send_alert_message(user_id):
     print('WORKING QUEUE:', f"Send Alert Message to/from {user_id=}")
-    username = AccessEnv.username_from_user_id()[user_id]
-    user_data = AccessEnv.on_get_check_users("dict")[user_id]
+    username = RequestManager.username_from_user_id()[user_id]
+    user_data = RequestManager.on_get_check_users("dict")[user_id]
     time = user_data['time']
     desc = user_data['desc']
     message = (f"🚨<b>ALERT</b>🚨. I haven't heard from @{username} for his/her {time} callback."
                "<b>Don't take this call lightly and make sure she/he is okay! It might be urgent!</b>\n"
                f"This could be important, here is the description that was given to this recall:\n\n {desc}")
 
-    for contact in AccessEnv.read_user_properties(user_id, "contacts"):
+    for contact in RequestManager.read_contacts_properties(user_id):
         if not contact["pair"]:
             continue
 
@@ -70,10 +70,10 @@ async def check_for_response():
             current_hour = datetime.now().hour
             print('WORKING QUEUE:', f"--- REFRESH {current_hour}h ---")
 
-        for user_id, user_data in AccessEnv.on_get_check_users("items"):
+        for user_id, user_data in RequestManager.on_get_check_users("items"):
             # Check for response message
-            if AccessEnv.read_user_properties(user_id, "response_message"):
-                AccessEnv.on_kill_queue_data(user_id)
+            if RequestManager.read_user_properties(user_id, "response_message"):
+                RequestManager.on_kill_queue_data(user_id)
                 continue
 
             # If there is no response
@@ -84,12 +84,12 @@ async def check_for_response():
             # Set alert mode to True
             if user_data["reminder_count"] >= 5:
                 await send_alert_message(user_id)
-                AccessEnv.on_kill_queue_data(user_id)
-                AccessEnv.update_user_properties(user_id, "alert_mode", True)
+                RequestManager.on_kill_queue_data(user_id)
+                RequestManager.update_user_properties(user_id, "alert_mode", True)
                 continue
 
             user_data['waiting_time'] -= 1
-            AccessEnv.on_write_check_queue(user_id, 'waiting_time', user_data['waiting_time'])
+            RequestManager.on_write_check_queue(user_id, 'waiting_time', user_data['waiting_time'])
 
         current_minute = datetime.now().minute
         # Wait until the minute changes

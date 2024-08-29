@@ -4,7 +4,6 @@ It provides various commands and message handlers to interact with users and man
 """
 
 import re
-from logzero import logger
 import random
 from datetime import datetime, timedelta
 
@@ -12,10 +11,10 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, Bot, Me
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes, CallbackQueryHandler
 from telegram.constants import ParseMode
 
-from utils.env_pipeline import AccessEnv
+from utils.env_pipeline import RequestManager
 from src import commands
 
-TOKEN, BOT_USERNAME = AccessEnv.telegram_keys()
+TOKEN, BOT_USERNAME = RequestManager.telegram_keys()
 bot = Bot(TOKEN)
 
 import functools
@@ -90,11 +89,11 @@ async def process_contacts(update: Update, content: str, action: str) -> Message
             error_contacts.append(line)
 
     if action == 'add':
-        notification = AccessEnv.on_write_contacts(user_id, user_username, "add", valid_contacts)
+        notification = RequestManager.add_contacts(user_id, user_username, valid_contacts)
         await notif_pairing_invitation(update, notification)
         message = "Given contact(s) are now added to your account.\nThey received an association request.🎉\n"
     else:
-        AccessEnv.on_write_contacts(user_id, user_username, "del", valid_contacts)
+        RequestManager.del_contacts(user_id, valid_contacts)
         message = "Given contact(s) are now deleted from your account.🚮\n"
 
     if error_contacts:
@@ -121,7 +120,7 @@ async def process_verifications(update: Update, content: str, action: str) -> Me
         if action == 'add':
             if match := re.match(r'^(0[0-9]|1[0-9]|2[0-3]):([0-5][0-9]) *- *([\w ]+)', line):
                 chosen_time, desc = f"{match.group(1)}:{match.group(2)}", match.group(3)
-                valid_verifs.append({"time": chosen_time, "desc": desc, "active": True})
+                valid_verifs.append({"time": chosen_time, "description": desc, "active": True})
             else:
                 error_verifs.append(line)
         else:
@@ -130,17 +129,21 @@ async def process_verifications(update: Update, content: str, action: str) -> Me
             else:
                 error_verifs.append(line)
 
-    if action == 'add':
-        not_valid = AccessEnv.on_write_verifications(user_id, "add", valid_verifs)
-        message = "Given daily verification(s) are now added to your account. 📅🔐\n"
-        if not_valid:
-            message += ("\nFollowing verification(s) weren't added. Make sure to "
-                        "space daily messages at least 20 minutes apart:\n")
-            message += "\n".join(f"❌ {verif}" for verif in not_valid)
-    else:
-        AccessEnv.on_write_verifications(user_id, "del", valid_verifs)
-        message = "Given daily verification(s) are now deleted from your account.🚫📅\n"
+    not_valid = []
+    message, base_message = "", ""
+    if len(valid_verifs) > 0:
+        if action == 'add':
+            not_valid = RequestManager.add_verifications(user_id, valid_verifs, skip_check=False)
+            base_message = "Given daily verification(s) are now added to your account. 📅🔐\n"
+            if not_valid:
+                message += ("\nFollowing verification(s) weren't added. Make sure to "
+                            "space daily messages at least 20 minutes apart:\n")
+                message += "\n".join(f"❌ {verif}" for verif in not_valid)
+        else:
+            RequestManager.del_verifications(user_id, valid_verifs)
+            base_message = "Given daily verification(s) are now deleted from your account.🚫📅\n"
 
+    message = f"{base_message if len(not_valid) != len(valid_verifs) else ''}" + message
     if error_verifs:
         message += "\nFollowing verification(s) weren't processed due to their unknown format:\n"
         message += "\n".join(f"❌ {verif}" for verif in error_verifs)
@@ -157,11 +160,12 @@ async def extract_bugreport(update: Update, content: str) -> Message:
         update (Update): The update object from Telegram.
         content (str): The bug report content.
     """
-    date = datetime.now().strftime("%d.%m.%Y_%Hh%M")
-    filename = f"bug_reports/report_{date}_{random.randint(0, 999999)}"
-    with open(filename, 'w') as file:
-        file.write(content)
-    return await update.message.reply_text("Thank you for the report!")
+    user = update.effective_user
+    user_id = user.id
+    username = user.username or user.first_name
+
+    report_id = RequestManager.write_bug_report(user_id, username, content)
+    return await update.message.reply_text(f"Thank you for the report! Your report ID is: {report_id}")
 
 
 @sub_debug_logger
@@ -183,7 +187,10 @@ async def process_alarm(update: Update, content: str, action: str) -> Message:
         else:
             error_alarms.append(line)
 
-    AccessEnv.on_write_verifications(user_id, action, valid_alarms)
+    if action == 'skip':
+        RequestManager.skip_verifications(user_id, valid_alarms)
+    elif action == 'undoskip':
+        RequestManager.undoskip_verifications(user_id, valid_alarms)
 
     message = (f"Given daily verification(s) are now {'skipped for the next 24h' if action == 'skip' else 'activated'}."
                f"{'⏰✨' if action == 'skip' else '🔐🔄'}\n")
@@ -215,8 +222,8 @@ async def extract_fastcheck(update: Update, content: str) -> Message:
     check_time = datetime.now() + timedelta(minutes=waiting_time)
     time_to_display = check_time.strftime("%H:%M")
 
-    new_alarm = {"time": time_to_display, "desc": "Auto fast check", "active": None}
-    AccessEnv.on_write_verifications(user_id, "add", [new_alarm], True)
+    new_alarm = {"time": time_to_display, "description": "Auto fast check", "active": None}
+    RequestManager.add_verifications(user_id, [new_alarm], skip_check=True)
 
     message = f"Fast Check in {waiting_time}mn taken into account! ({time_to_display}) 🚀"
     return await update.message.reply_text(message)
@@ -257,30 +264,30 @@ async def handle_messages(update: Update, context: ContextTypes.DEFAULT_TYPE, **
         context (ContextTypes.DEFAULT_TYPE): The context object for the handler.
     """
     user_id = update.message.from_user.id
-    response_message, alert_mode = AccessEnv.user_information(user_id)
+    response_message, alert_mode = RequestManager.user_information(user_id)
 
     if response_message:
-        get_state = AccessEnv.read_user_properties(user_id, "state")
-        AccessEnv.update_user_properties(user_id, "state", "")
+        get_state = RequestManager.read_user_properties(user_id, "state")
+        RequestManager.update_user_properties(user_id, "state", "")
         return await state_dispatcher(update, get_state, update.message.text)
 
     if not alert_mode:
         logger.debug('└── User response to verification demand')
         greeting = "Have a great day 🌞!" if datetime.now().hour < 16 else "Have a wonderful afternoon 🌅!"
         response = f"Thank you for your response! {greeting}"
-        AccessEnv.update_user_properties(user_id, "response_message", True)
+        RequestManager.update_user_properties(user_id, "response_message", True)
         return await update.message.reply_text(response)
 
     logger.debug('└── User response to unset the alert mode')
-    AccessEnv.update_user_properties(user_id, "alert_mode", False)
-    AccessEnv.update_user_properties(user_id, "response_message", True)
+    RequestManager.update_user_properties(user_id, "alert_mode", False)
+    RequestManager.update_user_properties(user_id, "response_message", True)
     await manual_undohelp(user_id, update.message.from_user.username)
     return await send_hope_message(update)
 
 
 async def error(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Log errors caused by updates."""
-    logger.error(f'===> Update {update} caused error {context.error}')
+    logger.error(f'/!\ Update {update} caused error {context.error}')
 
 
 @debug_logger
@@ -295,7 +302,7 @@ async def manual_help(user_id: int, username: str) -> None:
     message = (f"🚨<b>ALERT</b>🚨. @{username} has manually triggered the call for help."
                " <b>Please take this call seriously and ensure their well-being!</b>")
 
-    for contact in AccessEnv.read_user_properties(user_id, "contacts"):
+    for contact in RequestManager.read_contacts_properties(user_id):
         if contact["pair"]:
             await bot.send_message(chat_id=contact["id"], text=message, parse_mode=ParseMode.HTML)
 
@@ -312,7 +319,7 @@ async def manual_undohelp(user_id: int, username: str) -> None:
     message = (f"⚠️<b>Alert disabled</b>⚠️. @{username} manually disabled the alert."
                " <b>Please confirm it was intentional or check if it was a simple mistake.</b>")
 
-    for contact in AccessEnv.read_user_properties(user_id, "contacts"):
+    for contact in RequestManager.read_contacts_properties(user_id):
         if contact["pair"]:
             await bot.send_message(chat_id=contact["id"], text=message, parse_mode=ParseMode.HTML)
 
@@ -335,35 +342,35 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Message:
         return await query.edit_message_text(text=f"Unknown: Query data empty ({query.data})")
 
     if query.data == "1":
-        AccessEnv.update_user_properties(user_id, "alert_mode", True)
+        RequestManager.update_user_properties(user_id, "alert_mode", True)
         message = ("OK. Emergency contacts have received your request for help! 🆘\n"
                    "Type /undohelp to cancel the alert.")
         await manual_help(user_id, query.from_user.username)
     elif query.data == "2":
         message = "OK 😅. Glad to hear it was a mistake!"
     elif query.data == "3":
-        AccessEnv.update_user_properties(user_id, "alert_mode", False)
+        RequestManager.update_user_properties(user_id, "alert_mode", False)
         message = "OK. Your emergency contacts have received information that the alert has been disabled. 📢"
         await manual_undohelp(user_id, query.from_user.username)
     elif query.data == "4":
         message = "OK. Operation canceled."
     elif query.data[0] == "-":
-        contact_request = AccessEnv.read_user_properties(user_id, "contact_request")
+        contact_request = RequestManager.read_contact_requests_properties(user_id)
         del contact_request[query.data[1:]]
-        AccessEnv.update_user_properties(user_id, "contact_request", contact_request)
+        RequestManager.update_user_properties(user_id, "contact_request", contact_request)
         message = "<b>OK. Association request declined. ❌</b>"
     else:
         origin_id = int(query.data[1:])
-        contacts_pairing = AccessEnv.read_user_properties(origin_id, "contacts")
+        contacts_pairing = RequestManager.read_contacts_properties(origin_id)
         updated_pairing = [{"id": contact['id'], "pair": True if contact['id'] == user_id else contact['pair']}
                            for contact in contacts_pairing]
 
-        AccessEnv.update_user_properties(origin_id, "contacts", updated_pairing)
-        users_data = AccessEnv.username_from_user_id()
+        RequestManager.update_user_properties(origin_id, "contacts", updated_pairing)
+        users_data = RequestManager.username_from_user_id()
 
-        contact_request = AccessEnv.read_user_properties(user_id, "contact_request")
+        contact_request = RequestManager.read_contact_requests_properties(user_id)
         del contact_request[query.data[1:]]
-        AccessEnv.update_user_properties(user_id, "contact_request", contact_request)
+        RequestManager.update_user_properties(user_id, "contact_request", contact_request)
 
         logger.debug(f"API: Response message to association with {origin_id}")
         await bot.send_message(
