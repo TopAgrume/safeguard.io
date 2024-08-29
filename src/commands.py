@@ -47,6 +47,14 @@ def verify_condition(func: Callable) -> Callable: # VALID
             )
             return
 
+        user_exists = RequestManager.user_exists(message.from_user.id)
+        if not user_exists and func.__name__ != 'start_command':
+            await message.reply_text(
+                "You are not registered with Safeguard.io! Please use <b>/start</b> to register. 📲✨",
+                parse_mode=P_HTML
+            )
+            return
+
         return await func(update, context, **kwargs)
 
     return wrapper
@@ -90,6 +98,8 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kw
     for contact_key in requester_keys:
         RequestManager.update_contacts_properties(contact_key, "contact_id", user_id)
 
+    # In case the user just reconnected from a previous session
+    RequestManager.update_contacts_reload(username, user_id)
     return await request_command(update, context, quiet=True)
 
 
@@ -518,8 +528,8 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwa
     message = "<b>Do you want to notify emergency contacts? 🚨</b>"
     keyboard = [
         [
-            InlineKeyboardButton("Yes", callback_data="1"),
-            InlineKeyboardButton("No", callback_data="2"),
+            InlineKeyboardButton("Yes", callback_data="notify_emergencies"),
+            InlineKeyboardButton("No", callback_data="undo_notify"),
         ],
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
@@ -551,8 +561,8 @@ async def undohelp_command(update: Update, context: ContextTypes.DEFAULT_TYPE, *
     response = "<b>Do you want to cancel the alert? 🤔</b>"
     keyboard = [
         [
-            InlineKeyboardButton("Yes", callback_data="3"),
-            InlineKeyboardButton("No", callback_data="4"),
+            InlineKeyboardButton("Yes", callback_data="cancel_alert"),
+            InlineKeyboardButton("No", callback_data="no_cancel_alert"),
         ],
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)

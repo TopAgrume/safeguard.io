@@ -27,7 +27,7 @@ def get_db_connection():
         conn.close()
 
 def less_than_one_hour(time1: dict, time2: dict):
-    # Convert time strings to datetime objects
+    # Convert time strings to datetime.time objects
     time1_obj = time1['time']
     time2_obj = datetime.strptime(time2['time'], '%H:%M').time()
 
@@ -36,76 +36,28 @@ def less_than_one_hour(time1: dict, time2: dict):
 
     return abs(difference_in_minutes) < MAX_TIME_DIFF
 
-# TODO
-def add_user_and_link_request(user_id: int, username: str, current_dict: list, value: list):
-    special_action = []
-    related_user_id = RequestManager.on_get_user_usernames_id()
-
-    for new_contact in value:
-        if any(contact['tag'] == new_contact for contact in current_dict):
-            continue
-
-        if new_contact in list(related_user_id.keys()):
-            new_contact_id = related_user_id[new_contact]
-            current_dict.append({"id": int(new_contact_id), "tag": new_contact, "pair": False})
-
-            # Write in destination contact_request
-            request_dict = RequestManager.read_contact_requests_properties(int(new_contact_id))
-            request_dict[str(user_id)] = username
-            RequestManager.update_user_properties(int(new_contact_id), "contact_request", request_dict)
-
-            # Actions to take
-            pair_asking = {"id": int(new_contact_id), "tag": new_contact}
-            special_action.append(pair_asking)
-            continue
-
-        current_dict.append({"id": None, "tag": new_contact, "pair": False})
-
-        # Save the data
-        pair_asking = {"tag": username, "dest_tags": [new_contact]}
-        for origin_id, content in RequestManager.on_get_request_user("items"): #TODO
-            if origin_id == str(user_id):
-                content['dest_tags'].append(new_contact)
-                RequestManager.on_write_request(origin_id, 'dest_tags', content['dest_tags'])
-                break
-        else:
-            RequestManager.on_init_request(str(user_id), pair_asking)
-
-    return current_dict, special_action
-
-# TODO
-def delete_user_and_request(user_id: int, current_dict: list, value: list):
-    filtered_dict = []
-    print(current_dict)
-    for contact in current_dict:
-        if contact['tag'] not in value:
-            filtered_dict.append(contact)
-            continue
-
-        user_tag = contact['id']
-        if user_tag is None:
-            dest_tags = RequestManager.on_read_request(user_id, "dest_tags")
-            dest_tags.remove(contact['tag'])
-            if len(dest_tags) == 0:
-                request_contacts: dict = RequestManager.on_get_request_user("dict") #TODO
-                del request_contacts[str(user_id)]
-                RequestManager.on_write_all_request(request_contacts)
-            else:
-                RequestManager.on_write_request(str(user_id), "dest_tags", dest_tags)
-            continue
-
-        contact_request = RequestManager.read_contact_requests_properties(user_tag)
-        if str(user_id) in contact_request:
-            del contact_request[str(user_id)]
-            RequestManager.update_user_properties(user_tag, "contact_request", contact_request)
-    print("test")
-    return filtered_dict
-
         
 class RequestManager(object):
     users: dict = {}
 
-    @staticmethod # TODO only user attributes
+    @staticmethod
+    def user_exists(user_id: int) -> bool:
+        """
+        Check if a user with the given ID exists in the 'users' table.
+
+        Args:
+            user_id (int): The ID of the user to check.
+
+        Returns:
+            bool: True if the user exists, False otherwise.
+        """
+        with get_db_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute("SELECT 1 FROM users WHERE id = %s LIMIT 1", (user_id,))
+                return cur.fetchone() is not None
+
+
+    @staticmethod # VALID
     def update_user_properties(user_id: int, key: str, value: str | bool) -> None:
         """
         Update a specific property of a user in the 'users' table.
@@ -139,6 +91,23 @@ class RequestManager(object):
         with get_db_connection() as conn:
             with conn.cursor() as cur:
                 cur.execute(f"UPDATE contacts SET {key} = %s WHERE user_id = %s", (value, user_id))
+            conn.commit()
+
+    @staticmethod  # VALID
+    def update_contacts_reload(username: str, user_id: int) -> None:
+        """
+        Reload the contact_id property when a user reconnects.
+
+        Args:
+            username (str): The username of the user that just reconnected.
+            user_id (int): The contact_id of the user that just reconnected.
+
+        Returns:
+            None
+        """
+        with get_db_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute(f"UPDATE contacts SET contact_id = %s WHERE tag = %s", (user_id, username))
             conn.commit()
 
     @staticmethod  # VALID
@@ -218,6 +187,23 @@ class RequestManager(object):
             with conn.cursor() as cur:
                 for contact_tag in target_usernames:
                     cur.execute("DELETE FROM contacts WHERE user_id = %s AND tag = %s", (user_id, contact_tag))
+                conn.commit()
+
+    @staticmethod  # VALID
+    def del_contact_requests(user_id: int, requester_user_id: int) -> None:
+        """
+        Delete contacts requests from the user's contact requests list.
+
+        Args:
+            user_id (int): The ID of the user from whom contact requests will be deleted.
+            requester_user_id (int): The ID of the user whose will be deleted from the contact requests.
+
+        Returns:
+            None
+        """
+        with get_db_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute("DELETE FROM contact_requests WHERE user_id = %s AND requester_id = %s", (user_id, requester_user_id))
                 conn.commit()
 
     @staticmethod  # VALID
@@ -369,7 +355,7 @@ class RequestManager(object):
         with get_db_connection() as conn:
             with conn.cursor(cursor_factory=RealDictCursor) as cur:
                 cur.execute(f"SELECT requester_id, requester_tag FROM contact_requests WHERE user_id = %s", (user_id,))
-                requesters_info = cur.fetchone()
+                requesters_info = cur.fetchall()
                 return [(requester['requester_id'], requester['requester_tag']) for requester in requesters_info] if requesters_info else []
 
     @staticmethod  # VALID
@@ -445,8 +431,102 @@ class RequestManager(object):
             return report_id
 
 
+    @staticmethod  # VALID
+    def on_kill_data(user_id: int) -> None:
+        """
+        Delete a user from the 'users' table and all its relative data.
+
+        Args:
+            user_id (int): The ID of the user to delete.
+
+        Returns:
+            None
+        """
+        with get_db_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute("DELETE FROM users WHERE id = %s", (user_id,))
+            conn.commit()
+
+    @staticmethod  # VALID
+    def on_create_user(user_id: int, username: str) -> None:
+        """
+        Create a new user in the 'users' table with default values.
+
+        Args:
+            user_id (int): The ID of the new user.
+            username (str): The username of the new user.
+
+        Returns:
+            None
+        """
+        with get_db_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute("""
+                        INSERT INTO users (id, username, alert_mode, response_message, state)
+                        VALUES (%s, %s, %s, %s, %s)
+                    """, (user_id, username, False, True, ''))
+            conn.commit()
+
+    @staticmethod  # VALID
+    def transfer_pending_requests(user_id: int, target_username: str) -> list[int]:
+        """
+        Transfer pending requests to the 'contact_requests' table and delete them from the 'pending_requests' table.
+
+        Args:
+            user_id (int): The ID of the user receiving the pending requests.
+            target_username (str): The username associated with the pending requests.
+
+        Returns:
+            list[int]: A list of requester IDs whose requests were transferred.
+        """
+        with get_db_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute("SELECT requester_id, tag FROM pending_requests WHERE target_username = %s",
+                            (target_username,))
+                pending_requests = cur.fetchall()
+                for requester_id, tag in pending_requests:
+                    cur.execute(
+                        "INSERT INTO contact_requests (user_id, requester_id, requester_tag) VALUES (%s, %s, %s)",
+                        (user_id, requester_id, tag))
+                if len(pending_requests) > 0:
+                    cur.execute("DELETE FROM pending_requests WHERE target_username = %s", (target_username,))
+            conn.commit()
+            return [requester_id for requester_id, _ in pending_requests]
 
 
+    @staticmethod
+    def telegram_keys() -> tuple[str, str]:
+        """
+        Retrieve Telegram bot API token and bot username from environment variables.
+
+        Returns:
+            tuple[str, str]: A tuple containing the API token and bot username.
+
+        Raises:
+            ValueError: If one or more required environment variables are missing.
+        """
+        API_TOKEN = os.getenv('TOKEN')
+        BOT_USERNAME = os.getenv('BOT_USERNAME')
+        if not API_TOKEN or not BOT_USERNAME:
+            raise ValueError("One or more keys required environment variables are missing.")
+        return API_TOKEN, BOT_USERNAME
+
+    @staticmethod  # VALID
+    def username_from_user_id(user_id: int) -> str:
+        """
+        Retrieve the username associated with a user ID.
+
+        Args:
+            user_id (int): The ID of the user to look up.
+
+        Returns:
+            str: The username associated with the given user ID, or None if no user
+        """
+        with get_db_connection() as conn:
+            with conn.cursor(cursor_factory=RealDictCursor) as cur:
+                cur.execute("SELECT username FROM users WHERE id = %s", (user_id,))
+                user = cur.fetchone()
+                return user['username'] if user else None
 
 
     @staticmethod
@@ -458,45 +538,12 @@ class RequestManager(object):
                 return [(str(user['id']), user) for user in users]
 
     @staticmethod # TODO
-    def username_from_user_id():
+    def username_from_user_id(user_id: int):
         with get_db_connection() as conn:
             with conn.cursor(cursor_factory=RealDictCursor) as cur:
-                cur.execute("SELECT id, username FROM users")
-                users = cur.fetchall()
-                return {str(user['id']): user['username'] for user in users}
-
-    @staticmethod # TODO
-    def on_get_user_usernames_id():
-        with get_db_connection() as conn:
-            with conn.cursor(cursor_factory=RealDictCursor) as cur:
-                cur.execute("SELECT id, username FROM users")
-                users = cur.fetchall()
-                return {user['username']: str(user['id']) for user in users}
-
-    @staticmethod # VALID
-    def on_kill_data(user_id: int, file_path: str = "data/data.json") -> None:
-        with get_db_connection() as conn:
-            with conn.cursor() as cur:
-                cur.execute("DELETE FROM users WHERE id = %s", (user_id,))
-            conn.commit()
-
-    @staticmethod # VALID
-    def on_create_user(user_id: int, username: str) -> None:
-        with get_db_connection() as conn:
-            with conn.cursor() as cur:
-                cur.execute("""
-                    INSERT INTO users (id, username, alert_mode, response_message, state)
-                    VALUES (%s, %s, %s, %s, %s)
-                """, (user_id, username, False, True, ''))
-            conn.commit()
-
-    @staticmethod
-    def telegram_keys() -> tuple[str, str]:
-        API_TOKEN = os.getenv('TOKEN')
-        BOT_USERNAME = os.getenv('BOT_USERNAME')
-        if not API_TOKEN or not BOT_USERNAME:
-            raise ValueError("One or more keys required environment variables are missing.")
-        return API_TOKEN, BOT_USERNAME
+                cur.execute("SELECT username FROM users WHERE id = %s", (user_id,))
+                user = cur.fetchone()
+                return user['username'] if user else None
 
 
     @staticmethod
@@ -523,13 +570,6 @@ class RequestManager(object):
         with open("data/queue.json", 'w') as json_file:
             json.dump(base_dict, json_file, indent=4)
 
-    @staticmethod
-    def on_read_check_queue(user_id: int, key: str = None):
-        # Open and read a JSON file
-        with open('data/queue.json', 'r') as json_file:
-            data = json.load(json_file)[str(user_id)]
-
-        return data[key]
 
     @staticmethod
     def on_get_check_users(method: str):
@@ -547,74 +587,4 @@ class RequestManager(object):
     def on_kill_queue_data(user_id: int, file_path: str = "data/queue.json") -> None:
         RequestManager.on_kill_data(user_id, file_path)
 
-    @staticmethod # TODO
-    def on_get_request_user(method: str = "keys"):
-        with get_db_connection() as conn:
-            with conn.cursor(cursor_factory=RealDictCursor) as cur:
-                cur.execute("SELECT id, contact_request FROM users WHERE contact_request != '{}'")
-                users = cur.fetchall()
-                if method == "keys":
-                    return [str(user['id']) for user in users]
-                elif method == "dict":
-                    return {str(user['id']): user['contact_request'] for user in users}
-                return [(str(user['id']), user['contact_request']) for user in users]
 
-    @staticmethod # VALID
-    def transfer_pending_requests(user_id: int, target_username: str):
-        with get_db_connection() as conn:
-            with conn.cursor() as cur:
-                cur.execute("SELECT requester_id, tag FROM pending_requests WHERE target_username = %s", (target_username,))
-                pending_requests = cur.fetchall()
-                for contact_request in pending_requests:
-                    cur.execute("INSERT INTO contact_requests (user_id, requester_id, requester_tag) VALUES (%s, %s, %s)",
-                                (user_id, contact_request['requester_id'], contact_request['tag']))
-                if len(pending_requests) > 0:
-                    cur.execute("DELETE FROM pending_requests WHERE target_username = %s", (target_username,))
-            conn.commit()
-            return [contact_request['requester_id'] for contact_request in pending_requests]
-
-    @staticmethod
-    def on_init_request(user_id: str, daily_check: dict):
-        with get_db_connection() as conn:
-            with conn.cursor() as cur:
-                cur.execute("UPDATE users SET contact_request = %s WHERE id = %s", (json.dumps(daily_check), int(user_id)))
-            conn.commit()
-
-    @staticmethod
-    def on_write_request(user_id: str, key: str = None, value=None) -> None:
-        with get_db_connection() as conn:
-            with conn.cursor(cursor_factory=RealDictCursor) as cur:
-                cur.execute("SELECT contact_request FROM users WHERE id = %s", (int(user_id),))
-                user = cur.fetchone()
-                if user:
-                    contact_request = user['contact_request']
-                    if key is not None:
-                        contact_request[key] = value
-                    else:
-                        contact_request = value
-                    cur.execute("UPDATE users SET contact_request = %s WHERE id = %s", (json.dumps(contact_request), int(user_id)))
-            conn.commit()
-
-    @staticmethod #TODO add pending requests to the user requests
-    def on_write_all_request(all_data: dict) -> None:
-        with get_db_connection() as conn:
-            with conn.cursor() as cur:
-                for user_id, request_data in all_data.items():
-                    cur.execute("UPDATE users SET contact_request = %s WHERE id = %s", (json.dumps(request_data), int(user_id)))
-            conn.commit()
-
-    @staticmethod
-    def on_read_request(user_id: int, key: str = None):
-        with get_db_connection() as conn:
-            with conn.cursor(cursor_factory=RealDictCursor) as cur:
-                cur.execute("SELECT contact_request FROM users WHERE id = %s", (user_id,))
-                user = cur.fetchone()
-                if user and user['contact_request']:
-                    return user['contact_request'].get(key)
-
-    @staticmethod
-    def on_kill_request(user_id: int, file_path: str = "data/request.json") -> None:
-        with get_db_connection() as conn:
-            with conn.cursor() as cur:
-                cur.execute("UPDATE users SET contact_request = '{}' WHERE id = %s", (user_id,))
-            conn.commit()

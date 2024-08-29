@@ -55,7 +55,7 @@ async def notif_pairing_invitation(update: Update, notif_details: list) -> None:
     username = update.message.from_user.username
 
     for notif in notif_details:
-        logger.debug(f"Sending pairing invitation to {notif['id']} from @{username}")
+        logger.debug(f"Sending pairing invitation to @{notif['tag']} from @{username}")
         message = f"<b>Do you want to accept the pairing invitation from @{username}? 🤝</b>"
         keyboard = [
             [
@@ -301,9 +301,9 @@ async def manual_help(user_id: int, username: str) -> None:
     message = (f"🚨<b>ALERT</b>🚨. @{username} has manually triggered the call for help."
                " <b>Please take this call seriously and ensure their well-being!</b>")
 
-    for contact in RequestManager.read_contacts_properties(user_id):
-        if contact["pair"]:
-            await bot.send_message(chat_id=contact["id"], text=message, parse_mode=ParseMode.HTML)
+    for contact_id, _, pair in RequestManager.read_contacts_properties(user_id):
+        if pair:
+            await bot.send_message(chat_id=contact_id, text=message, parse_mode=ParseMode.HTML)
 
 
 @debug_logger
@@ -318,9 +318,9 @@ async def manual_undohelp(user_id: int, username: str) -> None:
     message = (f"⚠️<b>Alert disabled</b>⚠️. @{username} manually disabled the alert."
                " <b>Please confirm it was intentional or check if it was a simple mistake.</b>")
 
-    for contact in RequestManager.read_contacts_properties(user_id):
-        if contact["pair"]:
-            await bot.send_message(chat_id=contact["id"], text=message, parse_mode=ParseMode.HTML)
+    for contact_id, _, pair in RequestManager.read_contacts_properties(user_id):
+        if pair:
+            await bot.send_message(chat_id=contact_id, text=message, parse_mode=ParseMode.HTML)
 
 
 @debug_logger
@@ -334,44 +334,53 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Message:
     """
     query = update.callback_query
     user_id = query.from_user.id
+    username = query.from_user.username
 
     await query.answer()
 
     if not query.data:
         return await query.edit_message_text(text=f"Unknown: Query data empty ({query.data})")
 
-    if query.data == "1":
+    if query.data == "notify_emergencies":
         RequestManager.update_user_properties(user_id, "alert_mode", True)
+        logger.debug(f"└── @{username} triggered the alert")
+
         message = ("OK. Emergency contacts have received your request for help! 🆘\n"
                    "Type /undohelp to cancel the alert.")
         await manual_help(user_id, query.from_user.username)
-    elif query.data == "2":
+
+    elif query.data == "undo_notify":
+        logger.debug(f"└── @{username} canceled the wish for help")
         message = "OK 😅. Glad to hear it was a mistake!"
-    elif query.data == "3":
+
+    elif query.data == "cancel_alert":
         RequestManager.update_user_properties(user_id, "alert_mode", False)
+        logger.debug(f"└── @{username} canceled the alert")
+
         message = "OK. Your emergency contacts have received information that the alert has been disabled. 📢"
         await manual_undohelp(user_id, query.from_user.username)
-    elif query.data == "4":
-        message = "OK. Operation canceled."
+
+    elif query.data == "no_cancel_alert":
+        logger.debug(f"└── @{username} canceled the alert cancellation")
+        message = "OK. The alert is still active. 🚨"
+
     elif query.data[0] == "-":
-        contact_request = RequestManager.read_contact_requests_properties(user_id)
-        del contact_request[query.data[1:]]
-        RequestManager.update_user_properties(user_id, "contact_request", contact_request)
-        message = "<b>OK. Association request declined. ❌</b>"
-    else:
         origin_id = int(query.data[1:])
-        contacts_pairing = RequestManager.read_contacts_properties(origin_id)
-        updated_pairing = [{"id": contact['id'], "pair": True if contact['id'] == user_id else contact['pair']}
-                           for contact in contacts_pairing]
+        RequestManager.del_contact_requests(user_id, origin_id)
+        RequestManager.del_contacts(origin_id, [query.from_user.username])
+        target_username = RequestManager.username_from_user_id(origin_id)
 
-        RequestManager.update_user_properties(origin_id, "contacts", updated_pairing)
-        users_data = RequestManager.username_from_user_id()
+        logger.debug(f"└── @{username} declined association with @{target_username}")
+        message = f"<b>OK. Association request from @{target_username} declined. ❌</b>"
 
-        contact_request = RequestManager.read_contact_requests_properties(user_id)
-        del contact_request[query.data[1:]]
-        RequestManager.update_user_properties(user_id, "contact_request", contact_request)
+    else: #TODO double pairing
+        origin_id = int(query.data[1:])
 
-        logger.debug(f"API: Response message to association with {origin_id}")
+        RequestManager.update_contacts_properties(origin_id, "pair", True)
+        RequestManager.del_contact_requests(user_id, origin_id)
+        target_username = RequestManager.username_from_user_id(origin_id)
+
+        logger.debug(f"└── @{username} response message to association with @{target_username}")
         await bot.send_message(
             chat_id=origin_id,
             text=f"<b>@{query.from_user.username} has accepted your association "
@@ -379,7 +388,8 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Message:
             parse_mode=ParseMode.HTML
         )
 
-        message = (f"<b>Successful association @{users_data[query.data[1:]]} 🎉. "
+
+        message = (f"<b>Successful association @{target_username} 🎉. "
                    f"You will now be informed if this person no longer gives any news.</b>")
 
     return await query.edit_message_text(text=message, parse_mode=ParseMode.HTML)
@@ -429,6 +439,7 @@ def run_api():
     # Polls the bot
     logger.info('API: Bot is running...')
     app.run_polling()
+
 
 if __name__ == "__main__":
     run_api()
