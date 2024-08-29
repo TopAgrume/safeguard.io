@@ -4,14 +4,13 @@ It provides various commands and message handlers to interact with users and man
 """
 
 import re
-import random
 from datetime import datetime, timedelta
 
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, Bot, Message
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes, CallbackQueryHandler
 from telegram.constants import ParseMode
 
-from utils.env_pipeline import RequestManager
+from src.utils.env_pipeline import RequestManager
 from src import commands
 
 TOKEN, BOT_USERNAME = RequestManager.telegram_keys()

@@ -2,7 +2,7 @@ from datetime import datetime
 
 from telegram import Bot, KeyboardButton
 from telegram import ReplyKeyboardMarkup
-from utils.env_pipeline import RequestManager
+from src.utils.env_pipeline import RequestManager
 import random
 import telegram
 import asyncio

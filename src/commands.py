@@ -1,6 +1,6 @@
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup, Message
 from telegram.ext import ContextTypes
-from utils.env_pipeline import RequestManager
+from src.utils.env_pipeline import RequestManager
 import telegram
 from logzero import logger
 from functools import wraps

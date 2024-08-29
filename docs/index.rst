@@ -14,15 +14,14 @@ Chatbot
    Commands <autoapi/commands/index>
 
 
-Actions
--------
+Utils
+-----
 
 .. toctree::
    :maxdepth: 2
-   :caption: Actions API
+   :caption: Utils
 
-   Chatbot <autoapi/react_chatbot/index>
-   Commands <autoapi/commands/index>
+   Request Manager <autoapi/env_pipeline/index>
 
 
 Indices and tables

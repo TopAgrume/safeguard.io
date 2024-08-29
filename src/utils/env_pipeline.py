@@ -1,11 +1,10 @@
 import os
 import json
 import psycopg2
-from httpcore import request
 from psycopg2.extras import RealDictCursor
 from datetime import datetime
 from contextlib import contextmanager
-from utils.init_database import init_database
+from src.utils.init_database import init_database
 
 init_database()
 MAX_TIME_DIFF = 20
