@@ -1,9 +1,8 @@
 from datetime import datetime
-
-from telegram import Bot, KeyboardButton
+from telegram import Bot, KeyboardButton, Message
 from telegram import ReplyKeyboardMarkup
 from src.utils.env_pipeline import RequestManager
-
+from logzero import logger
 import asyncio
 import time
 
@@ -12,8 +11,8 @@ WAITING_TIME = 9
 bot = Bot(TOKEN)
 
 
-async def send_daily_message(user_id: int, description: str):
-    print('SCHEDULER:', f"Send daily 10h Message to {user_id = }")
+async def send_daily_message(user_id: int, username: str, verif_time: datetime.time, description: str) -> Message:
+    logger.debug(f"SCHEDULER: Send daily {verif_time} message to @{username}")
 
     keyboard = [
         [
@@ -26,40 +25,35 @@ async def send_daily_message(user_id: int, description: str):
     return await bot.send_message(chat_id=user_id, text=message, reply_markup=reply_markup)
 
 
-async def run_schedule():
+async def run_schedule() -> None:
     current_hour = -1
     while True:
         if datetime.now().hour != current_hour:
             current_hour = datetime.now().hour
-            print('SCHEDULER:', f"--- REFRESH {current_hour}h ---")
+            logger.info(f"SCHEDULER: --- REFRESH {current_hour}h ---")
 
-        for user_id, user_data in RequestManager.on_get_users("items"):
-            # If alert mode, do nothing
-            if not user_data["response_message"]:
+        for user_id, verif_time, verif_desc, verif_active in RequestManager.get_verifications_from_idle_users():
+            if not time.localtime().tm_hour == verif_time.hour:
+                continue
+            if not time.localtime().tm_min == verif_time.minute:
                 continue
 
-            get_daily_messages = user_data["daily_message"]
-            for unique_check in get_daily_messages:
-                if not time.localtime().tm_hour == int(unique_check["time"][:2]):
+            username = RequestManager.username_from_user_id(user_id)
+
+            # In case of skip or fast-check
+            if not verif_active:
+                if isinstance(verif_active, bool):
+                    RequestManager.undoskip_verifications(user_id, [verif_time])
+                    logger.debug(f"SCHEDULER: undo skip for @{username} at {verif_time} {verif_active}")
                     continue
-                if not time.localtime().tm_min == int(unique_check["time"][3:5]):
-                    continue
 
-                # In case of skip or fast-check
-                state = unique_check["active"]
-                if not state:
-                    if isinstance(state, bool):
-                        RequestManager.on_write_verifications(user_id, "undoskip", [unique_check["time"]])
-                        print('SCHEDULER:', f"undo skip for: {state}")
-                        continue
+                # Fast-check -> delete the created check
+                RequestManager.del_verifications(user_id, [verif_time])
+                logger.debug(f"SCHEDULER: kill fast check for @{username} at {verif_time} {verif_active}")
 
-                    # Fast-check -> delete the created check
-                    RequestManager.on_write_verifications(user_id, "del", [unique_check["time"]])
-                    print('SCHEDULER:', f"kill fast check: {state}")
-
-                RequestManager.update_user_properties(user_id, "response_message", False)
-                RequestManager.on_init_check_queue(str(user_id), unique_check, WAITING_TIME)
-                await send_daily_message(user_id, unique_check["desc"])
+            RequestManager.update_user_properties(user_id, "response_message", False)
+            RequestManager.init_check_queue(user_id, verif_time, verif_desc, WAITING_TIME)
+            await send_daily_message(user_id, username, verif_time, verif_desc)
 
         current_minute = datetime.now().minute
         # Wait until the minute changes
@@ -67,5 +61,5 @@ async def run_schedule():
             await asyncio.sleep(1)
 
 
-def run_schedule_process():
+if __name__ == "__main__":
     asyncio.run(run_schedule())
