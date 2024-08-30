@@ -29,7 +29,7 @@ Module Contents
 
 .. py:class:: VerificationService
 
-   TA service class for managing verifications-related operations such as retrieving, adding,
+   A service class for managing verifications-related operations such as retrieving, adding,
    deleting, skipping, and updating verification records. It also manages check queue items
    for verification checks.
 
