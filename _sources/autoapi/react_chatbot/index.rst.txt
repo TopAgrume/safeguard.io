@@ -55,6 +55,8 @@ Module Contents
 
 .. py:data:: bot
 
+   The Telegram bot object used to send messages and interact with users.
+
 .. py:function:: debug_logger(func)
 
    A decorator that logs the entry of an asynchronous function call at the API level.

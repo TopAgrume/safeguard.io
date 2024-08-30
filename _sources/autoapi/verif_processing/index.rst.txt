@@ -54,6 +54,8 @@ Module Contents
 
 .. py:data:: bot
 
+   The Telegram bot object used to send messages and interact with users.
+
 .. py:function:: send_reminder(user_id: int, username: str, reminder_count: int) -> telegram.Message
    :async:
 

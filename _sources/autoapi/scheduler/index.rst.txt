@@ -48,6 +48,8 @@ Module Contents
 
 .. py:data:: bot
 
+   The Telegram bot object used to send messages and interact with users.
+
 .. py:function:: send_daily_message(user_id: int, username: str, verif_time: datetime.datetime.time, description: str) -> telegram.Message
    :async:
 
