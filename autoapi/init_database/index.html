@@ -258,7 +258,7 @@
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#init_database.init_database" title="init_database.init_database"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init_database</span></code></a>()</p></td>
-<td><p></p></td>
+<td><p>Initializes the PostgreSQL database by creating the necessary tables if they don't exist.</p></td>
 </tr>
 </tbody>
 </table>
@@ -269,7 +269,25 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="init_database.init_database">
 <span class="sig-name descname"><span class="pre">init_database</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#init_database.init_database" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Initializes the PostgreSQL database by creating the necessary tables if they don’t exist.</p>
+<p>This function connects to the PostgreSQL server using the provided connection parameters,
+creates tables for users, contacts, daily messages, contact requests, pending requests,
+bug reports, and a check queue. The function sets the isolation level to AUTOCOMMIT to
+ensure that the table creation statements are executed immediately.</p>
+<dl class="simple">
+<dt>Tables:</dt><dd><ul class="simple">
+<li><p>users: Stores user information such as username, alert mode, and response status.</p></li>
+<li><p>contacts: Manages user contacts and pairing status.</p></li>
+<li><p>daily_messages: Stores scheduled daily messages for users.</p></li>
+<li><p>contact_requests: Manages contact requests between users.</p></li>
+<li><p>pending_requests: Handles pending contact requests.</p></li>
+<li><p>bug_reports: Logs bug reports submitted by users.</p></li>
+<li><p>check_queue: Manages verification checks and reminders.</p></li>
+</ul>
+</dd>
+</dl>
+<p>The function prints a success message after creating the tables and closes the database connection.</p>
+</dd></dl>
 
 </section>
 </section>
