@@ -6,7 +6,6 @@ from src.utils.config import Config
 from src.services.contact_service import ContactService
 from src.services.user_service import UserService
 from src.services.verification_service import VerificationService
-from logzero import logger
 from functools import wraps
 from typing import Any, Callable
 
@@ -16,6 +15,9 @@ except ValueError as e:
     print(f"Configuration error: {e}")
 
 # Initialization
+from src.utils.logger import setup_logger
+logger = setup_logger("Command Handler", "react_chatbot.log")
+"""Logger for the Command Handler service module"""
 API_TOKEN = Config.TELEGRAM_API_TOKEN
 """The API token for the Telegram bot, retrieved from the configuration file."""
 BOT_USERNAME = Config.TELEGRAM_BOT_USERNAME
@@ -42,7 +44,7 @@ def verify_condition(func: Callable) -> Callable: # VALID
     """
     @wraps(func)
     async def wrapper(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs: Any) -> Any:
-        logger.debug(f"{'API' if func.__name__ == 'handle_messages' else 'COMMAND'}: {func.__name__} call")
+        logger.debug(f"{'React Chatbot' if func.__name__ == 'handle_messages' else ''}: {func.__name__} call")
 
         message = update.message
         chat_type = message.chat.type

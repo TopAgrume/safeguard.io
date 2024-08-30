@@ -1,7 +1,7 @@
 from src.database.operations import DatabaseOperations
 from src.utils.logger import setup_logger
 
-logger = setup_logger(__name__)
+logger = setup_logger("user_service")
 """Logger for the user service module"""
 
 class UserService:

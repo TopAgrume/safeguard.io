@@ -19,6 +19,9 @@ except ValueError as e:
     print(f"Configuration error: {e}")
 
 # Initialization
+from src.utils.logger import setup_logger
+logger = setup_logger("React Chatbot", "react_chatbot.log")
+"""Logger for the React Chatbot service module"""
 API_TOKEN = Config.TELEGRAM_API_TOKEN
 """The API token for the Telegram bot, retrieved from the configuration file."""
 BOT_USERNAME = Config.TELEGRAM_BOT_USERNAME
@@ -43,7 +46,7 @@ def debug_logger(func):
     """
     @functools.wraps(func)
     async def wrapper(*args, **kwargs):
-        logger.debug(f"API: {func.__name__} call")
+        logger.debug(f"{func.__name__} call")
         return await func(*args, **kwargs)
     return wrapper
 
@@ -436,7 +439,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Message:
 
 def run_api():
     """Initialize and run the Telegram bot."""
-    logger.info('API: Starting bot...')
+    logger.info('Starting bot...')
 
     app = Application.builder().token(API_TOKEN).build()
 
@@ -476,7 +479,7 @@ def run_api():
     app.add_error_handler(error)
 
     # Polls the bot
-    logger.info('API: Bot is running...')
+    logger.info('Bot is running...')
     app.run_polling()
 
 

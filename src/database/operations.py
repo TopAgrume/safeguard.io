@@ -1,9 +1,6 @@
 from datetime import datetime
-from src.utils.logger import setup_logger
 from src.database.connection import get_db_cursor
 
-logger = setup_logger(__name__)
-"""Logger for the database operations module"""
 MAX_TIME_DIFF = 20
 """Maximum time difference in minutes"""
 

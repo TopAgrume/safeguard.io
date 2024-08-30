@@ -2,7 +2,7 @@ from datetime import datetime
 from src.database.operations import DatabaseOperations
 from src.utils.logger import setup_logger
 
-logger = setup_logger(__name__)
+logger = setup_logger("verification_service")
 """Logger for the verification service module"""
 
 class VerificationService:

@@ -4,12 +4,14 @@ import asyncio
 from datetime import datetime
 from telegram import Bot, KeyboardButton, Message
 from telegram import ReplyKeyboardMarkup
-from logzero import logger
+from src.utils.logger import setup_logger
 from src.utils.config import Config
 from src.services.user_service import UserService
 from src.services.verification_service import VerificationService
 
 # Initialization
+logger = setup_logger("Scheduler", "scheduler.log")
+"""Logger for the scheduler service module"""
 API_TOKEN = Config.TELEGRAM_API_TOKEN
 """The API token for the Telegram bot, retrieved from the configuration file."""
 BOT_USERNAME = Config.TELEGRAM_BOT_USERNAME
@@ -32,7 +34,7 @@ async def send_daily_message(user_id: int, username: str, verif_time: datetime.t
     Returns:
         Message: The Telegram message object representing the sent daily message.
     """
-    logger.debug(f"SCHEDULER: Send daily {verif_time} message to @{username}")
+    logger.debug(f"Send daily {verif_time} message to @{username}")
 
     # Construct the reply keyboard with predefined options
     keyboard = [
@@ -59,7 +61,7 @@ async def run_schedule() -> None:
         # Refresh the logger every hour
         if datetime.now().hour != current_hour:
             current_hour = datetime.now().hour
-            logger.info(f"SCHEDULER: --- REFRESH {current_hour}h ---")
+            logger.info(f"--- REFRESH {current_hour}h ---")
 
         # Iterate over users and their scheduled verifications
         for user_id, verif_time, verif_desc, verif_active in VerificationService.get_idle_users_verifications():
@@ -76,12 +78,12 @@ async def run_schedule() -> None:
                 if isinstance(verif_active, bool):
                     # Undo the skip and prepare the user for the next verification
                     VerificationService.undoskip_verifications(user_id, [verif_time])
-                    logger.debug(f"SCHEDULER: Undo skip for @{username} at {verif_time} {verif_active}")
+                    logger.debug(f"Undo skip for @{username} at {verif_time} {verif_active}")
                     continue
 
                 # Fast-check scenario: delete the created check
                 VerificationService.delete_verifications(user_id, [verif_time])
-                logger.debug(f"SCHEDULER: Kill fast check for @{username} at {verif_time} {verif_active}")
+                logger.debug(f"Kill fast check for @{username} at {verif_time} {verif_active}")
 
             # Update user properties and initialize the verification process
             UserService.update_user_property(user_id, "response_message", False)
@@ -96,4 +98,5 @@ async def run_schedule() -> None:
 
 if __name__ == "__main__":
     # Start the asynchronous event loop
+    logger.info('Starting Scheduler...')
     asyncio.run(run_schedule())

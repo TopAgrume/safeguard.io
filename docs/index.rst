@@ -12,9 +12,39 @@ Chatbot
 
    Chatbot <autoapi/react_chatbot/index>
    Commands <autoapi/commands/index>
-   Scheduler <autoapi/schedule_appeal/index>
-   Queue Processing <autoapi/queue_process/index>
 
+Scheduler
+---------
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Chatbot
+
+   Scheduler <autoapi/scheduler/index>
+   Queue Processing <autoapi/verif_processing/index>
+
+Services
+--------
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Chatbot
+
+   User <autoapi/user_service/index>
+   Contact <autoapi/contact_service/index>
+   Verification <autoapi/verification_service/index>
+   Bug Report <autoapi/bug_report_service/index>
+
+Database
+--------
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Utils
+
+   Connection <autoapi/connection/index>
+   Models <autoapi/models/index>
+   Operations <autoapi/operations/index>
 
 Utils
 -----
@@ -23,8 +53,8 @@ Utils
    :maxdepth: 2
    :caption: Utils
 
-   Init Databases <autoapi/init_database/index>
-   Request Manager <autoapi/env_pipeline/index>
+   Config <autoapi/config/index>
+   Logger <autoapi/logger/index>
 
 
 Indices and tables

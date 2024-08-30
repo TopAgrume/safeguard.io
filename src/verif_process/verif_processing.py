@@ -6,7 +6,7 @@ from datetime import datetime
 from telegram import Bot, KeyboardButton, Message
 from telegram import ReplyKeyboardMarkup
 from src.utils.config import Config
-from logzero import logger
+from src.utils.logger import setup_logger
 from src.services.contact_service import ContactService
 from src.services.user_service import UserService
 from src.services.verification_service import VerificationService
@@ -17,6 +17,8 @@ except ValueError as e:
     print(f"Configuration error: {e}")
 
 # Initialization
+logger = setup_logger("Queue Process", "queue_process.log")
+"""Logger for the Queue Process service module"""
 API_TOKEN = Config.TELEGRAM_API_TOKEN
 """The API token for the Telegram bot, retrieved from the configuration file."""
 BOT_USERNAME = Config.TELEGRAM_BOT_USERNAME
@@ -104,12 +106,12 @@ async def check_for_response() -> None:
         # Refresh the queue logger every hour
         if datetime.now().hour != current_hour:
             current_hour = datetime.now().hour
-            logger.info(f"WORKING QUEUE: --- REFRESH {current_hour}h ---")
+            logger.info(f"--- REFRESH {current_hour}h ---")
 
         # Process the verification queue
         for user_id, verif_time, verif_desc, reminder_c, waiting_time in VerificationService.get_check_queue_items():
             username = UserService.get_username(user_id)
-            logger.debug(f"WORKING QUEUE: {verif_time}'s verification processing for @{username}")
+            logger.debug(f"{verif_time}'s verification processing for @{username}")
 
             # Check if the user has responded
             if UserService.get_user_property(user_id, "response_message"):
@@ -143,4 +145,5 @@ async def check_for_response() -> None:
 
 if __name__ == "__main__":
     # Start the asynchronous event loop
+    logger.info('Starting Queue Process...')
     asyncio.run(check_for_response())
