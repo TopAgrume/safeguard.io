@@ -9,6 +9,7 @@ Attributes
 
 .. autoapisummary::
 
+   verif_processing.logger
    verif_processing.API_TOKEN
    verif_processing.BOT_USERNAME
    verif_processing.P_HTML
@@ -28,6 +29,10 @@ Functions
 
 Module Contents
 ---------------
+
+.. py:data:: logger
+
+   Logger for the Queue Process service module
 
 .. py:data:: API_TOKEN
 

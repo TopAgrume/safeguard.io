@@ -15,7 +15,7 @@ Functions
 Module Contents
 ---------------
 
-.. py:function:: setup_logger(name)
+.. py:function:: setup_logger(name: str, file_name: str = None) -> logging.Logger
 
    Logger configuration with both console and file handlers.
 

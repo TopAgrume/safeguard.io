@@ -3,7 +3,7 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" />
+<link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" /><link rel="prev" title="config" href="../config/index.html" />
 
     <!-- Generated with Sphinx 7.4.7 and Furo 2024.08.06 -->
         <title>logger - Safeguard.io 0.1 documentation</title>
@@ -204,6 +204,29 @@
 <li class="toctree-l1"><a class="reference internal" href="../react_chatbot/index.html">Chatbot</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../commands/index.html">Commands</a></li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">Chatbot</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../scheduler/index.html">Scheduler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../verif_processing/index.html">Queue Processing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Chatbot</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../user_service/index.html">User</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contact_service/index.html">Contact</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../verification_service/index.html">Verification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bug_report_service/index.html">Bug Report</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Utils</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../connection/index.html">Connection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../models/index.html">Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../operations/index.html">Operations</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Utils</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../config/index.html">Config</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Logger</a></li>
+</ul>
 
 </div>
 </div>
@@ -250,7 +273,7 @@
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#logger.setup_logger" title="logger.setup_logger"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setup_logger</span></code></a>(name)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#logger.setup_logger" title="logger.setup_logger"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setup_logger</span></code></a>(→ logging.Logger)</p></td>
 <td><p>Logger configuration with both console and file handlers.</p></td>
 </tr>
 </tbody>
@@ -261,7 +284,7 @@
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="logger.setup_logger">
-<span class="sig-name descname"><span class="pre">setup_logger</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#logger.setup_logger" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">setup_logger</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">logging.Logger</span></span></span><a class="headerlink" href="#logger.setup_logger" title="Link to this definition">¶</a></dt>
 <dd><p>Logger configuration with both console and file handlers.</p>
 <p>The logger will output debug-level messages to the console and info-level
 messages to a file named ‘app.log’. The log format includes the timestamp,
@@ -288,7 +311,17 @@ logger name, log level, and message.</p>
         
         <div class="related-pages">
           
-          
+          <a class="prev-page" href="../config/index.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">config</div>
+                
+              </div>
+            </a>
         </div>
         <div class="bottom-of-page">
           <div class="left-details">

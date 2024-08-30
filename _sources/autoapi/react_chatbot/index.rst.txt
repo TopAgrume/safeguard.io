@@ -9,6 +9,7 @@ Attributes
 
 .. autoapisummary::
 
+   react_chatbot.logger
    react_chatbot.API_TOKEN
    react_chatbot.BOT_USERNAME
    react_chatbot.bot
@@ -39,6 +40,10 @@ Functions
 
 Module Contents
 ---------------
+
+.. py:data:: logger
+
+   Logger for the React Chatbot service module
 
 .. py:data:: API_TOKEN
 

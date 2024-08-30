@@ -9,7 +9,6 @@ Attributes
 
 .. autoapisummary::
 
-   operations.logger
    operations.MAX_TIME_DIFF
 
 
@@ -31,10 +30,6 @@ Functions
 
 Module Contents
 ---------------
-
-.. py:data:: logger
-
-   Logger for the database operations module
 
 .. py:data:: MAX_TIME_DIFF
    :value: 20

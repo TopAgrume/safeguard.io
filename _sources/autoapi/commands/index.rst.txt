@@ -9,6 +9,7 @@ Attributes
 
 .. autoapisummary::
 
+   commands.logger
    commands.API_TOKEN
    commands.BOT_USERNAME
    commands.P_HTML
@@ -41,6 +42,10 @@ Functions
 
 Module Contents
 ---------------
+
+.. py:data:: logger
+
+   Logger for the Command Handler service module
 
 .. py:data:: API_TOKEN
 

@@ -3,7 +3,7 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" />
+<link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" /><link rel="next" title="user_service" href="../user_service/index.html" /><link rel="prev" title="scheduler" href="../scheduler/index.html" />
 
     <!-- Generated with Sphinx 7.4.7 and Furo 2024.08.06 -->
         <title>verif_processing - Safeguard.io 0.1 documentation</title>
@@ -204,6 +204,29 @@
 <li class="toctree-l1"><a class="reference internal" href="../react_chatbot/index.html">Chatbot</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../commands/index.html">Commands</a></li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">Chatbot</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../scheduler/index.html">Scheduler</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Queue Processing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Chatbot</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../user_service/index.html">User</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contact_service/index.html">Contact</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../verification_service/index.html">Verification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bug_report_service/index.html">Bug Report</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Utils</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../connection/index.html">Connection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../models/index.html">Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../operations/index.html">Operations</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Utils</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../config/index.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../logger/index.html">Logger</a></li>
+</ul>
 
 </div>
 </div>
@@ -250,19 +273,22 @@
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#verif_processing.API_TOKEN" title="verif_processing.API_TOKEN"><code class="xref py py-obj docutils literal notranslate"><span class="pre">API_TOKEN</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#verif_processing.logger" title="verif_processing.logger"><code class="xref py py-obj docutils literal notranslate"><span class="pre">logger</span></code></a></p></td>
+<td><p>Logger for the Queue Process service module</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#verif_processing.API_TOKEN" title="verif_processing.API_TOKEN"><code class="xref py py-obj docutils literal notranslate"><span class="pre">API_TOKEN</span></code></a></p></td>
 <td><p>The API token for the Telegram bot, retrieved from the configuration file.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#verif_processing.BOT_USERNAME" title="verif_processing.BOT_USERNAME"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BOT_USERNAME</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#verif_processing.BOT_USERNAME" title="verif_processing.BOT_USERNAME"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BOT_USERNAME</span></code></a></p></td>
 <td><p>The username of the Telegram bot, retrieved from the configuration file.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#verif_processing.P_HTML" title="verif_processing.P_HTML"><code class="xref py py-obj docutils literal notranslate"><span class="pre">P_HTML</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#verif_processing.P_HTML" title="verif_processing.P_HTML"><code class="xref py py-obj docutils literal notranslate"><span class="pre">P_HTML</span></code></a></p></td>
 <td><p>Parse mode set to HTML for formatting Telegram messages.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#verif_processing.WAITING_TIME" title="verif_processing.WAITING_TIME"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WAITING_TIME</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#verif_processing.WAITING_TIME" title="verif_processing.WAITING_TIME"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WAITING_TIME</span></code></a></p></td>
 <td><p>The default waiting time (in minutes) before sending the next reminder.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#verif_processing.bot" title="verif_processing.bot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bot</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#verif_processing.bot" title="verif_processing.bot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bot</span></code></a></p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -289,6 +315,12 @@
 </section>
 <section id="module-contents">
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
+<dl class="py data">
+<dt class="sig sig-object py" id="verif_processing.logger">
+<span class="sig-name descname"><span class="pre">logger</span></span><a class="headerlink" href="#verif_processing.logger" title="Link to this definition">¶</a></dt>
+<dd><p>Logger for the Queue Process service module</p>
+</dd></dl>
+
 <dl class="py data">
 <dt class="sig sig-object py" id="verif_processing.API_TOKEN">
 <span class="sig-name descname"><span class="pre">API_TOKEN</span></span><a class="headerlink" href="#verif_processing.API_TOKEN" title="Link to this definition">¶</a></dt>
@@ -378,8 +410,26 @@ If the user fails to respond after several reminders, it sends alerts to emergen
       <footer>
         
         <div class="related-pages">
-          
-          
+          <a class="next-page" href="../user_service/index.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">user_service</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="../scheduler/index.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">scheduler</div>
+                
+              </div>
+            </a>
         </div>
         <div class="bottom-of-page">
           <div class="left-details">
@@ -414,6 +464,7 @@ If the user fails to respond after several reminders, it sends alerts to emergen
 <li><a class="reference internal" href="#attributes">Attributes</a></li>
 <li><a class="reference internal" href="#functions">Functions</a></li>
 <li><a class="reference internal" href="#module-contents">Module Contents</a><ul>
+<li><a class="reference internal" href="#verif_processing.logger"><code class="docutils literal notranslate"><span class="pre">logger</span></code></a></li>
 <li><a class="reference internal" href="#verif_processing.API_TOKEN"><code class="docutils literal notranslate"><span class="pre">API_TOKEN</span></code></a></li>
 <li><a class="reference internal" href="#verif_processing.BOT_USERNAME"><code class="docutils literal notranslate"><span class="pre">BOT_USERNAME</span></code></a></li>
 <li><a class="reference internal" href="#verif_processing.P_HTML"><code class="docutils literal notranslate"><span class="pre">P_HTML</span></code></a></li>

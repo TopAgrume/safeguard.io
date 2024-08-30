@@ -204,6 +204,29 @@
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Chatbot</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../commands/index.html">Commands</a></li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">Chatbot</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../scheduler/index.html">Scheduler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../verif_processing/index.html">Queue Processing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Chatbot</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../user_service/index.html">User</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contact_service/index.html">Contact</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../verification_service/index.html">Verification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bug_report_service/index.html">Bug Report</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Utils</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../connection/index.html">Connection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../models/index.html">Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../operations/index.html">Operations</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Utils</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../config/index.html">Config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../logger/index.html">Logger</a></li>
+</ul>
 
 </div>
 </div>
@@ -250,13 +273,16 @@
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#react_chatbot.API_TOKEN" title="react_chatbot.API_TOKEN"><code class="xref py py-obj docutils literal notranslate"><span class="pre">API_TOKEN</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#react_chatbot.logger" title="react_chatbot.logger"><code class="xref py py-obj docutils literal notranslate"><span class="pre">logger</span></code></a></p></td>
+<td><p>Logger for the React Chatbot service module</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#react_chatbot.API_TOKEN" title="react_chatbot.API_TOKEN"><code class="xref py py-obj docutils literal notranslate"><span class="pre">API_TOKEN</span></code></a></p></td>
 <td><p>The API token for the Telegram bot, retrieved from the configuration file.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#react_chatbot.BOT_USERNAME" title="react_chatbot.BOT_USERNAME"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BOT_USERNAME</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#react_chatbot.BOT_USERNAME" title="react_chatbot.BOT_USERNAME"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BOT_USERNAME</span></code></a></p></td>
 <td><p>The username of the Telegram bot, retrieved from the configuration file.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#react_chatbot.bot" title="react_chatbot.bot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bot</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#react_chatbot.bot" title="react_chatbot.bot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bot</span></code></a></p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -322,6 +348,12 @@
 </section>
 <section id="module-contents">
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
+<dl class="py data">
+<dt class="sig sig-object py" id="react_chatbot.logger">
+<span class="sig-name descname"><span class="pre">logger</span></span><a class="headerlink" href="#react_chatbot.logger" title="Link to this definition">¶</a></dt>
+<dd><p>Logger for the React Chatbot service module</p>
+</dd></dl>
+
 <dl class="py data">
 <dt class="sig sig-object py" id="react_chatbot.API_TOKEN">
 <span class="sig-name descname"><span class="pre">API_TOKEN</span></span><a class="headerlink" href="#react_chatbot.API_TOKEN" title="Link to this definition">¶</a></dt>
@@ -626,6 +658,7 @@ indicates that a sub-level function is being called, and is indented for clarity
 <li><a class="reference internal" href="#attributes">Attributes</a></li>
 <li><a class="reference internal" href="#functions">Functions</a></li>
 <li><a class="reference internal" href="#module-contents">Module Contents</a><ul>
+<li><a class="reference internal" href="#react_chatbot.logger"><code class="docutils literal notranslate"><span class="pre">logger</span></code></a></li>
 <li><a class="reference internal" href="#react_chatbot.API_TOKEN"><code class="docutils literal notranslate"><span class="pre">API_TOKEN</span></code></a></li>
 <li><a class="reference internal" href="#react_chatbot.BOT_USERNAME"><code class="docutils literal notranslate"><span class="pre">BOT_USERNAME</span></code></a></li>
 <li><a class="reference internal" href="#react_chatbot.bot"><code class="docutils literal notranslate"><span class="pre">bot</span></code></a></li>
