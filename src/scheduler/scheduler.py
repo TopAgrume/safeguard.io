@@ -1,15 +1,22 @@
+import time
+import asyncio
+
 from datetime import datetime
 from telegram import Bot, KeyboardButton, Message
 from telegram import ReplyKeyboardMarkup
-from src.utils.env_pipeline import RequestManager
 from logzero import logger
-import asyncio
-import time
+from src.utils.config import Config
+from src.services.user_service import UserService
+from src.services.verification_service import VerificationService
 
-# Initialize the bot with a token and other constants
-TOKEN, BOT_USERNAME = RequestManager.telegram_keys()
+# Initialization
+API_TOKEN = Config.TELEGRAM_API_TOKEN
+"""The API token for the Telegram bot, retrieved from the configuration file."""
+BOT_USERNAME = Config.TELEGRAM_BOT_USERNAME
+"""The username of the Telegram bot, retrieved from the configuration file."""
 WAITING_TIME = 8
-bot = Bot(TOKEN)
+"""The default waiting time (in minutes) before sending the next reminder."""
+bot = Bot(API_TOKEN)
 
 
 async def send_daily_message(user_id: int, username: str, verif_time: datetime.time, description: str) -> Message:
@@ -55,30 +62,30 @@ async def run_schedule() -> None:
             logger.info(f"SCHEDULER: --- REFRESH {current_hour}h ---")
 
         # Iterate over users and their scheduled verifications
-        for user_id, verif_time, verif_desc, verif_active in RequestManager.get_verifications_from_idle_users():
+        for user_id, verif_time, verif_desc, verif_active in VerificationService.get_idle_users_verifications():
             # Ensure the current time matches the scheduled verification time
             if not time.localtime().tm_hour == verif_time.hour:
                 continue
             if not time.localtime().tm_min == verif_time.minute:
                 continue
 
-            username = RequestManager.username_from_user_id(user_id)
+            username = UserService.get_username(user_id)
 
             # Handle skipped or fast-check verifications
             if not verif_active:
                 if isinstance(verif_active, bool):
                     # Undo the skip and prepare the user for the next verification
-                    RequestManager.undoskip_verifications(user_id, [verif_time])
+                    VerificationService.undoskip_verifications(user_id, [verif_time])
                     logger.debug(f"SCHEDULER: Undo skip for @{username} at {verif_time} {verif_active}")
                     continue
 
                 # Fast-check scenario: delete the created check
-                RequestManager.del_verifications(user_id, [verif_time])
+                VerificationService.delete_verifications(user_id, [verif_time])
                 logger.debug(f"SCHEDULER: Kill fast check for @{username} at {verif_time} {verif_active}")
 
             # Update user properties and initialize the verification process
-            RequestManager.update_user_properties(user_id, "response_message", False)
-            RequestManager.init_check_queue(user_id, verif_time, verif_desc, WAITING_TIME)
+            UserService.update_user_property(user_id, "response_message", False)
+            VerificationService.add_check_queue_item(user_id, verif_time, verif_desc, WAITING_TIME)
             await send_daily_message(user_id, username, verif_time, verif_desc)
 
         # Wait until the minute changes before checking again

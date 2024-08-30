@@ -1,24 +1,30 @@
-"""
-This module implements a Telegram bot for managing user contacts, verifications, and alerts.
-It provides various commands and message handlers to interact with users and manage their data.
-"""
-
 import re
-from datetime import datetime, timedelta
+import functools
 
+from datetime import datetime, timedelta
+from logzero import logger
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, Bot, Message
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes, CallbackQueryHandler
 from telegram.constants import ParseMode
+from src.utils.config import Config
+from src.chatbot import commands
+from src.services.bug_report_service import BugReportService
+from src.services.contact_service import ContactService
+from src.services.user_service import UserService
+from src.services.verification_service import VerificationService
 
-from src.utils.env_pipeline import RequestManager
-from src import commands
+try:
+    Config.validate()
+except ValueError as e:
+    print(f"Configuration error: {e}")
 
-# Initialize the bot with a token and other constants
-TOKEN, BOT_USERNAME = RequestManager.telegram_keys()
-bot = Bot(TOKEN)
+# Initialization
+API_TOKEN = Config.TELEGRAM_API_TOKEN
+"""The API token for the Telegram bot, retrieved from the configuration file."""
+BOT_USERNAME = Config.TELEGRAM_BOT_USERNAME
+"""The username of the Telegram bot, retrieved from the configuration file."""
+bot = Bot(API_TOKEN)
 
-import functools
-from logzero import logger
 
 def debug_logger(func):
     """
@@ -41,6 +47,7 @@ def debug_logger(func):
         return await func(*args, **kwargs)
     return wrapper
 
+
 def sub_debug_logger(func):
     """
     A decorator that logs the entry of an asynchronous function call at the sub-level
@@ -62,6 +69,7 @@ def sub_debug_logger(func):
         logger.debug(f"    └── {func.__name__} call")
         return await func(*args, **kwargs)
     return wrapper
+
 
 @sub_debug_logger
 async def send_hope_message(update: Update) -> Message:
@@ -119,11 +127,11 @@ async def process_contacts(update: Update, content: str, action: str) -> Message
             error_contacts.append(line)
 
     if action == 'add':
-        notification = RequestManager.add_contacts(user_id, user_username, valid_contacts)
+        notification = ContactService.add_contacts(user_id, user_username, valid_contacts)
         await notif_pairing_invitation(update, notification)
         message = "Given contact(s) are now added to your account.\nThey received an association request.🎉\n"
     else:
-        RequestManager.del_contacts(user_id, valid_contacts)
+        ContactService.delete_contact(user_id, valid_contacts)
         message = "Given contact(s) are now deleted from your account.🚮\n"
 
     if error_contacts:
@@ -163,14 +171,14 @@ async def process_verifications(update: Update, content: str, action: str) -> Me
     message, base_message = "", ""
     if len(valid_verifs) > 0:
         if action == 'add':
-            not_valid = RequestManager.add_verifications(user_id, valid_verifs, skip_check=False)
+            not_valid = VerificationService.add_verifications(user_id, valid_verifs, skip_check=False)
             base_message = "Given daily verification(s) are now added to your account. 📅🔐\n"
             if not_valid:
                 message += ("\nFollowing verification(s) weren't added. Make sure to "
                             "space daily messages at least 20 minutes apart:\n")
                 message += "\n".join(f"❌ {verif}" for verif in not_valid)
         else:
-            RequestManager.del_verifications(user_id, valid_verifs)
+            VerificationService.delete_verifications(user_id, valid_verifs)
             base_message = "Given daily verification(s) are now deleted from your account.🚫📅\n"
 
     message = f"{base_message if len(not_valid) != len(valid_verifs) else ''}" + message
@@ -194,7 +202,7 @@ async def extract_bugreport(update: Update, content: str) -> Message:
     user_id = user.id
     username = user.username or user.first_name
 
-    report_id = RequestManager.write_bug_report(user_id, username, content)
+    report_id = BugReportService.add_bug_report(user_id, username, content)
     return await update.message.reply_text(f"Thank you for the report! Your report ID is: {report_id}")
 
 
@@ -218,9 +226,9 @@ async def process_alarm(update: Update, content: str, action: str) -> Message:
             error_alarms.append(line)
 
     if action == 'skip':
-        RequestManager.skip_verifications(user_id, valid_alarms)
+        VerificationService.skip_verifications(user_id, valid_alarms)
     elif action == 'undoskip':
-        RequestManager.undoskip_verifications(user_id, valid_alarms)
+        VerificationService.undoskip_verifications(user_id, valid_alarms)
 
     message = (f"Given daily verification(s) are now {'skipped for the next 24h' if action == 'skip' else 'activated'}."
                f"{'⏰✨' if action == 'skip' else '🔐🔄'}\n")
@@ -253,7 +261,7 @@ async def extract_fastcheck(update: Update, content: str) -> Message:
     time_to_display = check_time.strftime("%H:%M")
 
     new_alarm = {"time": time_to_display, "description": "Auto fast check", "active": None}
-    RequestManager.add_verifications(user_id, [new_alarm], skip_check=True)
+    VerificationService.add_verifications(user_id, [new_alarm], skip_check=True)
 
     message = f"Fast Check in {waiting_time}mn taken into account! ({time_to_display}) 🚀"
     return await update.message.reply_text(message)
@@ -294,23 +302,23 @@ async def handle_messages(update: Update, context: ContextTypes.DEFAULT_TYPE, **
         context (ContextTypes.DEFAULT_TYPE): The context object for the handler.
     """
     user_id = update.message.from_user.id
-    response_message, alert_mode = RequestManager.user_information(user_id)
+    response_message, alert_mode = UserService.get_user_information(user_id)
 
     if response_message:
-        get_state = RequestManager.read_user_properties(user_id, "state")
-        RequestManager.update_user_properties(user_id, "state", "")
+        get_state = UserService.get_user_property(user_id, "state")
+        UserService.update_user_property(user_id, "state", "")
         return await state_dispatcher(update, get_state, update.message.text)
 
     if not alert_mode:
         logger.debug('└── User response to verification demand')
         greeting = "Have a great day 🌞!" if datetime.now().hour < 16 else "Have a wonderful afternoon 🌅!"
         response = f"Thank you for your response! {greeting}"
-        RequestManager.update_user_properties(user_id, "response_message", True)
+        UserService.update_user_property(user_id, "response_message", True)
         return await update.message.reply_text(response)
 
     logger.debug('└── User response to unset the alert mode')
-    RequestManager.update_user_properties(user_id, "alert_mode", False)
-    RequestManager.update_user_properties(user_id, "response_message", True)
+    UserService.update_user_property(user_id, "alert_mode", False)
+    UserService.update_user_property(user_id, "response_message", True)
     await manual_undohelp(user_id, update.message.from_user.username)
     return await send_hope_message(update)
 
@@ -332,7 +340,7 @@ async def manual_help(user_id: int, username: str) -> None:
     message = (f"🚨<b>ALERT</b>🚨. @{username} has manually triggered the call for help."
                " <b>Please take this call seriously and ensure their well-being!</b>")
 
-    for contact_id, _, pair in RequestManager.read_contacts_properties(user_id):
+    for contact_id, _, pair in ContactService.get_contacts(user_id):
         if pair:
             await bot.send_message(chat_id=contact_id, text=message, parse_mode=ParseMode.HTML)
 
@@ -349,7 +357,7 @@ async def manual_undohelp(user_id: int, username: str) -> None:
     message = (f"⚠️<b>Alert disabled</b>⚠️.\n@{username} manually disabled the alert."
                " <b>Please confirm it was intentional or check if it was a simple mistake.</b>")
 
-    for contact_id, _, pair in RequestManager.read_contacts_properties(user_id):
+    for contact_id, _, pair in ContactService.get_contacts(user_id):
         if pair:
             await bot.send_message(chat_id=contact_id, text=message, parse_mode=ParseMode.HTML)
 
@@ -373,7 +381,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Message:
         return await query.edit_message_text(text=f"Unknown: Query data empty ({query.data})")
 
     if query.data == "notify_emergencies":
-        RequestManager.update_user_properties(user_id, "alert_mode", True)
+        UserService.update_user_property(user_id, "alert_mode", True)
         logger.debug(f"└── @{username} triggered the alert")
 
         message = ("OK. Emergency contacts have received your request for help! 🆘\n"
@@ -385,7 +393,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Message:
         message = "OK 😅. Glad to hear it was a mistake!"
 
     elif query.data == "cancel_alert":
-        RequestManager.update_user_properties(user_id, "alert_mode", False)
+        UserService.update_user_property(user_id, "alert_mode", False)
         logger.debug(f"└── @{username} canceled the alert")
 
         message = "OK. Your emergency contacts have received information that the alert has been disabled. 📢"
@@ -397,9 +405,9 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Message:
 
     elif query.data[0] == "-":
         origin_id = int(query.data[1:])
-        RequestManager.del_contact_requests(user_id, origin_id)
-        RequestManager.del_contacts(origin_id, [query.from_user.username])
-        target_username = RequestManager.username_from_user_id(origin_id)
+        ContactService.delete_contact_request(user_id, origin_id)
+        ContactService.delete_contact(origin_id, [query.from_user.username])
+        target_username = UserService.get_username(origin_id)
 
         logger.debug(f"└── @{username} declined association with @{target_username}")
         message = f"<b>OK. Association request from @{target_username} declined. ❌</b>"
@@ -407,9 +415,9 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Message:
     else: #TODO double pairing
         origin_id = int(query.data[1:])
 
-        RequestManager.update_contacts_pairing(origin_id, user_id,"pair", True)
-        RequestManager.del_contact_requests(user_id, origin_id)
-        target_username = RequestManager.username_from_user_id(origin_id)
+        ContactService.update_contact_pairing(origin_id, user_id, "pair", True)
+        ContactService.delete_contact_request(user_id, origin_id)
+        target_username = UserService.get_username(origin_id)
 
         logger.debug(f"└── @{username} accepted the association request with @{target_username}")
         await bot.send_message(
@@ -430,7 +438,7 @@ def run_api():
     """Initialize and run the Telegram bot."""
     logger.info('API: Starting bot...')
 
-    app = Application.builder().token(TOKEN).build()
+    app = Application.builder().token(API_TOKEN).build()
 
     # Commands
     command_handlers = [

@@ -1,18 +1,31 @@
-from datetime import datetime
-
-from telegram import Bot, KeyboardButton, Message
-from telegram import ReplyKeyboardMarkup
-from src.utils.env_pipeline import RequestManager
 import random
 import telegram
 import asyncio
-from logzero import logger
 
-# Initialize the bot with a token and other constants
-TOKEN, BOT_USERNAME = RequestManager.telegram_keys()
-WAITING_TIME = 9
+from datetime import datetime
+from telegram import Bot, KeyboardButton, Message
+from telegram import ReplyKeyboardMarkup
+from src.utils.config import Config
+from logzero import logger
+from src.services.contact_service import ContactService
+from src.services.user_service import UserService
+from src.services.verification_service import VerificationService
+
+try:
+    Config.validate()
+except ValueError as e:
+    print(f"Configuration error: {e}")
+
+# Initialization
+API_TOKEN = Config.TELEGRAM_API_TOKEN
+"""The API token for the Telegram bot, retrieved from the configuration file."""
+BOT_USERNAME = Config.TELEGRAM_BOT_USERNAME
+"""The username of the Telegram bot, retrieved from the configuration file."""
 P_HTML = telegram.constants.ParseMode.HTML
-bot = Bot(TOKEN)
+"""Parse mode set to HTML for formatting Telegram messages."""
+WAITING_TIME = 9
+"""The default waiting time (in minutes) before sending the next reminder."""
+bot = Bot(API_TOKEN)
 
 
 async def send_reminder(user_id: int, username: str, reminder_count: int) -> Message:
@@ -55,7 +68,7 @@ async def send_alert_message(user_id: int, verif_time: datetime.time, desc: str)
     Returns:
         Message: The Telegram message object sent to the user after alerting their contacts.
     """
-    username = RequestManager.username_from_user_id(user_id)
+    username = UserService.get_username(user_id)
     logger.debug(f"└── @{username} is now in alert mode")
 
     contact_message = (f"🚨<b>ALERT</b>🚨.\nI haven't received any response from @{username} for the scheduled {verif_time.hour:02}:{verif_time.minute:02} callback.\n"
@@ -63,7 +76,7 @@ async def send_alert_message(user_id: int, verif_time: datetime.time, desc: str)
                f"Here's the description provided for the callback:\n\n {desc}")
 
     # Notify emergency contacts
-    for contact_id, contact_tag in RequestManager.read_paired_contacts_properties(user_id):
+    for contact_id, contact_tag in ContactService.get_paired_contacts(user_id):
         await bot.send_message(chat_id=contact_id, text=contact_message, parse_mode=P_HTML)
         logger.debug(f"    └── Alert notification about @{username} sent to @{contact_tag}")
 
@@ -94,32 +107,32 @@ async def check_for_response() -> None:
             logger.info(f"WORKING QUEUE: --- REFRESH {current_hour}h ---")
 
         # Process the verification queue
-        for user_id, verif_time, verif_desc, reminder_c, waiting_time in RequestManager.retrieve_checks_from_queue():
-            username = RequestManager.username_from_user_id(user_id)
+        for user_id, verif_time, verif_desc, reminder_c, waiting_time in VerificationService.get_check_queue_items():
+            username = UserService.get_username(user_id)
             logger.debug(f"WORKING QUEUE: {verif_time}'s verification processing for @{username}")
 
             # Check if the user has responded
-            if RequestManager.read_user_properties(user_id, "response_message"):
+            if UserService.get_user_property(user_id, "response_message"):
                 logger.debug(f"└── User @{username} responded to the verification message")
-                RequestManager.on_kill_queue_data(user_id)
+                VerificationService.delete_check_queue_item(user_id)
                 continue
 
             # If no response and the waiting time has expired, send a reminder
             if waiting_time == 0:
                 waiting_time = WAITING_TIME
                 reminder_c += 1
-                RequestManager.update_check_queue_properties(user_id, "reminder_count", reminder_c)
+                VerificationService.update_check_queue_property(user_id, "reminder_count", reminder_c)
                 await send_reminder(user_id, username, reminder_c)
 
             # If the maximum number of reminders has been reached, send an alert
             if reminder_c >= 5:
                 await send_alert_message(user_id, verif_time, verif_desc)
-                RequestManager.on_kill_queue_data(user_id)
-                RequestManager.update_user_properties(user_id, "alert_mode", True)
+                VerificationService.delete_check_queue_item(user_id)
+                UserService.update_user_property(user_id, "alert_mode", True)
                 continue
 
             # Update the waiting time for the next iteration
-            RequestManager.update_check_queue_properties(user_id, "waiting_time", waiting_time - 1)
+            VerificationService.update_check_queue_property(user_id, "waiting_time", waiting_time - 1)
 
         # Wait for the next minute before checking again
         current_minute = datetime.now().second

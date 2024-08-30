@@ -1,14 +1,27 @@
+import telegram
+
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup, Message
 from telegram.ext import ContextTypes
-from src.utils.env_pipeline import RequestManager
-import telegram
+from src.utils.config import Config
+from src.services.contact_service import ContactService
+from src.services.user_service import UserService
+from src.services.verification_service import VerificationService
 from logzero import logger
 from functools import wraps
 from typing import Any, Callable
 
-# Initialize the bot with a token and other constants
-TOKEN, BOT_USERNAME = RequestManager.telegram_keys()
+try:
+    Config.validate()
+except ValueError as e:
+    print(f"Configuration error: {e}")
+
+# Initialization
+API_TOKEN = Config.TELEGRAM_API_TOKEN
+"""The API token for the Telegram bot, retrieved from the configuration file."""
+BOT_USERNAME = Config.TELEGRAM_BOT_USERNAME
+"""The username of the Telegram bot, retrieved from the configuration file."""
 P_HTML = telegram.constants.ParseMode.HTML
+"""Parse mode set to HTML for formatting Telegram messages."""
 
 
 def verify_condition(func: Callable) -> Callable: # VALID
@@ -48,7 +61,7 @@ def verify_condition(func: Callable) -> Callable: # VALID
             )
             return
 
-        user_exists = RequestManager.user_exists(message.from_user.id)
+        user_exists = UserService.user_exists(message.from_user.id)
         if not user_exists and func.__name__ != 'start_command':
             await message.reply_text(
                 "You are not registered with Safeguard.io! Please use <b>/start</b> to register. 📲✨",
@@ -83,24 +96,24 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kw
     user = update.message.from_user
     user_id, username = user.id, user.username
 
-    if RequestManager.user_already_registered(user_id):
+    if UserService.user_already_registered(user_id):
         logger.debug(f"└── User @{username} already registered")
         message = "Your profile is already linked with Safeguard.io!"
         return await update.message.reply_text(message)
 
-    RequestManager.on_create_user(user_id, username)
+    UserService.create_user(user_id, username)
     logger.debug(f"└── New user @{username} registered")
 
     message = f"Hello {user.first_name} 🌟! Thanks for chatting with me! I am Safeguard.io 😊."
     await update.message.reply_text(message)
 
-    requester_keys = RequestManager.transfer_pending_requests(user_id, username)
+    requester_keys = ContactService.transfer_pending_requests(user_id, username)
     logger.debug(f"└── New user @{username} has {len(requester_keys)} pending contact requests")
     for contact_key, contact_tag in requester_keys:
-        RequestManager.update_contacts_properties(contact_key, contact_tag, "contact_id", user_id)
+        ContactService.update_contacts_property(contact_key, contact_tag, "contact_id", user_id)
 
     # In case the user just reconnected from a previous session
-    RequestManager.update_contacts_reload(username, user_id)
+    ContactService.update_contacts_reload(username, user_id)
     return await request_command(update, context, quiet=True)
 
 
@@ -160,12 +173,12 @@ async def addcontact_command(update: Update, context: ContextTypes.DEFAULT_TYPE,
     user_id = update.message.from_user.id
     username = update.message.from_user.username
 
-    if len(RequestManager.read_contacts_properties(user_id)) > 9:
+    if len(ContactService.get_contacts(user_id)) > 9:
         logger.debug(f"└── User @{username} already have 10 contacts")
         message = "You cannot add an additional contacts (10 max). 🛑"
         return await update.message.reply_text(message)
 
-    RequestManager.update_user_properties(user_id, "state", "addcontact")
+    UserService.update_user_property(user_id, "state", "addcontact")
 
     message = ("Sure thing! Please provide me with a list of contacts you'd like to add. 📋\n"
                "<b>Make sure to use the following format:</b>\n\n"
@@ -189,7 +202,7 @@ async def showcontacts_command(update: Update, context: ContextTypes.DEFAULT_TYP
         Message: Response message from the bot.
     """
     user_id = update.message.from_user.id
-    contact_list = RequestManager.read_contacts_properties(user_id)
+    contact_list = ContactService.get_contacts(user_id)
     username = update.message.from_user.username
 
     if len(contact_list) == 0:
@@ -221,7 +234,7 @@ async def delcontact_command(update: Update, context: ContextTypes.DEFAULT_TYPE,
         Message: Response message from the bot.
     """
     user_id = update.message.from_user.id
-    user_contacts = RequestManager.read_contacts_properties(user_id)
+    user_contacts = ContactService.get_contacts(user_id)
     username = update.message.from_user.username
 
     if len(user_contacts) == 0:
@@ -232,7 +245,7 @@ async def delcontact_command(update: Update, context: ContextTypes.DEFAULT_TYPE,
     display = ['@' + tag for _, tag, _ in user_contacts]
     reply_markup = ReplyKeyboardMarkup([display], resize_keyboard=True, one_time_keyboard=True)
 
-    RequestManager.update_user_properties(user_id, "state", "delcontact")
+    UserService.update_user_property(user_id, "state", "delcontact")
 
     message = "Sure! Chose the contact to delete.🗑️\n"
     return await update.message.reply_text(message, reply_markup=reply_markup, parse_mode=P_HTML)
@@ -254,12 +267,12 @@ async def addverif_command(update: Update, context: ContextTypes.DEFAULT_TYPE, *
     user_id = update.message.from_user.id
     username = update.message.from_user.username
 
-    if len(RequestManager.read_verifications_properties(user_id)) > 5:
+    if len(VerificationService.get_user_verifications(user_id)) > 5:
         logger.debug(f"└── User @{username} already have 6 verifications")
         message = "<b>You cannot add an additional daily check (6 max). 🛑</b>"
         return await update.message.reply_text(message, parse_mode=P_HTML)
 
-    RequestManager.update_user_properties(user_id, "state", "addverif")
+    UserService.update_user_property(user_id, "state", "addverif")
 
     message = ("OK. Send me a list of daily verifications to add. 📅⏰\n"
                "<b>Please use this format</b>:\n\n"
@@ -283,7 +296,7 @@ async def showverifs_command(update: Update, context: ContextTypes.DEFAULT_TYPE,
         Message: Response message from the bot.
     """
     user_id = update.message.from_user.id
-    verif_list = RequestManager.read_verifications_properties(user_id)
+    verif_list = VerificationService.get_user_verifications(user_id)
     username = update.message.from_user.username
 
     if len(verif_list) == 0:
@@ -328,7 +341,7 @@ async def delverif_command(update: Update, context: ContextTypes.DEFAULT_TYPE, *
     """
     user_id = update.message.from_user.id
     username = update.message.from_user.username
-    verif_list = RequestManager.read_verifications_properties(user_id)
+    verif_list = VerificationService.get_user_verifications(user_id)
 
     if len(verif_list) == 0:
         logger.debug(f"└── User @{username} does not have any verification to delete")
@@ -340,7 +353,7 @@ async def delverif_command(update: Update, context: ContextTypes.DEFAULT_TYPE, *
     keyboard =[f"{time.hour:02}:{time.minute:02}" for time, _, _ in sorted_list]
     reply_markup = ReplyKeyboardMarkup([keyboard], resize_keyboard=True, one_time_keyboard=True)
 
-    RequestManager.update_user_properties(user_id, "state", "delverif")
+    UserService.update_user_property(user_id, "state", "delverif")
 
     message = ("Alright! Please choose the daily verifications you'd like to delete. ❌🕒\n"
                "Click /empty to cancel the operation.")
@@ -363,7 +376,7 @@ async def skip_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwa
     user_id = update.message.from_user.id
     username = update.message.from_user.username
 
-    verif_list = RequestManager.read_verifications_properties(user_id)
+    verif_list = VerificationService.get_user_verifications(user_id)
     verif_list = list(filter(lambda x: x[2], verif_list))
 
     if len(verif_list) == 0:
@@ -376,7 +389,7 @@ async def skip_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwa
     keyboard = [f"{time.hour:02}:{time.minute:02}" for time, _, _ in sorted_list]
     reply_markup = ReplyKeyboardMarkup([keyboard], resize_keyboard=True, one_time_keyboard=True)
 
-    RequestManager.update_user_properties(user_id, "state", "skip")
+    UserService.update_user_property(user_id, "state", "skip")
 
     message = ("Sure! Please choose the daily verifications you'd like to skip. 🚫🕒\n"
                "Click /empty to cancel the operation.")
@@ -398,7 +411,7 @@ async def undoskip_command(update: Update, context: ContextTypes.DEFAULT_TYPE, *
     """
     user_id = update.message.from_user.id
     username = update.message.from_user.username
-    verif_list = RequestManager.read_verifications_properties(user_id)
+    verif_list = VerificationService.get_user_verifications(user_id)
     verif_list = list(filter(lambda x: not x[2], verif_list))
 
     if len(verif_list) == 0:
@@ -411,7 +424,7 @@ async def undoskip_command(update: Update, context: ContextTypes.DEFAULT_TYPE, *
     keyboard =[f"{time.hour:02}:{time.minute:02}" for time, _, active in sorted_list if active is not None]
     reply_markup = ReplyKeyboardMarkup([keyboard], resize_keyboard=True, one_time_keyboard=True)
 
-    RequestManager.update_user_properties(user_id, "state", "undoskip")
+    UserService.update_user_property(user_id, "state", "undoskip")
 
     message = ("OK. Please choose the daily verifications you'd like to undo skip for. 🔄🕒\n"
                "Click /empty to cancel the operation.")
@@ -432,7 +445,7 @@ async def bugreport_command(update: Update, context: ContextTypes.DEFAULT_TYPE, 
         Message: Response message from the bot.
     """
     user_id = update.message.from_user.id
-    RequestManager.update_user_properties(user_id, "state", "bugreport")
+    UserService.update_user_property(user_id, "state", "bugreport")
 
     message = ("Sure! Please describe the bug and the steps you took to encounter it. 🐞📝\n"
                "Click /empty to cancel the operation.")
@@ -455,7 +468,7 @@ async def request_command(update: Update, context: ContextTypes.DEFAULT_TYPE, qu
     """
     user_id = update.message.from_user.id
     username = update.message.from_user.username
-    contact_request = RequestManager.read_contact_requests_properties(user_id)
+    contact_request = ContactService.get_contact_requests(user_id)
 
     if len(contact_request) == 0 and not quiet:
         logger.debug(f"└── User @{username} does not have any association request")
@@ -492,7 +505,7 @@ async def fastcheck_command(update: Update, context: ContextTypes.DEFAULT_TYPE, 
     reply_markup = ReplyKeyboardMarkup([keyboard], resize_keyboard=True, one_time_keyboard=True)
 
     user_id = update.message.from_user.id
-    RequestManager.update_user_properties(user_id, "state", "fastcheck")
+    UserService.update_user_property(user_id, "state", "fastcheck")
 
     message = ("Alright! When would you like to have the quick check? 🕒🚀 "
                "<b>(less than 20 minutes)</b>\n"
@@ -515,15 +528,15 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwa
     """
     user_id = update.message.from_user.id
     username = update.message.from_user.username
-    alert_mode = RequestManager.read_user_properties(user_id, "alert_mode")
+    alert_mode = UserService.get_user_property(user_id, "alert_mode")
 
     if alert_mode:
         logger.debug(f"└── User @{username} already in alert mode")
         message = "<b>You are already in alert mode! 🚨</b>"
         return await update.message.reply_text(message, parse_mode=P_HTML)
 
-    if not RequestManager.read_user_properties(user_id, "response_message"):
-        RequestManager.update_user_properties(user_id, "response_message", True)
+    if not UserService.get_user_property(user_id, "response_message"):
+        UserService.update_user_property(user_id, "response_message", True)
         await update.message.reply_text("Answer received, daily verification has been turned off.")
 
     message = "<b>Do you want to notify emergency contacts? 🚨</b>"
@@ -554,7 +567,7 @@ async def undohelp_command(update: Update, context: ContextTypes.DEFAULT_TYPE, *
     user_id = update.message.from_user.id
     username = update.message.from_user.username
 
-    if not RequestManager.read_user_properties(user_id, "alert_mode"):
+    if not UserService.get_user_property(user_id, "alert_mode"):
         logger.debug(f"└── User @{username} already in safe mode")
         message = "<b>This operation can only be used in alert state! ⚠️</b>"
         return await update.message.reply_text(message, parse_mode=P_HTML)
@@ -584,7 +597,7 @@ async def empty_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kw
         Message: Response message from the bot.
     """
     user_id = update.message.from_user.id
-    RequestManager.update_user_properties(user_id, "state", "")
+    UserService.update_user_property(user_id, "state", "")
     message = "Sure thing! Operation canceled. ✅"
     return await update.message.reply_text(message)
 
@@ -603,6 +616,6 @@ async def kill_user_data(update: Update, context: ContextTypes.DEFAULT_TYPE, **k
         Message: Response message from the bot.
     """
     user_id = update.message.from_user.id
-    RequestManager.on_kill_data(user_id)
+    UserService.delete_user(user_id)
     message = "<b>Your personal data has been deleted.🗑️</b>"
     return await update.message.reply_text(message, parse_mode=P_HTML)
