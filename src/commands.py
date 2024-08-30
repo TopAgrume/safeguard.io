@@ -6,6 +6,7 @@ from logzero import logger
 from functools import wraps
 from typing import Any, Callable
 
+# Initialize the bot with a token and other constants
 TOKEN, BOT_USERNAME = RequestManager.telegram_keys()
 P_HTML = telegram.constants.ParseMode.HTML
 
@@ -95,8 +96,8 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kw
 
     requester_keys = RequestManager.transfer_pending_requests(user_id, username)
     logger.debug(f"└── New user @{username} has {len(requester_keys)} pending contact requests")
-    for contact_key in requester_keys:
-        RequestManager.update_contacts_properties(contact_key, "contact_id", user_id)
+    for contact_key, contact_tag in requester_keys:
+        RequestManager.update_contacts_properties(contact_key, contact_tag, "contact_id", user_id)
 
     # In case the user just reconnected from a previous session
     RequestManager.update_contacts_reload(username, user_id)

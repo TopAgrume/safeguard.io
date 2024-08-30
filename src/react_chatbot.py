@@ -13,6 +13,7 @@ from telegram.constants import ParseMode
 from src.utils.env_pipeline import RequestManager
 from src import commands
 
+# Initialize the bot with a token and other constants
 TOKEN, BOT_USERNAME = RequestManager.telegram_keys()
 bot = Bot(TOKEN)
 
@@ -20,6 +21,20 @@ import functools
 from logzero import logger
 
 def debug_logger(func):
+    """
+    A decorator that logs the entry of an asynchronous function call at the API level.
+
+    This decorator is intended for logging at the API level and provides a simple
+    debug message before calling the decorated function. The message indicates
+    that the API function is being called.
+
+    Args:
+        func (coroutine): The asynchronous function to be decorated.
+
+    Returns:
+        coroutine: The wrapped asynchronous function that logs the debug message
+                   before executing the original function.
+    """
     @functools.wraps(func)
     async def wrapper(*args, **kwargs):
         logger.debug(f"API: {func.__name__} call")
@@ -27,12 +42,28 @@ def debug_logger(func):
     return wrapper
 
 def sub_debug_logger(func):
+    """
+    A decorator that logs the entry of an asynchronous function call at the sub-level
+    (e.g., nested function calls within an API function).
+
+    This decorator is intended for logging sub-level function calls and provides
+    an indented debug message before calling the decorated function. The message
+    indicates that a sub-level function is being called, and is indented for clarity.
+
+    Args:
+        func (coroutine): The asynchronous function to be decorated.
+
+    Returns:
+        coroutine: The wrapped asynchronous function that logs the indented debug
+                   message before executing the original function.
+    """
     @functools.wraps(func)
     async def wrapper(*args, **kwargs):
         logger.debug(f"    └── {func.__name__} call")
         return await func(*args, **kwargs)
     return wrapper
 
+@sub_debug_logger
 async def send_hope_message(update: Update) -> Message:
     """Send a message indicating that the alert status has been reset."""
     username = update.message.from_user.username
@@ -55,7 +86,7 @@ async def notif_pairing_invitation(update: Update, notif_details: list) -> None:
     username = update.message.from_user.username
 
     for notif in notif_details:
-        logger.debug(f"Sending pairing invitation to @{notif['tag']} from @{username}")
+        logger.debug(f"        └── Sending pairing invitation to @{notif['tag']} from @{username}")
         message = f"<b>Do you want to accept the pairing invitation from @{username}? 🤝</b>"
         keyboard = [
             [
@@ -315,7 +346,7 @@ async def manual_undohelp(user_id: int, username: str) -> None:
         user_id (int): The user's ID.
         username (str): The user's username.
     """
-    message = (f"⚠️<b>Alert disabled</b>⚠️. @{username} manually disabled the alert."
+    message = (f"⚠️<b>Alert disabled</b>⚠️.\n@{username} manually disabled the alert."
                " <b>Please confirm it was intentional or check if it was a simple mistake.</b>")
 
     for contact_id, _, pair in RequestManager.read_contacts_properties(user_id):
@@ -376,11 +407,11 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Message:
     else: #TODO double pairing
         origin_id = int(query.data[1:])
 
-        RequestManager.update_contacts_properties(origin_id, "pair", True)
+        RequestManager.update_contacts_pairing(origin_id, user_id,"pair", True)
         RequestManager.del_contact_requests(user_id, origin_id)
         target_username = RequestManager.username_from_user_id(origin_id)
 
-        logger.debug(f"└── @{username} response message to association with @{target_username}")
+        logger.debug(f"└── @{username} accepted the association request with @{target_username}")
         await bot.send_message(
             chat_id=origin_id,
             text=f"<b>@{query.from_user.username} has accepted your association "

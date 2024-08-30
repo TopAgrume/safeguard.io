@@ -75,12 +75,13 @@ class RequestManager(object):
             conn.commit()
 
     @staticmethod  # VALID
-    def update_contacts_properties(user_id: int, key: str, value: int | bool) -> None:
+    def update_contacts_properties(user_id: int, target_username: str, key: str, value: int | bool) -> None:
         """
         Update a specific property of a contact in the 'contacts' table.
 
         Args:
             user_id (int): The ID of the user who owns the contact.
+            target_username (str): The username of the contact.
             key (str): The column name in the 'contacts' table to update.
             value (int | bool): The new value for the property.
 
@@ -89,7 +90,26 @@ class RequestManager(object):
         """
         with get_db_connection() as conn:
             with conn.cursor() as cur:
-                cur.execute(f"UPDATE contacts SET {key} = %s WHERE user_id = %s", (value, user_id))
+                cur.execute(f"UPDATE contacts SET {key} = %s WHERE user_id = %s AND tag = %s", (value, user_id, target_username))
+            conn.commit()
+
+    @staticmethod  # VALID
+    def update_contacts_pairing(user_id: int, contact_id: int, key: str, value: int | bool) -> None:
+        """
+        Update a specific property of a contact in the 'contacts' table.
+
+        Args:
+            user_id (int): The ID of the user who owns the contact.
+            contact_id (int): The ID of the contact.
+            key (str): The column name in the 'contacts' table to update.
+            value (int | bool): The new value for the property.
+
+        Returns:
+            None
+        """
+        with get_db_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute(f"UPDATE contacts SET {key} = %s WHERE user_id = %s AND contact_id = %s ", (value, user_id, contact_id))
             conn.commit()
 
     @staticmethod  # VALID
@@ -106,7 +126,7 @@ class RequestManager(object):
         """
         with get_db_connection() as conn:
             with conn.cursor() as cur:
-                cur.execute(f"UPDATE contacts SET contact_id = %s WHERE tag = %s", (user_id, username))
+                cur.execute(f"UPDATE contacts SET contact_id = %s WHERE tag = %s AND contact_id IS NULL", (user_id, username))
             conn.commit()
 
     @staticmethod  # VALID
@@ -387,13 +407,13 @@ class RequestManager(object):
         """
         with get_db_connection() as conn:
             with conn.cursor(cursor_factory=RealDictCursor) as cur:
-                cur.execute(f"SELECT contact_id, tag FROM contacts WHERE user_id = %s AND pair = TRUE", (user_id,))
+                cur.execute(f"SELECT contact_id, tag FROM contacts WHERE user_id = %s AND pair = TRUE AND contact_id IS NOT NULL", (user_id,))
                 contacts = cur.fetchall()
                 return [(contact['contact_id'], contact['tag']) for contact in contacts] if contacts else []
 
 
     @staticmethod  # VALID
-    def read_verifications_properties(user_id: int) -> list[tuple[str, str, bool]]:
+    def read_verifications_properties(user_id: int) -> list[tuple[datetime.time, str, bool]]:
         """
         Retrieve the verifications for a user.
 
@@ -485,7 +505,7 @@ class RequestManager(object):
             conn.commit()
 
     @staticmethod  # VALID
-    def transfer_pending_requests(user_id: int, target_username: str) -> list[int]:
+    def transfer_pending_requests(user_id: int, target_username: str) -> list[tuple[int, str]]:
         """
         Transfer pending requests to the 'contact_requests' table and delete them from the 'pending_requests' table.
 
@@ -508,7 +528,7 @@ class RequestManager(object):
                 if len(pending_requests) > 0:
                     cur.execute("DELETE FROM pending_requests WHERE target_username = %s", (target_username,))
             conn.commit()
-            return [requester_id for requester_id, _ in pending_requests]
+            return [(requester_id, tag) for requester_id, tag in pending_requests]
 
 
     @staticmethod
