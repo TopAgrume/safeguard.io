@@ -20,7 +20,6 @@ Functions
 
    schedule_appeal.send_daily_message
    schedule_appeal.run_schedule
-   schedule_appeal.run_schedule_process
 
 
 Module Contents
@@ -32,13 +31,11 @@ Module Contents
 
 .. py:data:: bot
 
-.. py:function:: send_daily_message(user_id: int, description: str)
+.. py:function:: send_daily_message(user_id: int, username: str, verif_time: datetime.datetime.time, description: str) -> telegram.Message
    :async:
 
 
-.. py:function:: run_schedule()
+.. py:function:: run_schedule() -> None
    :async:
 
-
-.. py:function:: run_schedule_process()
 

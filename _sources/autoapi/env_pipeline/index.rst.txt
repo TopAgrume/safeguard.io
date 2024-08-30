@@ -301,6 +301,20 @@ Module Contents
 
 
 
+   .. py:method:: read_paired_contacts_properties(user_id: int) -> list[tuple[int, str]]
+      :staticmethod:
+
+
+      Retrieve the paired contacts information for a user.
+
+      :param user_id: The ID of the user whose contacts are being retrieved.
+      :type user_id: int
+
+      :returns: A list of tuples containing the contact ID and tag for each contact.
+      :rtype: list[tuple[int, str, bool]]
+
+
+
    .. py:method:: read_verifications_properties(user_id: int) -> list[tuple[str, str, bool]]
       :staticmethod:
 
@@ -418,28 +432,100 @@ Module Contents
 
 
 
-   .. py:method:: on_get_users()
+   .. py:method:: get_verifications_from_idle_users() -> list[tuple[int, datetime.datetime.time, str, bool]]
       :staticmethod:
 
 
+      Retrieves a list of verifications from users who have not responded.
 
-   .. py:method:: on_init_check_queue(user_id: str, daily_check: dict, waiting_time: int)
+      The method queries the database for users with active daily messages
+      but have a response_message flag set to True.
+
+      :returns:
+
+                A list of tuples, each containing:
+                    - user ID (int)
+                    - time of the message (datetime.time)
+                    - description of the message (str)
+                    - whether the message is active (bool)
+      :rtype: list[tuple[int, datetime.time, str, bool]]
+
+
+
+   .. py:method:: init_check_queue(user_id: int, time: datetime.datetime.time, desc: str, waiting_time: int) -> None
       :staticmethod:
 
 
+      Initializes a check queue entry for a user.
 
-   .. py:method:: on_write_check_queue(user_id: str, key: str = None, value=None) -> None
+      Inserts a new entry into the check_queue table with the given user ID,
+      time, description, and waiting time. The reminder_count is set to 0 by default.
+
+      :param user_id: The ID of the user.
+      :type user_id: int
+      :param time: The time associated with the check.
+      :type time: datetime.time
+      :param desc: The description of the check.
+      :type desc: str
+      :param waiting_time: The waiting time before the next reminder.
+      :type waiting_time: int
+
+      :returns: None
+
+
+
+   .. py:method:: retrieve_checks_from_queue() -> list[tuple[int, datetime.datetime.time, str, int, int]]
       :staticmethod:
 
 
+      Retrieves all checks from the check queue.
 
-   .. py:method:: on_get_check_users(method: str)
+      Queries the check_queue table to get all queued checks.
+
+      :returns:
+
+                A list of tuples, each containing:
+                    - user ID (int)
+                    - time of the check (datetime.time)
+                    - description of the check (str)
+                    - reminder count (int)
+                    - waiting time (int)
+      :rtype: list[tuple[int, datetime.time, str, int, int]]
+
+
+
+   .. py:method:: update_check_queue_properties(user_id: int, key: str, value: int) -> None
       :staticmethod:
 
 
+      Updates a specific property of a user's check queue entry.
 
-   .. py:method:: on_kill_queue_data(user_id: int, file_path: str = 'data/queue.json') -> None
+      Allows updating any integer field in the check_queue table
+      for the given user based on the provided key.
+
+      :param user_id: The ID of the user.
+      :type user_id: int
+      :param key: The name of the field to be updated.
+      :type key: str
+      :param value: The new value to be set for the specified field.
+      :type value: int
+
+      :returns: None
+
+
+
+   .. py:method:: on_kill_queue_data(user_id: int) -> None
       :staticmethod:
+
+
+      Deletes a user's check queue entry.
+
+      Removes the entry from the check_queue table for the specified user.
+
+      :param user_id: The ID of the user whose check queue entry should be deleted.
+      :type user_id: int
+
+      :returns: None
 
 
 

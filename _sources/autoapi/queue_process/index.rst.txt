@@ -22,7 +22,6 @@ Functions
    queue_process.send_reminder
    queue_process.send_alert_message
    queue_process.check_for_response
-   queue_process.run_queue_process
 
 
 Module Contents
@@ -36,17 +35,15 @@ Module Contents
 
 .. py:data:: bot
 
-.. py:function:: send_reminder(user_id: str, user_data: dict)
+.. py:function:: send_reminder(user_id: int, username: str, reminder_count: int) -> telegram.Message
    :async:
 
 
-.. py:function:: send_alert_message(user_id)
+.. py:function:: send_alert_message(user_id: int, time: str, desc: str) -> telegram.Message
    :async:
 
 
 .. py:function:: check_for_response()
    :async:
 
-
-.. py:function:: run_queue_process()
 

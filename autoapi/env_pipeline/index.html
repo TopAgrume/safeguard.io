@@ -609,6 +609,23 @@
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="env_pipeline.RequestManager.read_paired_contacts_properties">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">read_paired_contacts_properties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#env_pipeline.RequestManager.read_paired_contacts_properties" title="Link to this definition">¶</a></dt>
+<dd><p>Retrieve the paired contacts information for a user.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>user_id</strong> (<em>int</em>) – The ID of the user whose contacts are being retrieved.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of tuples containing the contact ID and tag for each contact.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[tuple[int, str, bool]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="env_pipeline.RequestManager.read_verifications_properties">
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">read_verifications_properties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#env_pipeline.RequestManager.read_verifications_properties" title="Link to this definition">¶</a></dt>
 <dd><p>Retrieve the verifications for a user.</p>
@@ -749,29 +766,110 @@
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="env_pipeline.RequestManager.on_get_users">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">on_get_users</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#env_pipeline.RequestManager.on_get_users" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="env_pipeline.RequestManager.get_verifications_from_idle_users">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_verifications_from_idle_users</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">datetime.datetime.time</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#env_pipeline.RequestManager.get_verifications_from_idle_users" title="Link to this definition">¶</a></dt>
+<dd><p>Retrieves a list of verifications from users who have not responded.</p>
+<p>The method queries the database for users with active daily messages
+but have a response_message flag set to True.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>A list of tuples, each containing:</dt><dd><ul class="simple">
+<li><p>user ID (int)</p></li>
+<li><p>time of the message (datetime.time)</p></li>
+<li><p>description of the message (str)</p></li>
+<li><p>whether the message is active (bool)</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list[tuple[int, datetime.time, str, bool]]</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="env_pipeline.RequestManager.on_init_check_queue">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">on_init_check_queue</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">daily_check</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">waiting_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#env_pipeline.RequestManager.on_init_check_queue" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="env_pipeline.RequestManager.init_check_queue">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">init_check_queue</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime.datetime.time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">desc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">waiting_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#env_pipeline.RequestManager.init_check_queue" title="Link to this definition">¶</a></dt>
+<dd><p>Initializes a check queue entry for a user.</p>
+<p>Inserts a new entry into the check_queue table with the given user ID,
+time, description, and waiting time. The reminder_count is set to 0 by default.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>user_id</strong> (<em>int</em>) – The ID of the user.</p></li>
+<li><p><strong>time</strong> (<em>datetime.time</em>) – The time associated with the check.</p></li>
+<li><p><strong>desc</strong> (<em>str</em>) – The description of the check.</p></li>
+<li><p><strong>waiting_time</strong> (<em>int</em>) – The waiting time before the next reminder.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="env_pipeline.RequestManager.on_write_check_queue">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">on_write_check_queue</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#env_pipeline.RequestManager.on_write_check_queue" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="env_pipeline.RequestManager.retrieve_checks_from_queue">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">retrieve_checks_from_queue</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">datetime.datetime.time</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#env_pipeline.RequestManager.retrieve_checks_from_queue" title="Link to this definition">¶</a></dt>
+<dd><p>Retrieves all checks from the check queue.</p>
+<p>Queries the check_queue table to get all queued checks.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>A list of tuples, each containing:</dt><dd><ul class="simple">
+<li><p>user ID (int)</p></li>
+<li><p>time of the check (datetime.time)</p></li>
+<li><p>description of the check (str)</p></li>
+<li><p>reminder count (int)</p></li>
+<li><p>waiting time (int)</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list[tuple[int, datetime.time, str, int, int]]</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="env_pipeline.RequestManager.on_get_check_users">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">on_get_check_users</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#env_pipeline.RequestManager.on_get_check_users" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="env_pipeline.RequestManager.update_check_queue_properties">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">update_check_queue_properties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#env_pipeline.RequestManager.update_check_queue_properties" title="Link to this definition">¶</a></dt>
+<dd><p>Updates a specific property of a user’s check queue entry.</p>
+<p>Allows updating any integer field in the check_queue table
+for the given user based on the provided key.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>user_id</strong> (<em>int</em>) – The ID of the user.</p></li>
+<li><p><strong>key</strong> (<em>str</em>) – The name of the field to be updated.</p></li>
+<li><p><strong>value</strong> (<em>int</em>) – The new value to be set for the specified field.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="env_pipeline.RequestManager.on_kill_queue_data">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">on_kill_queue_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'data/queue.json'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#env_pipeline.RequestManager.on_kill_queue_data" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">on_kill_queue_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#env_pipeline.RequestManager.on_kill_queue_data" title="Link to this definition">¶</a></dt>
+<dd><p>Deletes a user’s check queue entry.</p>
+<p>Removes the entry from the check_queue table for the specified user.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>user_id</strong> (<em>int</em>) – The ID of the user whose check queue entry should be deleted.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
@@ -852,6 +950,7 @@
 <li><a class="reference internal" href="#env_pipeline.RequestManager.read_user_properties"><code class="docutils literal notranslate"><span class="pre">RequestManager.read_user_properties()</span></code></a></li>
 <li><a class="reference internal" href="#env_pipeline.RequestManager.read_contact_requests_properties"><code class="docutils literal notranslate"><span class="pre">RequestManager.read_contact_requests_properties()</span></code></a></li>
 <li><a class="reference internal" href="#env_pipeline.RequestManager.read_contacts_properties"><code class="docutils literal notranslate"><span class="pre">RequestManager.read_contacts_properties()</span></code></a></li>
+<li><a class="reference internal" href="#env_pipeline.RequestManager.read_paired_contacts_properties"><code class="docutils literal notranslate"><span class="pre">RequestManager.read_paired_contacts_properties()</span></code></a></li>
 <li><a class="reference internal" href="#env_pipeline.RequestManager.read_verifications_properties"><code class="docutils literal notranslate"><span class="pre">RequestManager.read_verifications_properties()</span></code></a></li>
 <li><a class="reference internal" href="#env_pipeline.RequestManager.user_already_registered"><code class="docutils literal notranslate"><span class="pre">RequestManager.user_already_registered()</span></code></a></li>
 <li><a class="reference internal" href="#env_pipeline.RequestManager.write_bug_report"><code class="docutils literal notranslate"><span class="pre">RequestManager.write_bug_report()</span></code></a></li>
@@ -860,10 +959,10 @@
 <li><a class="reference internal" href="#env_pipeline.RequestManager.transfer_pending_requests"><code class="docutils literal notranslate"><span class="pre">RequestManager.transfer_pending_requests()</span></code></a></li>
 <li><a class="reference internal" href="#env_pipeline.RequestManager.telegram_keys"><code class="docutils literal notranslate"><span class="pre">RequestManager.telegram_keys()</span></code></a></li>
 <li><a class="reference internal" href="#env_pipeline.RequestManager.username_from_user_id"><code class="docutils literal notranslate"><span class="pre">RequestManager.username_from_user_id()</span></code></a></li>
-<li><a class="reference internal" href="#env_pipeline.RequestManager.on_get_users"><code class="docutils literal notranslate"><span class="pre">RequestManager.on_get_users()</span></code></a></li>
-<li><a class="reference internal" href="#env_pipeline.RequestManager.on_init_check_queue"><code class="docutils literal notranslate"><span class="pre">RequestManager.on_init_check_queue()</span></code></a></li>
-<li><a class="reference internal" href="#env_pipeline.RequestManager.on_write_check_queue"><code class="docutils literal notranslate"><span class="pre">RequestManager.on_write_check_queue()</span></code></a></li>
-<li><a class="reference internal" href="#env_pipeline.RequestManager.on_get_check_users"><code class="docutils literal notranslate"><span class="pre">RequestManager.on_get_check_users()</span></code></a></li>
+<li><a class="reference internal" href="#env_pipeline.RequestManager.get_verifications_from_idle_users"><code class="docutils literal notranslate"><span class="pre">RequestManager.get_verifications_from_idle_users()</span></code></a></li>
+<li><a class="reference internal" href="#env_pipeline.RequestManager.init_check_queue"><code class="docutils literal notranslate"><span class="pre">RequestManager.init_check_queue()</span></code></a></li>
+<li><a class="reference internal" href="#env_pipeline.RequestManager.retrieve_checks_from_queue"><code class="docutils literal notranslate"><span class="pre">RequestManager.retrieve_checks_from_queue()</span></code></a></li>
+<li><a class="reference internal" href="#env_pipeline.RequestManager.update_check_queue_properties"><code class="docutils literal notranslate"><span class="pre">RequestManager.update_check_queue_properties()</span></code></a></li>
 <li><a class="reference internal" href="#env_pipeline.RequestManager.on_kill_queue_data"><code class="docutils literal notranslate"><span class="pre">RequestManager.on_kill_queue_data()</span></code></a></li>
 </ul>
 </li>
