@@ -4,30 +4,56 @@ services:
     postgres:
         image: postgres
         environment:
-            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-            POSTGRES_DB: ${POSTGRES_DB}
-            POSTGRES_USER: ${POSTGRES_USER}
+            POSTGRES_PASSWORD: ${DB_PASSWORD}
+            POSTGRES_DB: ${DB_NAME}
+            POSTGRES_USER: ${DB_USER}
         ports:
-          - "5432:5432"
+            - "${DB_PORT}:5432"
         healthcheck:
-            test: ["CMD-SHELL", "sh -c 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}'"]
+            test: ["CMD-SHELL", "sh -c 'pg_isready -U ${DB_USER} -d ${DB_NAME}'"]
             interval: 5s
             timeout: 5s
             retries: 5
         volumes:
-          - database_data:/var/lib/postgresql/data
+            - database_data:/var/lib/postgresql/data
+        env_file:
+            - .env
 
-    #react-chatbot:
-    #    depends_on:
-     #       postgres:
-      #          condition: service_healthy
-       # build:
-        #    context: ./src
-    #        dockerfile: Dockerfile
-     #   env_file:
-      #    - .env
-       # volumes:
-        #  - ./src:/app
+    react-chatbot:
+        build:
+            context: .
+            dockerfile: ./src/Dockerfile.chatbot
+        env_file:
+            - .env
+        depends_on:
+            postgres:
+                condition: service_healthy
+        volumes:
+            - ./src:/app
+
+    scheduler:
+        build:
+            context: .
+            dockerfile: ./src/Dockerfile.scheduler
+        env_file:
+            - .env
+        depends_on:
+            postgres:
+                condition: service_healthy
+        volumes:
+            - ./src:/app
+
+    verif-process:
+        build:
+            context: .
+            dockerfile: ./src/Dockerfile.verif_process
+        env_file:
+            - .env
+        depends_on:
+            postgres:
+                condition: service_healthy
+        volumes:
+            - ./src:/app
 
 volumes:
     database_data:

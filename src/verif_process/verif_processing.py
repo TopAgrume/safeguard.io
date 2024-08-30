@@ -5,11 +5,11 @@ import asyncio
 from datetime import datetime
 from telegram import Bot, KeyboardButton, Message
 from telegram import ReplyKeyboardMarkup
-from src.utils.config import Config
-from src.utils.logger import setup_logger
-from src.services.contact_service import ContactService
-from src.services.user_service import UserService
-from src.services.verification_service import VerificationService
+from utils.config import Config
+from utils.logger import setup_logger
+from services.contact_service import ContactService
+from services.user_service import UserService
+from services.verification_service import VerificationService
 
 try:
     Config.validate()

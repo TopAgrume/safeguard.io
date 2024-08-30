@@ -2,24 +2,25 @@ import re
 import functools
 
 from datetime import datetime, timedelta
-from logzero import logger
+from utils.logger import setup_logger
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, Bot, Message
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes, CallbackQueryHandler
 from telegram.constants import ParseMode
-from src.utils.config import Config
-from src.chatbot import commands
-from src.services.bug_report_service import BugReportService
-from src.services.contact_service import ContactService
-from src.services.user_service import UserService
-from src.services.verification_service import VerificationService
+from utils.config import Config
+from chatbot import commands
+from services.bug_report_service import BugReportService
+from services.contact_service import ContactService
+from services.user_service import UserService
+from services.verification_service import VerificationService
+from database.models import init_database
 
 try:
     Config.validate()
+    init_database()
 except ValueError as e:
     print(f"Configuration error: {e}")
 
 # Initialization
-from src.utils.logger import setup_logger
 logger = setup_logger("React Chatbot", "react_chatbot.log")
 """Logger for the React Chatbot service module"""
 API_TOKEN = Config.TELEGRAM_API_TOKEN

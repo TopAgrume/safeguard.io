@@ -1,5 +1,5 @@
 from datetime import datetime
-from src.database.connection import get_db_cursor
+from database.connection import get_db_cursor
 
 MAX_TIME_DIFF = 20
 """Maximum time difference in minutes"""

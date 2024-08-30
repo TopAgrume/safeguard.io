@@ -2,11 +2,12 @@ import telegram
 
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup, Message
 from telegram.ext import ContextTypes
-from src.utils.config import Config
-from src.services.contact_service import ContactService
-from src.services.user_service import UserService
-from src.services.verification_service import VerificationService
+from utils.config import Config
+from services.contact_service import ContactService
+from services.user_service import UserService
+from services.verification_service import VerificationService
 from functools import wraps
+from utils.logger import setup_logger
 from typing import Any, Callable
 
 try:
@@ -15,7 +16,6 @@ except ValueError as e:
     print(f"Configuration error: {e}")
 
 # Initialization
-from src.utils.logger import setup_logger
 logger = setup_logger("Command Handler", "react_chatbot.log")
 """Logger for the Command Handler service module"""
 API_TOKEN = Config.TELEGRAM_API_TOKEN

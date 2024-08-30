@@ -1,6 +1,6 @@
 from datetime import datetime
-from src.database.operations import DatabaseOperations
-from src.utils.logger import setup_logger
+from database.operations import DatabaseOperations
+from utils.logger import setup_logger
 
 logger = setup_logger("verification_service")
 """Logger for the verification service module"""

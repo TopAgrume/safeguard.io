@@ -4,10 +4,10 @@ import asyncio
 from datetime import datetime
 from telegram import Bot, KeyboardButton, Message
 from telegram import ReplyKeyboardMarkup
-from src.utils.logger import setup_logger
-from src.utils.config import Config
-from src.services.user_service import UserService
-from src.services.verification_service import VerificationService
+from utils.logger import setup_logger
+from utils.config import Config
+from services.user_service import UserService
+from services.verification_service import VerificationService
 
 # Initialization
 logger = setup_logger("Scheduler", "scheduler.log")

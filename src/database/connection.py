@@ -1,6 +1,9 @@
 import os
 from psycopg2.pool import SimpleConnectionPool
 from contextlib import contextmanager
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Database connection parameters
 DB_PARAMS = {

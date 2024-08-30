@@ -1,5 +1,5 @@
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
-from src.database.connection import get_db_connection
+from database.connection import get_db_connection
 
 def init_database():
     """
