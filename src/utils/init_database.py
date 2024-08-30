@@ -2,6 +2,25 @@ import psycopg2
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 
 def init_database():
+    """
+    Initializes the PostgreSQL database by creating the necessary tables if they don't exist.
+
+    This function connects to the PostgreSQL server using the provided connection parameters,
+    creates tables for users, contacts, daily messages, contact requests, pending requests,
+    bug reports, and a check queue. The function sets the isolation level to AUTOCOMMIT to
+    ensure that the table creation statements are executed immediately.
+
+    Tables:
+        - users: Stores user information such as username, alert mode, and response status.
+        - contacts: Manages user contacts and pairing status.
+        - daily_messages: Stores scheduled daily messages for users.
+        - contact_requests: Manages contact requests between users.
+        - pending_requests: Handles pending contact requests.
+        - bug_reports: Logs bug reports submitted by users.
+        - check_queue: Manages verification checks and reminders.
+
+    The function prints a success message after creating the tables and closes the database connection.
+    """
     # Database connection parameters
     DB_PARAMS = {
         "dbname": "postgres",
