@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" /><link rel="next" title="env_pipeline" href="../env_pipeline/index.html" /><link rel="prev" title="queue_process" href="../queue_process/index.html" />
+<link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" />
 
     <!-- Generated with Sphinx 7.4.7 and Furo 2024.08.06 -->
-        <title>init_database - Safeguard.io 0.1 documentation</title>
+        <title>logger - Safeguard.io 0.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=fd3f3429" />
@@ -203,13 +203,6 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../react_chatbot/index.html">Chatbot</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../commands/index.html">Commands</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../schedule_appeal/index.html">Scheduler</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../queue_process/index.html">Queue Processing</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Utils</span></p>
-<ul class="current">
-<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Init Databases</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../env_pipeline/index.html">Request Manager</a></li>
 </ul>
 
 </div>
@@ -230,7 +223,7 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="../../_sources/autoapi/init_database/index.rst.txt" title="View this page">
+  <a class="muted-link" href="../../_sources/autoapi/logger/index.rst.txt" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
@@ -250,15 +243,15 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="module-init_database">
-<span id="init-database"></span><h1>init_database<a class="headerlink" href="#module-init_database" title="Link to this heading">¶</a></h1>
+          <section id="module-logger">
+<span id="logger"></span><h1>logger<a class="headerlink" href="#module-logger" title="Link to this heading">¶</a></h1>
 <section id="functions">
 <h2>Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#init_database.init_database" title="init_database.init_database"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init_database</span></code></a>()</p></td>
-<td><p>Initializes the PostgreSQL database by creating the necessary tables if they don't exist.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#logger.setup_logger" title="logger.setup_logger"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setup_logger</span></code></a>(name)</p></td>
+<td><p>Logger configuration with both console and file handlers.</p></td>
 </tr>
 </tbody>
 </table>
@@ -267,26 +260,23 @@
 <section id="module-contents">
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
 <dl class="py function">
-<dt class="sig sig-object py" id="init_database.init_database">
-<span class="sig-name descname"><span class="pre">init_database</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#init_database.init_database" title="Link to this definition">¶</a></dt>
-<dd><p>Initializes the PostgreSQL database by creating the necessary tables if they don’t exist.</p>
-<p>This function connects to the PostgreSQL server using the provided connection parameters,
-creates tables for users, contacts, daily messages, contact requests, pending requests,
-bug reports, and a check queue. The function sets the isolation level to AUTOCOMMIT to
-ensure that the table creation statements are executed immediately.</p>
-<dl class="simple">
-<dt>Tables:</dt><dd><ul class="simple">
-<li><p>users: Stores user information such as username, alert mode, and response status.</p></li>
-<li><p>contacts: Manages user contacts and pairing status.</p></li>
-<li><p>daily_messages: Stores scheduled daily messages for users.</p></li>
-<li><p>contact_requests: Manages contact requests between users.</p></li>
-<li><p>pending_requests: Handles pending contact requests.</p></li>
-<li><p>bug_reports: Logs bug reports submitted by users.</p></li>
-<li><p>check_queue: Manages verification checks and reminders.</p></li>
-</ul>
+<dt class="sig sig-object py" id="logger.setup_logger">
+<span class="sig-name descname"><span class="pre">setup_logger</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#logger.setup_logger" title="Link to this definition">¶</a></dt>
+<dd><p>Logger configuration with both console and file handlers.</p>
+<p>The logger will output debug-level messages to the console and info-level
+messages to a file named ‘app.log’. The log format includes the timestamp,
+logger name, log level, and message.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>name</strong> (<em>str</em>) – The name of the logger, typically the module’s __name__.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A configured logger instance with handlers attached.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>logging.Logger</p>
 </dd>
 </dl>
-<p>The function prints a success message after creating the tables and closes the database connection.</p>
 </dd></dl>
 
 </section>
@@ -297,26 +287,8 @@ ensure that the table creation statements are executed immediately.</p>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="../env_pipeline/index.html">
-              <div class="page-info">
-                <div class="context">
-                  <span>Next</span>
-                </div>
-                <div class="title">env_pipeline</div>
-              </div>
-              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
-            </a>
-          <a class="prev-page" href="../queue_process/index.html">
-              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
-              <div class="page-info">
-                <div class="context">
-                  <span>Previous</span>
-                </div>
-                
-                <div class="title">queue_process</div>
-                
-              </div>
-            </a>
+          
+          
         </div>
         <div class="bottom-of-page">
           <div class="left-details">
@@ -347,10 +319,10 @@ ensure that the table creation statements are executed immediately.</p>
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">init_database</a><ul>
+<li><a class="reference internal" href="#">logger</a><ul>
 <li><a class="reference internal" href="#functions">Functions</a></li>
 <li><a class="reference internal" href="#module-contents">Module Contents</a><ul>
-<li><a class="reference internal" href="#init_database.init_database"><code class="docutils literal notranslate"><span class="pre">init_database()</span></code></a></li>
+<li><a class="reference internal" href="#logger.setup_logger"><code class="docutils literal notranslate"><span class="pre">setup_logger()</span></code></a></li>
 </ul>
 </li>
 </ul>

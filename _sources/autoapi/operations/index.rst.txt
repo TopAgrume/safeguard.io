@@ -1,0 +1,514 @@
+operations
+==========
+
+.. py:module:: operations
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   operations.logger
+   operations.MAX_TIME_DIFF
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   operations.DatabaseOperations
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   operations.less_than_one_hour
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+   Logger for the database operations module
+
+.. py:data:: MAX_TIME_DIFF
+   :value: 20
+
+
+   Maximum time difference in minutes
+
+.. py:function:: less_than_one_hour(time1: datetime.datetime.time, time2: dict) -> bool
+
+   Determines whether the time difference between two given time objects is less than one hour.
+
+   :param time1: A `datetime.time` object.
+   :type time1: datetime.time
+   :param time2: A dictionary containing a 'time' key, which holds a time string in the format '%H:%M'.
+   :type time2: dict
+
+   :returns: `True` if the difference between the two times is less than one hour, `False` otherwise.
+   :rtype: bool
+
+
+.. py:class:: DatabaseOperations
+
+   .. py:method:: user_exists(user_id: int) -> bool
+      :staticmethod:
+
+
+      Check if a user with the given ID exists in the 'users' table.
+
+      :param user_id: The ID of the user to check.
+      :type user_id: int
+
+      :returns: True if the user exists, False otherwise.
+      :rtype: bool
+
+
+
+   .. py:method:: user_already_registered(user_id: int) -> bool
+      :staticmethod:
+
+
+      Check if a user is already registered in the 'users' table.
+
+      :param user_id: The ID of the user to check.
+      :type user_id: int
+
+      :returns: True if the user is registered, False otherwise.
+      :rtype: bool
+
+
+
+   .. py:method:: get_username(user_id: int) -> str
+      :staticmethod:
+
+
+      Retrieve the username associated with a user ID.
+
+      :param user_id: The ID of the user to look up.
+      :type user_id: int
+
+      :returns: The username associated with the given user ID, or None if no user
+      :rtype: str
+
+
+
+   .. py:method:: get_user_property(user_id: int, key: str) -> str | bool
+      :staticmethod:
+
+
+      Read a specific property of a user from the 'users' table.
+
+      :param user_id: The ID of the user whose property is being read.
+      :type user_id: int
+      :param key: The column name in the 'users' table to retrieve.
+      :type key: str
+
+      :returns: The value of the specified property for the user, or None if the user is not found.
+      :rtype: str | bool
+
+
+
+   .. py:method:: get_user_information(user_id: int) -> tuple[bool, bool]
+      :staticmethod:
+
+
+      Retrieve specific information about a user.
+
+      :param user_id: The ID of the user whose information is being retrieved.
+      :type user_id: int
+
+      :returns: A tuple containing the response message and alert mode for the user, or (None, None) if the user is not found.
+      :rtype: tuple
+
+
+
+   .. py:method:: update_user_property(user_id: int, key: str, value: str | bool) -> None
+      :staticmethod:
+
+
+      Update a specific property of a user in the 'users' table.
+
+      :param user_id: The ID of the user whose property is to be updated.
+      :type user_id: int
+      :param key: The column name in the 'users' table to update.
+      :type key: str
+      :param value: The new value for the property.
+      :type value: str | bool
+
+
+
+   .. py:method:: create_user(user_id: int, username: str) -> None
+      :staticmethod:
+
+
+      Create a new user in the 'users' table with default values.
+
+      :param user_id: The ID of the new user.
+      :type user_id: int
+      :param username: The username of the new user.
+      :type username: str
+
+
+
+   .. py:method:: delete_user(user_id: int) -> None
+      :staticmethod:
+
+
+      Delete a user from the 'users' table and all its relative data.
+
+      :param user_id: The ID of the user to delete.
+      :type user_id: int
+
+
+
+   .. py:method:: get_contacts(user_id: int) -> list[tuple[int, str, bool]]
+      :staticmethod:
+
+
+      Retrieve the contact information for a user.
+
+      :param user_id: The ID of the user whose contacts are being retrieved.
+      :type user_id: int
+
+      :returns: A list of tuples containing the contact ID, tag, and pair status for each contact.
+      :rtype: list[tuple[int, str, bool]]
+
+
+
+   .. py:method:: get_paired_contacts(user_id: int) -> list[tuple[int, str]]
+      :staticmethod:
+
+
+      Retrieve the paired contacts information for a user.
+
+      :param user_id: The ID of the user whose contacts are being retrieved.
+      :type user_id: int
+
+      :returns: A list of tuples containing the contact ID and tag for each contact.
+      :rtype: list[tuple[int, str, bool]]
+
+
+
+   .. py:method:: add_contacts(user_id: int, username: str, target_usernames: list[str]) -> list[dict]
+      :staticmethod:
+
+
+      Add new contacts for a user and handle contact requests.
+
+      :param user_id: The ID of the user adding contacts.
+      :type user_id: int
+      :param username: The username of the user adding contacts.
+      :type username: str
+      :param target_usernames: A list of usernames to add as contacts.
+      :type target_usernames: list[str]
+
+      :returns: A list of notifications with contact IDs and tags for successfully added contacts.
+      :rtype: list[dict]
+
+
+
+   .. py:method:: update_contacts_property(user_id: int, target_username: str, key: str, value: int | bool) -> None
+      :staticmethod:
+
+
+      Update a specific property of a contact in the 'contacts' table.
+
+      :param user_id: The ID of the user who owns the contact.
+      :type user_id: int
+      :param target_username: The username of the contact.
+      :type target_username: str
+      :param key: The column name in the 'contacts' table to update.
+      :type key: str
+      :param value: The new value for the property.
+      :type value: int | bool
+
+
+
+   .. py:method:: update_contact_pairing(user_id: int, contact_id: int, key: str, value: int | bool) -> None
+      :staticmethod:
+
+
+      Update a specific property of a contact in the 'contacts' table.
+
+      :param user_id: The ID of the user who owns the contact.
+      :type user_id: int
+      :param contact_id: The ID of the contact.
+      :type contact_id: int
+      :param key: The column name in the 'contacts' table to update.
+      :type key: str
+      :param value: The new value for the property.
+      :type value: int | bool
+
+
+
+   .. py:method:: update_contacts_reload(username: str, user_id: int) -> None
+      :staticmethod:
+
+
+      Reload the contact_id property when a user reconnects.
+
+      :param username: The username of the user that just reconnected.
+      :type username: str
+      :param user_id: The contact_id of the user that just reconnected.
+      :type user_id: int
+
+
+
+   .. py:method:: delete_contact(user_id: int, target_usernames: list[str]) -> None
+      :staticmethod:
+
+
+      Delete contacts from the user's contact list.
+
+      :param user_id: The ID of the user from whom contacts will be deleted.
+      :type user_id: int
+      :param target_usernames: A list of usernames to delete from the contacts.
+      :type target_usernames: list[str]
+
+
+
+   .. py:method:: get_contact_requests(user_id: int) -> list[tuple[int, str]]
+      :staticmethod:
+
+
+      Retrieve the contact requests for a user.
+
+      :param user_id: The ID of the user whose contact requests are being retrieved.
+      :type user_id: int
+
+      :returns: A list of tuples containing the requester ID and requester tag for each contact request.
+      :rtype: list[tuple[int, str]]
+
+
+
+   .. py:method:: delete_contact_request(user_id: int, requester_user_id: int) -> None
+      :staticmethod:
+
+
+      Delete contacts requests from the user's contact requests list.
+
+      :param user_id: The ID of the user from whom contact requests will be deleted.
+      :type user_id: int
+      :param requester_user_id: The ID of the user whose will be deleted from the contact requests.
+      :type requester_user_id: int
+
+
+
+   .. py:method:: get_user_verifications(user_id: int) -> list[tuple[datetime.datetime.time, str, bool]]
+      :staticmethod:
+
+
+      Retrieve the verifications for a user.
+
+      :param user_id: The ID of the user whose verifications are being retrieved.
+      :type user_id: int
+
+      :returns: A list of tuples containing the time, description, and active status for each verification.
+      :rtype: list
+
+
+
+   .. py:method:: get_idle_users_verifications() -> list[tuple[int, datetime.datetime.time, str, bool]]
+      :staticmethod:
+
+
+      Retrieves a list of verifications from users who have not responded.
+
+      The method queries the database for users with active daily messages
+      but have a response_message flag set to True.
+
+      :returns:
+
+                A list of tuples, each containing:
+                    - user ID (int)
+                    - time of the message (datetime.time)
+                    - description of the message (str)
+                    - whether the message is active (bool)
+      :rtype: list[tuple[int, datetime.time, str, bool]]
+
+
+
+   .. py:method:: delete_verifications(user_id: int, times_to_delete: list) -> None
+      :staticmethod:
+
+
+      Delete specific verifications for a user.
+
+      :param user_id: The ID of the user from whom verifications will be deleted.
+      :type user_id: int
+      :param times_to_delete: A list of times specifying which verifications to delete.
+      :type times_to_delete: list
+
+
+
+   .. py:method:: update_verification_status(user_id: int, times_to_update: list, active: bool) -> None
+      :staticmethod:
+
+
+      Update the status of specific verifications for a user.
+
+      :param user_id: The ID of the user whose verification statuses are being updated.
+      :type user_id: int
+      :param times_to_update: A list of times specifying which verifications to update.
+      :type times_to_update: list
+      :param active: The new status for the verifications (active or inactive).
+      :type active: bool
+
+
+
+   .. py:method:: skip_verifications(user_id: int, times_to_skip: list) -> None
+      :staticmethod:
+
+
+      Mark specific verifications as skipped (inactive).
+
+      :param user_id: The ID of the user whose verifications are being skipped.
+      :type user_id: int
+      :param times_to_skip: A list of times specifying which verifications to skip.
+      :type times_to_skip: list
+
+
+
+   .. py:method:: undoskip_verifications(user_id: int, times_to_undoskip: list) -> None
+      :staticmethod:
+
+
+      Revert the status of specific verifications to active.
+
+      :param user_id: The ID of the user whose verifications are being reverted.
+      :type user_id: int
+      :param times_to_undoskip: A list of times specifying which verifications to reactivate.
+      :type times_to_undoskip: list
+
+
+
+   .. py:method:: add_verifications(user_id: int, new_verifications: list, skip_check: bool = False) -> list[str]
+      :staticmethod:
+
+
+      Add new verifications for a user.
+
+      :param user_id: The ID of the user for whom verifications are being added.
+      :type user_id: int
+      :param new_verifications: A list of new verification entries to add.
+      :type new_verifications: list
+      :param skip_check: Whether to skip validation checks for existing verifications.
+      :type skip_check: bool
+
+      :returns: A list of times for which verifications were not valid.
+      :rtype: list
+
+
+
+   .. py:method:: transfer_pending_requests(user_id: int, target_username: str) -> list[tuple[int, str]]
+      :staticmethod:
+
+
+      Transfer pending requests to the 'contact_requests' table and delete them from the 'pending_requests' table.
+
+      :param user_id: The ID of the user receiving the pending requests.
+      :type user_id: int
+      :param target_username: The username associated with the pending requests.
+      :type target_username: str
+
+      :returns: A list of requester IDs whose requests were transferred.
+      :rtype: list[int]
+
+
+
+   .. py:method:: add_bug_report(user_id: int, username: str, message: str) -> int
+      :staticmethod:
+
+
+      Write a bug report for a user.
+
+      :param user_id: The ID of the user submitting the bug report.
+      :type user_id: int
+      :param username: The username of the user submitting the bug report.
+      :type username: str
+      :param message: The content of the bug report.
+      :type message: str
+
+      :returns: The ID of the newly created bug report.
+      :rtype: int
+
+
+
+   .. py:method:: get_check_queue_items() -> list[tuple[int, datetime.datetime.time, str, int, int]]
+      :staticmethod:
+
+
+      Retrieves all checks from the check queue.
+
+      Queries the check_queue table to get all queued checks.
+
+      :returns:
+
+                A list of tuples, each containing:
+                    - user ID (int)
+                    - time of the check (datetime.time)
+                    - description of the check (str)
+                    - reminder count (int)
+                    - waiting time (int)
+      :rtype: list[tuple[int, datetime.time, str, int, int]]
+
+
+
+   .. py:method:: update_check_queue_property(user_id: int, key: str, value: int) -> None
+      :staticmethod:
+
+
+      Updates a specific property of a user's check queue entry.
+
+      Allows updating any integer field in the check_queue table
+      for the given user based on the provided key.
+
+      :param user_id: The ID of the user.
+      :type user_id: int
+      :param key: The name of the field to be updated.
+      :type key: str
+      :param value: The new value to be set for the specified field.
+      :type value: int
+
+
+
+   .. py:method:: add_check_queue_item(user_id: int, time: datetime.datetime.time, desc: str, waiting_time: int) -> None
+      :staticmethod:
+
+
+      Initializes a check queue entry for a user.
+
+      Inserts a new entry into the check_queue table with the given user ID,
+      time, description, and waiting time. The reminder_count is set to 0 by default.
+
+      :param user_id: The ID of the user.
+      :type user_id: int
+      :param time: The time associated with the check.
+      :type time: datetime.time
+      :param desc: The description of the check.
+      :type desc: str
+      :param waiting_time: The waiting time before the next reminder.
+      :type waiting_time: int
+
+
+
+   .. py:method:: delete_check_queue_item(user_id: int) -> None
+      :staticmethod:
+
+
+      Deletes a user's check queue entry.
+
+      Removes the entry from the check_queue table for the specified user.
+
+      :param user_id: The ID of the user whose check queue entry should be deleted.
+      :type user_id: int
+
+
+

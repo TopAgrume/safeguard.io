@@ -1,0 +1,180 @@
+contact_service
+===============
+
+.. py:module:: contact_service
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   contact_service.logger
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   contact_service.ContactService
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+   Logger for the contact service module
+
+.. py:class:: ContactService
+
+   .. py:method:: get_contacts(user_id: int) -> list[tuple[int, str, bool]]
+      :staticmethod:
+
+
+      Retrieve the contact information for a user.
+
+      :param user_id: The ID of the user whose contacts are being retrieved.
+      :type user_id: int
+
+      :returns: A list of tuples containing the contact ID, tag, and pair status for each contact.
+      :rtype: list[tuple[int, str, bool]]
+
+
+
+   .. py:method:: add_contacts(user_id: int, username: str, target_usernames: list[str]) -> list[dict]
+      :staticmethod:
+
+
+      Add new contacts for a user and handle contact requests.
+
+      :param user_id: The ID of the user adding contacts.
+      :type user_id: int
+      :param username: The username of the user adding contacts.
+      :type username: str
+      :param target_usernames: A list of usernames to add as contacts.
+      :type target_usernames: list[str]
+
+      :returns: A list of notifications with contact IDs and tags for successfully added contacts.
+      :rtype: list[dict]
+
+
+
+   .. py:method:: delete_contact(user_id: int, target_usernames: list[str]) -> None
+      :staticmethod:
+
+
+      Delete contacts from the user's contact list.
+
+      :param user_id: The ID of the user from whom contacts will be deleted.
+      :type user_id: int
+      :param target_usernames: A list of usernames to delete from the contacts.
+      :type target_usernames: list[str]
+
+
+
+   .. py:method:: get_contact_requests(user_id: int) -> list[tuple[int, str]]
+      :staticmethod:
+
+
+      Retrieve the contact requests for a user.
+
+      :param user_id: The ID of the user whose contact requests are being retrieved.
+      :type user_id: int
+
+      :returns: A list of tuples containing the requester ID and requester tag for each contact request.
+      :rtype: list[tuple[int, str]]
+
+
+
+   .. py:method:: delete_contact_request(user_id: int, requester_user_id: int) -> None
+      :staticmethod:
+
+
+      Delete contact request from the user's contact requests list.
+
+      :param user_id: The ID of the user from whom contact request will be deleted.
+      :type user_id: int
+      :param requester_user_id: The ID of the user whose will be deleted from the contact requests.
+      :type requester_user_id: int
+
+
+
+   .. py:method:: update_contacts_property(user_id: int, target_username: str, key: str, value: int | bool) -> None
+      :staticmethod:
+
+
+      Update a specific property of a contact in the 'contacts' table.
+
+      :param user_id: The ID of the user who owns the contact.
+      :type user_id: int
+      :param target_username: The username of the contact.
+      :type target_username: str
+      :param key: The column name in the 'contacts' table to update.
+      :type key: str
+      :param value: The new value for the property.
+      :type value: int | bool
+
+
+
+   .. py:method:: update_contact_pairing(user_id: int, contact_id: int, key: str, value: int | bool) -> None
+      :staticmethod:
+
+
+      Update a specific property of a contact in the 'contacts' table.
+
+      :param user_id: The ID of the user who owns the contact.
+      :type user_id: int
+      :param contact_id: The ID of the contact.
+      :type contact_id: int
+      :param key: The column name in the 'contacts' table to update.
+      :type key: str
+      :param value: The new value for the property.
+      :type value: int | bool
+
+
+
+   .. py:method:: update_contacts_reload(username: str, user_id: int) -> None
+      :staticmethod:
+
+
+      Reload the contact_id property when a user reconnects.
+
+      :param username: The username of the user that just reconnected.
+      :type username: str
+      :param user_id: The contact_id of the user that just reconnected.
+      :type user_id: int
+
+
+
+   .. py:method:: get_paired_contacts(user_id: int) -> list[tuple[int, str]]
+      :staticmethod:
+
+
+      Retrieve the paired contacts information for a user.
+
+      :param user_id: The ID of the user whose contacts are being retrieved.
+      :type user_id: int
+
+      :returns: A list of tuples containing the contact ID and tag for each paired contact.
+      :rtype: list[tuple[int, str]]
+
+
+
+   .. py:method:: transfer_pending_requests(user_id: int, target_username: str) -> list[tuple[int, str]]
+      :staticmethod:
+
+
+      Transfer pending requests to the 'contact_requests' table and delete them from the 'pending_requests' table.
+
+      :param user_id: The ID of the user receiving the pending requests.
+      :type user_id: int
+      :param target_username: The username associated with the pending requests.
+      :type target_username: str
+
+      :returns: A list of tuples containing requester IDs and tags whose requests were transferred.
+      :rtype: list[tuple[int, str]]
+
+
+

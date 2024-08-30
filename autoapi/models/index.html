@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" />
 
     <!-- Generated with Sphinx 7.4.7 and Furo 2024.08.06 -->
-        <title>main - Safeguard.io 0.1 documentation</title>
+        <title>models - Safeguard.io 0.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=fd3f3429" />
@@ -203,13 +203,6 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../react_chatbot/index.html">Chatbot</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../commands/index.html">Commands</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../schedule_appeal/index.html">Scheduler</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../queue_process/index.html">Queue Processing</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Utils</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../init_database/index.html">Init Databases</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../env_pipeline/index.html">Request Manager</a></li>
 </ul>
 
 </div>
@@ -230,7 +223,7 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="../../_sources/autoapi/main/index.rst.txt" title="View this page">
+  <a class="muted-link" href="../../_sources/autoapi/models/index.rst.txt" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
@@ -250,15 +243,15 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="module-main">
-<span id="main"></span><h1>main<a class="headerlink" href="#module-main" title="Link to this heading">¶</a></h1>
-<section id="attributes">
-<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading">¶</a></h2>
+          <section id="module-models">
+<span id="models"></span><h1>models<a class="headerlink" href="#module-models" title="Link to this heading">¶</a></h1>
+<section id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#main.api_process_obj" title="main.api_process_obj"><code class="xref py py-obj docutils literal notranslate"><span class="pre">api_process_obj</span></code></a></p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#models.init_database" title="models.init_database"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init_database</span></code></a>()</p></td>
+<td><p>Initializes the PostgreSQL database by creating the necessary tables if they don't exist.</p></td>
 </tr>
 </tbody>
 </table>
@@ -266,10 +259,27 @@
 </section>
 <section id="module-contents">
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
-<dl class="py data">
-<dt class="sig sig-object py" id="main.api_process_obj">
-<span class="sig-name descname"><span class="pre">api_process_obj</span></span><a class="headerlink" href="#main.api_process_obj" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="models.init_database">
+<span class="sig-name descname"><span class="pre">init_database</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#models.init_database" title="Link to this definition">¶</a></dt>
+<dd><p>Initializes the PostgreSQL database by creating the necessary tables if they don’t exist.</p>
+<p>This function connects to the PostgreSQL server using the provided connection parameters,
+creates tables for users, contacts, daily messages, contact requests, pending requests,
+bug reports, and a check queue. The function sets the isolation level to AUTOCOMMIT to
+ensure that the table creation statements are executed immediately.</p>
+<dl class="simple">
+<dt>Tables:</dt><dd><ul class="simple">
+<li><p>users: Stores user information such as username, alert mode, and response status.</p></li>
+<li><p>contacts: Manages user contacts and pairing status.</p></li>
+<li><p>daily_messages: Stores scheduled daily messages for users.</p></li>
+<li><p>contact_requests: Manages contact requests between users.</p></li>
+<li><p>pending_requests: Handles pending contact requests.</p></li>
+<li><p>bug_reports: Logs bug reports submitted by users.</p></li>
+<li><p>check_queue: Manages verification checks and reminders.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 </section>
@@ -311,10 +321,10 @@
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">main</a><ul>
-<li><a class="reference internal" href="#attributes">Attributes</a></li>
+<li><a class="reference internal" href="#">models</a><ul>
+<li><a class="reference internal" href="#functions">Functions</a></li>
 <li><a class="reference internal" href="#module-contents">Module Contents</a><ul>
-<li><a class="reference internal" href="#main.api_process_obj"><code class="docutils literal notranslate"><span class="pre">api_process_obj</span></code></a></li>
+<li><a class="reference internal" href="#models.init_database"><code class="docutils literal notranslate"><span class="pre">init_database()</span></code></a></li>
 </ul>
 </li>
 </ul>

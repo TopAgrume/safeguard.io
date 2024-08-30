@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" /><link rel="next" title="init_database" href="../init_database/index.html" /><link rel="prev" title="schedule_appeal" href="../schedule_appeal/index.html" />
+<link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" />
 
     <!-- Generated with Sphinx 7.4.7 and Furo 2024.08.06 -->
-        <title>queue_process - Safeguard.io 0.1 documentation</title>
+        <title>verif_processing - Safeguard.io 0.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=fd3f3429" />
@@ -200,16 +200,9 @@
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
   <p class="caption" role="heading"><span class="caption-text">Chatbot</span></p>
-<ul class="current">
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="../react_chatbot/index.html">Chatbot</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../commands/index.html">Commands</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../schedule_appeal/index.html">Scheduler</a></li>
-<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Queue Processing</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Utils</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../init_database/index.html">Init Databases</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../env_pipeline/index.html">Request Manager</a></li>
 </ul>
 
 </div>
@@ -230,7 +223,7 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="../../_sources/autoapi/queue_process/index.rst.txt" title="View this page">
+  <a class="muted-link" href="../../_sources/autoapi/verif_processing/index.rst.txt" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
@@ -250,20 +243,26 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="module-queue_process">
-<span id="queue-process"></span><h1>queue_process<a class="headerlink" href="#module-queue_process" title="Link to this heading">¶</a></h1>
+          <section id="module-verif_processing">
+<span id="verif-processing"></span><h1>verif_processing<a class="headerlink" href="#module-verif_processing" title="Link to this heading">¶</a></h1>
 <section id="attributes">
 <h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading">¶</a></h2>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#queue_process.WAITING_TIME" title="queue_process.WAITING_TIME"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WAITING_TIME</span></code></a></p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#verif_processing.API_TOKEN" title="verif_processing.API_TOKEN"><code class="xref py py-obj docutils literal notranslate"><span class="pre">API_TOKEN</span></code></a></p></td>
+<td><p>The API token for the Telegram bot, retrieved from the configuration file.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#queue_process.P_HTML" title="queue_process.P_HTML"><code class="xref py py-obj docutils literal notranslate"><span class="pre">P_HTML</span></code></a></p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#verif_processing.BOT_USERNAME" title="verif_processing.BOT_USERNAME"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BOT_USERNAME</span></code></a></p></td>
+<td><p>The username of the Telegram bot, retrieved from the configuration file.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#queue_process.bot" title="queue_process.bot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bot</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#verif_processing.P_HTML" title="verif_processing.P_HTML"><code class="xref py py-obj docutils literal notranslate"><span class="pre">P_HTML</span></code></a></p></td>
+<td><p>Parse mode set to HTML for formatting Telegram messages.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#verif_processing.WAITING_TIME" title="verif_processing.WAITING_TIME"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WAITING_TIME</span></code></a></p></td>
+<td><p>The default waiting time (in minutes) before sending the next reminder.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#verif_processing.bot" title="verif_processing.bot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bot</span></code></a></p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -275,13 +274,13 @@
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#queue_process.send_reminder" title="queue_process.send_reminder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">send_reminder</span></code></a>(→ telegram.Message)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#verif_processing.send_reminder" title="verif_processing.send_reminder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">send_reminder</span></code></a>(→ telegram.Message)</p></td>
 <td><p>Sends a reminder message to a user, prompting them to respond to a verification message.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#queue_process.send_alert_message" title="queue_process.send_alert_message"><code class="xref py py-obj docutils literal notranslate"><span class="pre">send_alert_message</span></code></a>(→ telegram.Message)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#verif_processing.send_alert_message" title="verif_processing.send_alert_message"><code class="xref py py-obj docutils literal notranslate"><span class="pre">send_alert_message</span></code></a>(→ telegram.Message)</p></td>
 <td><p>Sends an alert message to a user's emergency contacts if the user fails to respond.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#queue_process.check_for_response" title="queue_process.check_for_response"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_for_response</span></code></a>(→ None)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#verif_processing.check_for_response" title="verif_processing.check_for_response"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_for_response</span></code></a>(→ None)</p></td>
 <td><p>Continuously checks for user responses and manages the reminder and alert system.</p></td>
 </tr>
 </tbody>
@@ -291,23 +290,37 @@
 <section id="module-contents">
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
 <dl class="py data">
-<dt class="sig sig-object py" id="queue_process.WAITING_TIME">
-<span class="sig-name descname"><span class="pre">WAITING_TIME</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">9</span></em><a class="headerlink" href="#queue_process.WAITING_TIME" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="verif_processing.API_TOKEN">
+<span class="sig-name descname"><span class="pre">API_TOKEN</span></span><a class="headerlink" href="#verif_processing.API_TOKEN" title="Link to this definition">¶</a></dt>
+<dd><p>The API token for the Telegram bot, retrieved from the configuration file.</p>
+</dd></dl>
 
 <dl class="py data">
-<dt class="sig sig-object py" id="queue_process.P_HTML">
-<span class="sig-name descname"><span class="pre">P_HTML</span></span><a class="headerlink" href="#queue_process.P_HTML" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="verif_processing.BOT_USERNAME">
+<span class="sig-name descname"><span class="pre">BOT_USERNAME</span></span><a class="headerlink" href="#verif_processing.BOT_USERNAME" title="Link to this definition">¶</a></dt>
+<dd><p>The username of the Telegram bot, retrieved from the configuration file.</p>
+</dd></dl>
 
 <dl class="py data">
-<dt class="sig sig-object py" id="queue_process.bot">
-<span class="sig-name descname"><span class="pre">bot</span></span><a class="headerlink" href="#queue_process.bot" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="verif_processing.P_HTML">
+<span class="sig-name descname"><span class="pre">P_HTML</span></span><a class="headerlink" href="#verif_processing.P_HTML" title="Link to this definition">¶</a></dt>
+<dd><p>Parse mode set to HTML for formatting Telegram messages.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="verif_processing.WAITING_TIME">
+<span class="sig-name descname"><span class="pre">WAITING_TIME</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">9</span></em><a class="headerlink" href="#verif_processing.WAITING_TIME" title="Link to this definition">¶</a></dt>
+<dd><p>The default waiting time (in minutes) before sending the next reminder.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="verif_processing.bot">
+<span class="sig-name descname"><span class="pre">bot</span></span><a class="headerlink" href="#verif_processing.bot" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="queue_process.send_reminder">
-<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">send_reminder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">username</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reminder_count</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">telegram.Message</span></span></span><a class="headerlink" href="#queue_process.send_reminder" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="verif_processing.send_reminder">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">send_reminder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">username</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reminder_count</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">telegram.Message</span></span></span><a class="headerlink" href="#verif_processing.send_reminder" title="Link to this definition">¶</a></dt>
 <dd><p>Sends a reminder message to a user, prompting them to respond to a verification message.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -327,8 +340,8 @@
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="queue_process.send_alert_message">
-<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">send_alert_message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verif_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime.datetime.time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">desc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">telegram.Message</span></span></span><a class="headerlink" href="#queue_process.send_alert_message" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="verif_processing.send_alert_message">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">send_alert_message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verif_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime.datetime.time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">desc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">telegram.Message</span></span></span><a class="headerlink" href="#verif_processing.send_alert_message" title="Link to this definition">¶</a></dt>
 <dd><p>Sends an alert message to a user’s emergency contacts if the user fails to respond.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -348,8 +361,8 @@
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="queue_process.check_for_response">
-<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">check_for_response</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#queue_process.check_for_response" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="verif_processing.check_for_response">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">check_for_response</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#verif_processing.check_for_response" title="Link to this definition">¶</a></dt>
 <dd><p>Continuously checks for user responses and manages the reminder and alert system.</p>
 <p>This function runs an infinite loop that checks for user responses to scheduled verification
 messages. If a response is not received within the set waiting time, it sends reminders.
@@ -365,26 +378,8 @@ If the user fails to respond after several reminders, it sends alerts to emergen
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="../init_database/index.html">
-              <div class="page-info">
-                <div class="context">
-                  <span>Next</span>
-                </div>
-                <div class="title">init_database</div>
-              </div>
-              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
-            </a>
-          <a class="prev-page" href="../schedule_appeal/index.html">
-              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
-              <div class="page-info">
-                <div class="context">
-                  <span>Previous</span>
-                </div>
-                
-                <div class="title">schedule_appeal</div>
-                
-              </div>
-            </a>
+          
+          
         </div>
         <div class="bottom-of-page">
           <div class="left-details">
@@ -415,16 +410,18 @@ If the user fails to respond after several reminders, it sends alerts to emergen
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">queue_process</a><ul>
+<li><a class="reference internal" href="#">verif_processing</a><ul>
 <li><a class="reference internal" href="#attributes">Attributes</a></li>
 <li><a class="reference internal" href="#functions">Functions</a></li>
 <li><a class="reference internal" href="#module-contents">Module Contents</a><ul>
-<li><a class="reference internal" href="#queue_process.WAITING_TIME"><code class="docutils literal notranslate"><span class="pre">WAITING_TIME</span></code></a></li>
-<li><a class="reference internal" href="#queue_process.P_HTML"><code class="docutils literal notranslate"><span class="pre">P_HTML</span></code></a></li>
-<li><a class="reference internal" href="#queue_process.bot"><code class="docutils literal notranslate"><span class="pre">bot</span></code></a></li>
-<li><a class="reference internal" href="#queue_process.send_reminder"><code class="docutils literal notranslate"><span class="pre">send_reminder()</span></code></a></li>
-<li><a class="reference internal" href="#queue_process.send_alert_message"><code class="docutils literal notranslate"><span class="pre">send_alert_message()</span></code></a></li>
-<li><a class="reference internal" href="#queue_process.check_for_response"><code class="docutils literal notranslate"><span class="pre">check_for_response()</span></code></a></li>
+<li><a class="reference internal" href="#verif_processing.API_TOKEN"><code class="docutils literal notranslate"><span class="pre">API_TOKEN</span></code></a></li>
+<li><a class="reference internal" href="#verif_processing.BOT_USERNAME"><code class="docutils literal notranslate"><span class="pre">BOT_USERNAME</span></code></a></li>
+<li><a class="reference internal" href="#verif_processing.P_HTML"><code class="docutils literal notranslate"><span class="pre">P_HTML</span></code></a></li>
+<li><a class="reference internal" href="#verif_processing.WAITING_TIME"><code class="docutils literal notranslate"><span class="pre">WAITING_TIME</span></code></a></li>
+<li><a class="reference internal" href="#verif_processing.bot"><code class="docutils literal notranslate"><span class="pre">bot</span></code></a></li>
+<li><a class="reference internal" href="#verif_processing.send_reminder"><code class="docutils literal notranslate"><span class="pre">send_reminder()</span></code></a></li>
+<li><a class="reference internal" href="#verif_processing.send_alert_message"><code class="docutils literal notranslate"><span class="pre">send_alert_message()</span></code></a></li>
+<li><a class="reference internal" href="#verif_processing.check_for_response"><code class="docutils literal notranslate"><span class="pre">check_for_response()</span></code></a></li>
 </ul>
 </li>
 </ul>

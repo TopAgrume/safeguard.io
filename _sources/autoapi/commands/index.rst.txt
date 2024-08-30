@@ -9,6 +9,8 @@ Attributes
 
 .. autoapisummary::
 
+   commands.API_TOKEN
+   commands.BOT_USERNAME
    commands.P_HTML
 
 
@@ -40,7 +42,17 @@ Functions
 Module Contents
 ---------------
 
+.. py:data:: API_TOKEN
+
+   The API token for the Telegram bot, retrieved from the configuration file.
+
+.. py:data:: BOT_USERNAME
+
+   The username of the Telegram bot, retrieved from the configuration file.
+
 .. py:data:: P_HTML
+
+   Parse mode set to HTML for formatting Telegram messages.
 
 .. py:function:: verify_condition(func: Callable) -> Callable
 

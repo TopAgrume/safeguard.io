@@ -1,7 +1,7 @@
-init_database
-=============
+models
+======
 
-.. py:module:: init_database
+.. py:module:: models
 
 
 Functions
@@ -9,7 +9,7 @@ Functions
 
 .. autoapisummary::
 
-   init_database.init_database
+   models.init_database
 
 
 Module Contents
@@ -32,7 +32,5 @@ Module Contents
        - pending_requests: Handles pending contact requests.
        - bug_reports: Logs bug reports submitted by users.
        - check_queue: Manages verification checks and reminders.
-
-   The function prints a success message after creating the tables and closes the database connection.
 
 

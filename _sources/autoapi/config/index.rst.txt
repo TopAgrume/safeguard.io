@@ -1,0 +1,54 @@
+config
+======
+
+.. py:module:: config
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   config.Config
+
+
+Module Contents
+---------------
+
+.. py:class:: Config
+
+   Configuration class for retrieving and validating environment variables required
+   for the Telegram bot.
+
+   .. attribute:: TELEGRAM_API_TOKEN
+
+      The API token for the Telegram bot, retrieved from the
+      environment variables.
+
+      :type: str
+
+   .. attribute:: TELEGRAM_BOT_USERNAME
+
+      The username of the Telegram bot, retrieved from the
+      environment variables.
+
+      :type: str
+
+
+   .. py:attribute:: TELEGRAM_API_TOKEN
+
+
+   .. py:attribute:: TELEGRAM_BOT_USERNAME
+
+
+   .. py:method:: validate()
+      :classmethod:
+
+
+      Validates that the necessary Telegram environment variables are set. If any of
+      the required variables are missing, it raises a ValueError.
+
+      :raises ValueError: If TELEGRAM_API_TOKEN or TELEGRAM_BOT_USERNAME is not set.
+
+
+

@@ -1,7 +1,7 @@
-schedule_appeal
-===============
+scheduler
+=========
 
-.. py:module:: schedule_appeal
+.. py:module:: scheduler
 
 
 Attributes
@@ -9,8 +9,10 @@ Attributes
 
 .. autoapisummary::
 
-   schedule_appeal.WAITING_TIME
-   schedule_appeal.bot
+   scheduler.API_TOKEN
+   scheduler.BOT_USERNAME
+   scheduler.WAITING_TIME
+   scheduler.bot
 
 
 Functions
@@ -18,16 +20,26 @@ Functions
 
 .. autoapisummary::
 
-   schedule_appeal.send_daily_message
-   schedule_appeal.run_schedule
+   scheduler.send_daily_message
+   scheduler.run_schedule
 
 
 Module Contents
 ---------------
 
+.. py:data:: API_TOKEN
+
+   The API token for the Telegram bot, retrieved from the configuration file.
+
+.. py:data:: BOT_USERNAME
+
+   The username of the Telegram bot, retrieved from the configuration file.
+
 .. py:data:: WAITING_TIME
    :value: 8
 
+
+   The default waiting time (in minutes) before sending the next reminder.
 
 .. py:data:: bot
 

@@ -1,0 +1,48 @@
+connection
+==========
+
+.. py:module:: connection
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   connection.DB_PARAMS
+   connection.pool
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   connection.get_db_connection
+   connection.get_db_cursor
+
+
+Module Contents
+---------------
+
+.. py:data:: DB_PARAMS
+
+.. py:data:: pool
+
+.. py:function:: get_db_connection()
+
+   Context manager for database connections.
+
+   :Yields: *psycopg2.extensions.connection* -- A database connection from the pool.
+
+
+.. py:function:: get_db_cursor(commit=False)
+
+   Context manager for database cursors.
+
+   :param commit: Whether to commit the transaction after executing queries.
+   :type commit: bool
+
+   :Yields: *psycopg2.extensions.cursor* -- A database cursor.
+
+

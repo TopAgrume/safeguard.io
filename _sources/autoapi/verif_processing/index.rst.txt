@@ -1,7 +1,7 @@
-queue_process
-=============
+verif_processing
+================
 
-.. py:module:: queue_process
+.. py:module:: verif_processing
 
 
 Attributes
@@ -9,9 +9,11 @@ Attributes
 
 .. autoapisummary::
 
-   queue_process.WAITING_TIME
-   queue_process.P_HTML
-   queue_process.bot
+   verif_processing.API_TOKEN
+   verif_processing.BOT_USERNAME
+   verif_processing.P_HTML
+   verif_processing.WAITING_TIME
+   verif_processing.bot
 
 
 Functions
@@ -19,19 +21,31 @@ Functions
 
 .. autoapisummary::
 
-   queue_process.send_reminder
-   queue_process.send_alert_message
-   queue_process.check_for_response
+   verif_processing.send_reminder
+   verif_processing.send_alert_message
+   verif_processing.check_for_response
 
 
 Module Contents
 ---------------
 
+.. py:data:: API_TOKEN
+
+   The API token for the Telegram bot, retrieved from the configuration file.
+
+.. py:data:: BOT_USERNAME
+
+   The username of the Telegram bot, retrieved from the configuration file.
+
+.. py:data:: P_HTML
+
+   Parse mode set to HTML for formatting Telegram messages.
+
 .. py:data:: WAITING_TIME
    :value: 9
 
 
-.. py:data:: P_HTML
+   The default waiting time (in minutes) before sending the next reminder.
 
 .. py:data:: bot
 

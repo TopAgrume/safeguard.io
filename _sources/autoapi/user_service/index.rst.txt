@@ -1,0 +1,147 @@
+user_service
+============
+
+.. py:module:: user_service
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   user_service.logger
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   user_service.UserService
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+   Logger for the user service module
+
+.. py:class:: UserService
+
+   A service class for managing user-related operations such as creating, deleting,
+   and retrieving user data from the database. This class interacts with the database
+   through the DatabaseOperations module and logs operations using the setup logger.
+
+
+   .. py:method:: create_user(user_id: int, username: str) -> None
+      :staticmethod:
+
+
+      Create a new user in the 'users' table with default values.
+
+      :param user_id: The ID of the new user.
+      :type user_id: int
+      :param username: The username of the new user.
+      :type username: str
+
+
+
+   .. py:method:: delete_user(user_id: int) -> None
+      :staticmethod:
+
+
+      Delete a user from the 'users' table and all its relative data.
+
+      :param user_id: The ID of the user to delete.
+      :type user_id: int
+
+
+
+   .. py:method:: user_exists(user_id: int) -> bool
+      :staticmethod:
+
+
+      Check if a user with the given ID exists in the 'users' table.
+
+      :param user_id: The ID of the user to check.
+      :type user_id: int
+
+      :returns: True if the user exists, False otherwise.
+      :rtype: bool
+
+
+
+   .. py:method:: get_username(user_id: int) -> str
+      :staticmethod:
+
+
+      Retrieve the username associated with a user ID.
+
+      :param user_id: The ID of the user to look up.
+      :type user_id: int
+
+      :returns: The username associated with the given user ID, or None if no user is found.
+      :rtype: str
+
+
+
+   .. py:method:: get_user_property(user_id: int, key: str) -> str | bool
+      :staticmethod:
+
+
+      Read a specific property of a user from the 'users' table.
+
+      :param user_id: The ID of the user whose property is being read.
+      :type user_id: int
+      :param key: The column name in the 'users' table to retrieve.
+      :type key: str
+
+      :returns: The value of the specified property for the user, or None if the user is not found.
+      :rtype: str | bool
+
+
+
+   .. py:method:: update_user_property(user_id: int, key: str, value: str | bool) -> None
+      :staticmethod:
+
+
+      Update a specific property of a user in the 'users' table.
+
+      :param user_id: The ID of the user whose property is to be updated.
+      :type user_id: int
+      :param key: The column name in the 'users' table to update.
+      :type key: str
+      :param value: The new value for the property.
+      :type value: str | bool
+
+
+
+   .. py:method:: get_user_information(user_id: int) -> tuple[bool, bool]
+      :staticmethod:
+
+
+      Retrieve specific information about a user.
+
+      :param user_id: The ID of the user whose information is being retrieved.
+      :type user_id: int
+
+      :returns: A tuple containing the response message and alert mode for the user, or (None, None) if the user is not found.
+      :rtype: tuple
+
+
+
+   .. py:method:: user_already_registered(user_id: int) -> bool
+      :staticmethod:
+
+
+      Check if a user is already registered in the 'users' table.
+
+      :param user_id: The ID of the user to check.
+      :type user_id: int
+
+      :returns: True if the user is registered, False otherwise.
+      :rtype: bool
+
+
+

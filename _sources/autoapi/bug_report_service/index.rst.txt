@@ -1,0 +1,49 @@
+bug_report_service
+==================
+
+.. py:module:: bug_report_service
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   bug_report_service.logger
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   bug_report_service.BugReportService
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+   Logger for the bug report service module
+
+.. py:class:: BugReportService
+
+   .. py:method:: add_bug_report(user_id: int, username: str, message: str) -> int
+      :staticmethod:
+
+
+      Write a bug report for a user.
+
+      :param user_id: The ID of the user submitting the bug report.
+      :type user_id: int
+      :param username: The username of the user submitting the bug report.
+      :type username: str
+      :param message: The content of the bug report.
+      :type message: str
+
+      :returns: The ID of the newly created bug report.
+      :rtype: int
+
+
+

@@ -3,18 +3,14 @@ react_chatbot
 
 .. py:module:: react_chatbot
 
-.. autoapi-nested-parse::
-
-   This module implements a Telegram bot for managing user contacts, verifications, and alerts.
-   It provides various commands and message handlers to interact with users and manage their data.
-
-
 
 Attributes
 ----------
 
 .. autoapisummary::
 
+   react_chatbot.API_TOKEN
+   react_chatbot.BOT_USERNAME
    react_chatbot.bot
 
 
@@ -43,6 +39,14 @@ Functions
 
 Module Contents
 ---------------
+
+.. py:data:: API_TOKEN
+
+   The API token for the Telegram bot, retrieved from the configuration file.
+
+.. py:data:: BOT_USERNAME
+
+   The username of the Telegram bot, retrieved from the configuration file.
 
 .. py:data:: bot
 

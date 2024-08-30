@@ -3,7 +3,7 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" /><link rel="next" title="schedule_appeal" href="../schedule_appeal/index.html" /><link rel="prev" title="react_chatbot" href="../react_chatbot/index.html" />
+<link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" /><link rel="prev" title="react_chatbot" href="../react_chatbot/index.html" />
 
     <!-- Generated with Sphinx 7.4.7 and Furo 2024.08.06 -->
         <title>commands - Safeguard.io 0.1 documentation</title>
@@ -203,13 +203,6 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../react_chatbot/index.html">Chatbot</a></li>
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Commands</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../schedule_appeal/index.html">Scheduler</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../queue_process/index.html">Queue Processing</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Utils</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../init_database/index.html">Init Databases</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../env_pipeline/index.html">Request Manager</a></li>
 </ul>
 
 </div>
@@ -257,8 +250,14 @@
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
 <tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#commands.API_TOKEN" title="commands.API_TOKEN"><code class="xref py py-obj docutils literal notranslate"><span class="pre">API_TOKEN</span></code></a></p></td>
+<td><p>The API token for the Telegram bot, retrieved from the configuration file.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#commands.BOT_USERNAME" title="commands.BOT_USERNAME"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BOT_USERNAME</span></code></a></p></td>
+<td><p>The username of the Telegram bot, retrieved from the configuration file.</p></td>
+</tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#commands.P_HTML" title="commands.P_HTML"><code class="xref py py-obj docutils literal notranslate"><span class="pre">P_HTML</span></code></a></p></td>
-<td><p></p></td>
+<td><p>Parse mode set to HTML for formatting Telegram messages.</p></td>
 </tr>
 </tbody>
 </table>
@@ -330,9 +329,22 @@
 <section id="module-contents">
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
 <dl class="py data">
+<dt class="sig sig-object py" id="commands.API_TOKEN">
+<span class="sig-name descname"><span class="pre">API_TOKEN</span></span><a class="headerlink" href="#commands.API_TOKEN" title="Link to this definition">¶</a></dt>
+<dd><p>The API token for the Telegram bot, retrieved from the configuration file.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="commands.BOT_USERNAME">
+<span class="sig-name descname"><span class="pre">BOT_USERNAME</span></span><a class="headerlink" href="#commands.BOT_USERNAME" title="Link to this definition">¶</a></dt>
+<dd><p>The username of the Telegram bot, retrieved from the configuration file.</p>
+</dd></dl>
+
+<dl class="py data">
 <dt class="sig sig-object py" id="commands.P_HTML">
 <span class="sig-name descname"><span class="pre">P_HTML</span></span><a class="headerlink" href="#commands.P_HTML" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Parse mode set to HTML for formatting Telegram messages.</p>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="commands.verify_condition">
@@ -726,15 +738,7 @@
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="../schedule_appeal/index.html">
-              <div class="page-info">
-                <div class="context">
-                  <span>Next</span>
-                </div>
-                <div class="title">schedule_appeal</div>
-              </div>
-              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
-            </a>
+          
           <a class="prev-page" href="../react_chatbot/index.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
@@ -780,6 +784,8 @@
 <li><a class="reference internal" href="#attributes">Attributes</a></li>
 <li><a class="reference internal" href="#functions">Functions</a></li>
 <li><a class="reference internal" href="#module-contents">Module Contents</a><ul>
+<li><a class="reference internal" href="#commands.API_TOKEN"><code class="docutils literal notranslate"><span class="pre">API_TOKEN</span></code></a></li>
+<li><a class="reference internal" href="#commands.BOT_USERNAME"><code class="docutils literal notranslate"><span class="pre">BOT_USERNAME</span></code></a></li>
 <li><a class="reference internal" href="#commands.P_HTML"><code class="docutils literal notranslate"><span class="pre">P_HTML</span></code></a></li>
 <li><a class="reference internal" href="#commands.verify_condition"><code class="docutils literal notranslate"><span class="pre">verify_condition()</span></code></a></li>
 <li><a class="reference internal" href="#commands.start_command"><code class="docutils literal notranslate"><span class="pre">start_command()</span></code></a></li>

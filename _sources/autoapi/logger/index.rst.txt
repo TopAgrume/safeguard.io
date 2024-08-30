@@ -1,0 +1,32 @@
+logger
+======
+
+.. py:module:: logger
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   logger.setup_logger
+
+
+Module Contents
+---------------
+
+.. py:function:: setup_logger(name)
+
+   Logger configuration with both console and file handlers.
+
+   The logger will output debug-level messages to the console and info-level
+   messages to a file named 'app.log'. The log format includes the timestamp,
+   logger name, log level, and message.
+
+   :param name: The name of the logger, typically the module's __name__.
+   :type name: str
+
+   :returns: A configured logger instance with handlers attached.
+   :rtype: logging.Logger
+
+

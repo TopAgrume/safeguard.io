@@ -1,0 +1,195 @@
+verification_service
+====================
+
+.. py:module:: verification_service
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   verification_service.logger
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   verification_service.VerificationService
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+   Logger for the verification service module
+
+.. py:class:: VerificationService
+
+   .. py:method:: get_user_verifications(user_id: int) -> list[tuple[datetime.datetime.time, str, bool]]
+      :staticmethod:
+
+
+      Retrieve the verifications for a user.
+
+      :param user_id: The ID of the user whose verifications are being retrieved.
+      :type user_id: int
+
+      :returns: A list of tuples containing the time, description, and active status for each verification.
+      :rtype: list[tuple[datetime.time, str, bool]]
+
+
+
+   .. py:method:: get_idle_users_verifications() -> list[tuple[int, datetime.datetime.time, str, bool]]
+      :staticmethod:
+
+
+      Retrieves a list of verifications from users who have not responded.
+
+      :returns:
+
+                A list of tuples, each containing:
+                    - user ID (int)
+                    - time of the message (datetime.time)
+                    - description of the message (str)
+                    - whether the message is active (bool)
+      :rtype: list[tuple[int, datetime.time, str, bool]]
+
+
+
+   .. py:method:: add_verifications(user_id: int, new_verifications: list, skip_check: bool = False) -> list[str]
+      :staticmethod:
+
+
+      Add new verifications for a user.
+
+      :param user_id: The ID of the user for whom verifications are being added.
+      :type user_id: int
+      :param new_verifications: A list of new verification entries to add.
+      :type new_verifications: list
+      :param skip_check: Whether to skip validation checks for existing verifications.
+      :type skip_check: bool
+
+      :returns: A list of times for which verifications were not valid.
+      :rtype: list[str]
+
+
+
+   .. py:method:: delete_verifications(user_id: int, times_to_delete: list) -> None
+      :staticmethod:
+
+
+      Delete specific verifications for a user.
+
+      :param user_id: The ID of the user from whom verifications will be deleted.
+      :type user_id: int
+      :param times_to_delete: A list of times specifying which verifications to delete.
+      :type times_to_delete: list
+
+
+
+   .. py:method:: skip_verifications(user_id: int, times_to_skip: list) -> None
+      :staticmethod:
+
+
+      Mark specific verifications as skipped (inactive).
+
+      :param user_id: The ID of the user whose verifications are being skipped.
+      :type user_id: int
+      :param times_to_skip: A list of times specifying which verifications to skip.
+      :type times_to_skip: list
+
+
+
+   .. py:method:: undoskip_verifications(user_id: int, times_to_undoskip: list) -> None
+      :staticmethod:
+
+
+      Revert the status of specific verifications to active.
+
+      :param user_id: The ID of the user whose verifications are being reverted.
+      :type user_id: int
+      :param times_to_undoskip: A list of times specifying which verifications to reactivate.
+      :type times_to_undoskip: list
+
+
+
+   .. py:method:: get_check_queue_items() -> list[tuple[int, datetime.datetime.time, str, int, int]]
+      :staticmethod:
+
+
+      Retrieves all checks from the check queue.
+
+      :returns:
+
+                A list of tuples, each containing:
+                    - user ID (int)
+                    - time of the check (datetime.time)
+                    - description of the check (str)
+                    - reminder count (int)
+                    - waiting time (int)
+      :rtype: list[tuple[int, datetime.time, str, int, int]]
+
+
+
+   .. py:method:: update_check_queue_property(user_id: int, key: str, value: int) -> None
+      :staticmethod:
+
+
+      Updates a specific property of a user's check queue entry.
+
+      :param user_id: The ID of the user.
+      :type user_id: int
+      :param key: The name of the field to be updated.
+      :type key: str
+      :param value: The new value to be set for the specified field.
+      :type value: int
+
+
+
+   .. py:method:: add_check_queue_item(user_id: int, time: datetime.datetime.time, desc: str, waiting_time: int) -> None
+      :staticmethod:
+
+
+      Initializes a check queue entry for a user.
+
+      :param user_id: The ID of the user.
+      :type user_id: int
+      :param time: The time associated with the check.
+      :type time: datetime.time
+      :param desc: The description of the check.
+      :type desc: str
+      :param waiting_time: The waiting time before the next reminder.
+      :type waiting_time: int
+
+
+
+   .. py:method:: delete_check_queue_item(user_id: int) -> None
+      :staticmethod:
+
+
+      Deletes a user's check queue entry.
+
+      :param user_id: The ID of the user whose check queue entry should be deleted.
+      :type user_id: int
+
+
+
+   .. py:method:: update_verification_status(user_id: int, times_to_update: list, active: bool) -> None
+      :staticmethod:
+
+
+      Update the status of specific verifications for a user.
+
+      :param user_id: The ID of the user whose verification statuses are being updated.
+      :type user_id: int
+      :param times_to_update: A list of times specifying which verifications to update.
+      :type times_to_update: list
+      :param active: The new status for the verifications (active or inactive).
+      :type active: bool
+
+
+
