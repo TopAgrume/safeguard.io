@@ -5,6 +5,9 @@ logger = setup_logger("contact_service")
 """Logger for the contact service module"""
 
 class ContactService:
+    """A service class for managing user-related operations such as adding, retrieving, updating,
+    and deleting contacts, as well as handling contact requests.
+    """
     @staticmethod
     def get_contacts(user_id: int) -> list[tuple[int, str, bool]]:
         """

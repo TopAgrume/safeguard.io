@@ -6,6 +6,10 @@ logger = setup_logger("verification_service")
 """Logger for the verification service module"""
 
 class VerificationService:
+    """TA service class for managing verifications-related operations such as retrieving, adding,
+    deleting, skipping, and updating verification records. It also manages check queue items
+    for verification checks.
+    """
     @staticmethod
     def get_user_verifications(user_id: int) -> list[tuple[datetime.time, str, bool]]:
         """

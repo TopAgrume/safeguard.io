@@ -5,6 +5,7 @@ logger = setup_logger("bug_report_service")
 """Logger for the bug report service module"""
 
 class BugReportService:
+    """The `BugReportService` class provides static methods to handle bug reports submitted by users."""
     @staticmethod
     def add_bug_report(user_id: int, username: str, message: str) -> int:
         """
