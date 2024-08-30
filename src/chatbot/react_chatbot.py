@@ -27,7 +27,7 @@ API_TOKEN = Config.TELEGRAM_API_TOKEN
 BOT_USERNAME = Config.TELEGRAM_BOT_USERNAME
 """The username of the Telegram bot, retrieved from the configuration file."""
 bot = Bot(API_TOKEN)
-
+"""The Telegram bot object used to send messages and interact with users."""
 
 def debug_logger(func):
     """

@@ -28,7 +28,7 @@ P_HTML = telegram.constants.ParseMode.HTML
 WAITING_TIME = 9
 """The default waiting time (in minutes) before sending the next reminder."""
 bot = Bot(API_TOKEN)
-
+"""The Telegram bot object used to send messages and interact with users."""
 
 async def send_reminder(user_id: int, username: str, reminder_count: int) -> Message:
     """

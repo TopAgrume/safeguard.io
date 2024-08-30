@@ -19,7 +19,7 @@ BOT_USERNAME = Config.TELEGRAM_BOT_USERNAME
 WAITING_TIME = 8
 """The default waiting time (in minutes) before sending the next reminder."""
 bot = Bot(API_TOKEN)
-
+"""The Telegram bot object used to send messages and interact with users."""
 
 async def send_daily_message(user_id: int, username: str, verif_time: datetime.time, description: str) -> Message:
     """
