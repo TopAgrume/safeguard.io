@@ -29,6 +29,10 @@ Module Contents
 
 .. py:class:: ContactService
 
+   A service class for managing user-related operations such as adding, retrieving, updating,
+   and deleting contacts, as well as handling contact requests.
+
+
    .. py:method:: get_contacts(user_id: int) -> list[tuple[int, str, bool]]
       :staticmethod:
 

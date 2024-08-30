@@ -29,6 +29,9 @@ Module Contents
 
 .. py:class:: BugReportService
 
+   The `BugReportService` class provides static methods to handle bug reports submitted by users.
+
+
    .. py:method:: add_bug_report(user_id: int, username: str, message: str) -> int
       :staticmethod:
 

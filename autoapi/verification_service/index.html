@@ -286,7 +286,7 @@
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#verification_service.VerificationService" title="verification_service.VerificationService"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VerificationService</span></code></a></p></td>
-<td><p></p></td>
+<td><p>TA service class for managing verifications-related operations such as retrieving, adding,</p></td>
 </tr>
 </tbody>
 </table>
@@ -303,7 +303,10 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="verification_service.VerificationService">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">VerificationService</span></span><a class="headerlink" href="#verification_service.VerificationService" title="Link to this definition">¶</a></dt>
-<dd><dl class="py method">
+<dd><p>TA service class for managing verifications-related operations such as retrieving, adding,
+deleting, skipping, and updating verification records. It also manages check queue items
+for verification checks.</p>
+<dl class="py method">
 <dt class="sig sig-object py" id="verification_service.VerificationService.get_user_verifications">
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_user_verifications</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">datetime.datetime.time</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#verification_service.VerificationService.get_user_verifications" title="Link to this definition">¶</a></dt>
 <dd><p>Retrieve the verifications for a user.</p>
