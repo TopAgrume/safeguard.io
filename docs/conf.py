@@ -14,8 +14,8 @@ sys.path.insert(0, os.path.abspath(os.path.join(current_dir, "../src")))
 project = 'Safeguard.io'
 copyright = '2024'
 author = 'Alex DR'
-release = '0.1'
-version = '1.0'
+release = 'v1.0'
+version = '2.0'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
