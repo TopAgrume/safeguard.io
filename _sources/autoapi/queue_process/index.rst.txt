@@ -39,11 +39,46 @@ Module Contents
    :async:
 
 
-.. py:function:: send_alert_message(user_id: int, time: str, desc: str) -> telegram.Message
+   Sends a reminder message to a user, prompting them to respond to a verification message.
+
+   :param user_id: The Telegram user ID to send the message to.
+   :type user_id: int
+   :param username: The username of the user for logging purposes.
+   :type username: str
+   :param reminder_count: The count of the reminder being sent.
+   :type reminder_count: int
+
+   :returns: The Telegram message object representing the sent reminder.
+   :rtype: Message
+
+
+.. py:function:: send_alert_message(user_id: int, verif_time: datetime.datetime.time, desc: str) -> telegram.Message
    :async:
 
 
-.. py:function:: check_for_response()
+   Sends an alert message to a user's emergency contacts if the user fails to respond.
+
+   :param user_id: The Telegram user ID to alert.
+   :type user_id: int
+   :param verif_time: The time when the verification was supposed to occur.
+   :type verif_time: datetime.time
+   :param desc: Description provided for the callback.
+   :type desc: str
+
+   :returns: The Telegram message object sent to the user after alerting their contacts.
+   :rtype: Message
+
+
+.. py:function:: check_for_response() -> None
    :async:
+
+
+   Continuously checks for user responses and manages the reminder and alert system.
+
+   This function runs an infinite loop that checks for user responses to scheduled verification
+   messages. If a response is not received within the set waiting time, it sends reminders.
+   If the user fails to respond after several reminders, it sends alerts to emergency contacts.
+
+   The function also manages the queue of users to be checked and updates their status accordingly.
 
 

@@ -83,7 +83,7 @@ Module Contents
 
 
 
-   .. py:method:: update_contacts_properties(user_id: int, key: str, value: int | bool) -> None
+   .. py:method:: update_contacts_properties(user_id: int, target_username: str, key: str, value: int | bool) -> None
       :staticmethod:
 
 
@@ -91,6 +91,27 @@ Module Contents
 
       :param user_id: The ID of the user who owns the contact.
       :type user_id: int
+      :param target_username: The username of the contact.
+      :type target_username: str
+      :param key: The column name in the 'contacts' table to update.
+      :type key: str
+      :param value: The new value for the property.
+      :type value: int | bool
+
+      :returns: None
+
+
+
+   .. py:method:: update_contacts_pairing(user_id: int, contact_id: int, key: str, value: int | bool) -> None
+      :staticmethod:
+
+
+      Update a specific property of a contact in the 'contacts' table.
+
+      :param user_id: The ID of the user who owns the contact.
+      :type user_id: int
+      :param contact_id: The ID of the contact.
+      :type contact_id: int
       :param key: The column name in the 'contacts' table to update.
       :type key: str
       :param value: The new value for the property.
@@ -315,7 +336,7 @@ Module Contents
 
 
 
-   .. py:method:: read_verifications_properties(user_id: int) -> list[tuple[str, str, bool]]
+   .. py:method:: read_verifications_properties(user_id: int) -> list[tuple[datetime.datetime.time, str, bool]]
       :staticmethod:
 
 
@@ -389,7 +410,7 @@ Module Contents
 
 
 
-   .. py:method:: transfer_pending_requests(user_id: int, target_username: str) -> list[int]
+   .. py:method:: transfer_pending_requests(user_id: int, target_username: str) -> list[tuple[int, str]]
       :staticmethod:
 
 

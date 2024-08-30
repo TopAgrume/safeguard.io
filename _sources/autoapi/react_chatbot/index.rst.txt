@@ -48,7 +48,40 @@ Module Contents
 
 .. py:function:: debug_logger(func)
 
+   A decorator that logs the entry of an asynchronous function call at the API level.
+
+   This decorator is intended for logging at the API level and provides a simple
+   debug message before calling the decorated function. The message indicates
+   that the API function is being called.
+
+   :param func: The asynchronous function to be decorated.
+   :type func: coroutine
+
+   :returns:
+
+             The wrapped asynchronous function that logs the debug message
+                        before executing the original function.
+   :rtype: coroutine
+
+
 .. py:function:: sub_debug_logger(func)
+
+   A decorator that logs the entry of an asynchronous function call at the sub-level
+   (e.g., nested function calls within an API function).
+
+   This decorator is intended for logging sub-level function calls and provides
+   an indented debug message before calling the decorated function. The message
+   indicates that a sub-level function is being called, and is indented for clarity.
+
+   :param func: The asynchronous function to be decorated.
+   :type func: coroutine
+
+   :returns:
+
+             The wrapped asynchronous function that logs the indented debug
+                        message before executing the original function.
+   :rtype: coroutine
+
 
 .. py:function:: send_hope_message(update: telegram.Update) -> telegram.Message
    :async:

@@ -1,6 +1,0 @@
-debug_tool
-==========
-
-.. py:module:: debug_tool
-
-

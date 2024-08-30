@@ -12,6 +12,8 @@ Chatbot
 
    Chatbot <autoapi/react_chatbot/index>
    Commands <autoapi/commands/index>
+   Scheduler <autoapi/schedule_appeal/index>
+   Queue Processing <autoapi/queue_process/index>
 
 
 Utils
@@ -21,6 +23,7 @@ Utils
    :maxdepth: 2
    :caption: Utils
 
+   Init Databases <autoapi/init_database/index>
    Request Manager <autoapi/env_pipeline/index>
 
 

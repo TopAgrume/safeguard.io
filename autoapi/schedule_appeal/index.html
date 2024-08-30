@@ -3,7 +3,7 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" />
+<link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" /><link rel="next" title="queue_process" href="../queue_process/index.html" /><link rel="prev" title="commands" href="../commands/index.html" />
 
     <!-- Generated with Sphinx 7.4.7 and Furo 2024.08.06 -->
         <title>schedule_appeal - Safeguard.io 0.1 documentation</title>
@@ -200,12 +200,15 @@
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
   <p class="caption" role="heading"><span class="caption-text">Chatbot</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../react_chatbot/index.html">Chatbot</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../commands/index.html">Commands</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Scheduler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../queue_process/index.html">Queue Processing</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Utils</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../init_database/index.html">Init Databases</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../env_pipeline/index.html">Request Manager</a></li>
 </ul>
 
@@ -270,10 +273,10 @@
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#schedule_appeal.send_daily_message" title="schedule_appeal.send_daily_message"><code class="xref py py-obj docutils literal notranslate"><span class="pre">send_daily_message</span></code></a>(→ telegram.Message)</p></td>
-<td><p></p></td>
+<td><p>Sends a daily scheduled message to the user, prompting them to confirm their status.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#schedule_appeal.run_schedule" title="schedule_appeal.run_schedule"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_schedule</span></code></a>(→ None)</p></td>
-<td><p></p></td>
+<td><p>Runs the main scheduling loop, sending daily messages at the specified time for each user.</p></td>
 </tr>
 </tbody>
 </table>
@@ -283,7 +286,7 @@
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
 <dl class="py data">
 <dt class="sig sig-object py" id="schedule_appeal.WAITING_TIME">
-<span class="sig-name descname"><span class="pre">WAITING_TIME</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">9</span></em><a class="headerlink" href="#schedule_appeal.WAITING_TIME" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">WAITING_TIME</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">8</span></em><a class="headerlink" href="#schedule_appeal.WAITING_TIME" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py data">
@@ -294,12 +297,33 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="schedule_appeal.send_daily_message">
 <em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">send_daily_message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">username</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verif_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime.datetime.time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">telegram.Message</span></span></span><a class="headerlink" href="#schedule_appeal.send_daily_message" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Sends a daily scheduled message to the user, prompting them to confirm their status.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>user_id</strong> (<em>int</em>) – The Telegram user ID to send the message to.</p></li>
+<li><p><strong>username</strong> (<em>str</em>) – The username of the user for logging purposes.</p></li>
+<li><p><strong>verif_time</strong> (<em>datetime.time</em>) – The scheduled time for the verification message.</p></li>
+<li><p><strong>description</strong> (<em>str</em>) – A description associated with the daily message.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The Telegram message object representing the sent daily message.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Message</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="schedule_appeal.run_schedule">
 <em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">run_schedule</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#schedule_appeal.run_schedule" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Runs the main scheduling loop, sending daily messages at the specified time for each user.</p>
+<p>This function checks the current time every minute and sends messages to users
+when their scheduled verification time matches the current time. If the verification
+is skipped or marked as a fast-check, it updates the user’s status accordingly.</p>
+</dd></dl>
 
 </section>
 </section>
@@ -309,8 +333,26 @@
       <footer>
         
         <div class="related-pages">
-          
-          
+          <a class="next-page" href="../queue_process/index.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">queue_process</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="../commands/index.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">commands</div>
+                
+              </div>
+            </a>
         </div>
         <div class="bottom-of-page">
           <div class="left-details">

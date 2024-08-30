@@ -203,9 +203,12 @@
 <ul class="current">
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Chatbot</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../commands/index.html">Commands</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../schedule_appeal/index.html">Scheduler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../queue_process/index.html">Queue Processing</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Utils</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../init_database/index.html">Init Databases</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../env_pipeline/index.html">Request Manager</a></li>
 </ul>
 
@@ -269,10 +272,10 @@ It provides various commands and message handlers to interact with users and man
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#react_chatbot.debug_logger" title="react_chatbot.debug_logger"><code class="xref py py-obj docutils literal notranslate"><span class="pre">debug_logger</span></code></a>(func)</p></td>
-<td><p></p></td>
+<td><p>A decorator that logs the entry of an asynchronous function call at the API level.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#react_chatbot.sub_debug_logger" title="react_chatbot.sub_debug_logger"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sub_debug_logger</span></code></a>(func)</p></td>
-<td><p></p></td>
+<td><p>A decorator that logs the entry of an asynchronous function call at the sub-level</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#react_chatbot.send_hope_message" title="react_chatbot.send_hope_message"><code class="xref py py-obj docutils literal notranslate"><span class="pre">send_hope_message</span></code></a>(→ telegram.Message)</p></td>
 <td><p>Send a message indicating that the alert status has been reset.</p></td>
@@ -330,12 +333,51 @@ It provides various commands and message handlers to interact with users and man
 <dl class="py function">
 <dt class="sig sig-object py" id="react_chatbot.debug_logger">
 <span class="sig-name descname"><span class="pre">debug_logger</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#react_chatbot.debug_logger" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>A decorator that logs the entry of an asynchronous function call at the API level.</p>
+<p>This decorator is intended for logging at the API level and provides a simple
+debug message before calling the decorated function. The message indicates
+that the API function is being called.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>func</strong> (<em>coroutine</em>) – The asynchronous function to be decorated.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>The wrapped asynchronous function that logs the debug message</dt><dd><p>before executing the original function.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>coroutine</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="react_chatbot.sub_debug_logger">
 <span class="sig-name descname"><span class="pre">sub_debug_logger</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#react_chatbot.sub_debug_logger" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>A decorator that logs the entry of an asynchronous function call at the sub-level
+(e.g., nested function calls within an API function).</p>
+<p>This decorator is intended for logging sub-level function calls and provides
+an indented debug message before calling the decorated function. The message
+indicates that a sub-level function is being called, and is indented for clarity.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>func</strong> (<em>coroutine</em>) – The asynchronous function to be decorated.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>The wrapped asynchronous function that logs the indented debug</dt><dd><p>message before executing the original function.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>coroutine</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="react_chatbot.send_hope_message">

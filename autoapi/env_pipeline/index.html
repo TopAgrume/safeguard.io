@@ -3,7 +3,7 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" /><link rel="prev" title="commands" href="../commands/index.html" />
+<link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" /><link rel="prev" title="init_database" href="../init_database/index.html" />
 
     <!-- Generated with Sphinx 7.4.7 and Furo 2024.08.06 -->
         <title>env_pipeline - Safeguard.io 0.1 documentation</title>
@@ -203,9 +203,12 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../react_chatbot/index.html">Chatbot</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../commands/index.html">Commands</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../schedule_appeal/index.html">Scheduler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../queue_process/index.html">Queue Processing</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Utils</span></p>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../init_database/index.html">Init Databases</a></li>
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Request Manager</a></li>
 </ul>
 
@@ -359,12 +362,32 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="env_pipeline.RequestManager.update_contacts_properties">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">update_contacts_properties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#env_pipeline.RequestManager.update_contacts_properties" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">update_contacts_properties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_username</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#env_pipeline.RequestManager.update_contacts_properties" title="Link to this definition">¶</a></dt>
 <dd><p>Update a specific property of a contact in the ‘contacts’ table.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>user_id</strong> (<em>int</em>) – The ID of the user who owns the contact.</p></li>
+<li><p><strong>target_username</strong> (<em>str</em>) – The username of the contact.</p></li>
+<li><p><strong>key</strong> (<em>str</em>) – The column name in the ‘contacts’ table to update.</p></li>
+<li><p><strong>value</strong> (<em>int</em><em> | </em><em>bool</em>) – The new value for the property.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="env_pipeline.RequestManager.update_contacts_pairing">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">update_contacts_pairing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contact_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#env_pipeline.RequestManager.update_contacts_pairing" title="Link to this definition">¶</a></dt>
+<dd><p>Update a specific property of a contact in the ‘contacts’ table.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>user_id</strong> (<em>int</em>) – The ID of the user who owns the contact.</p></li>
+<li><p><strong>contact_id</strong> (<em>int</em>) – The ID of the contact.</p></li>
 <li><p><strong>key</strong> (<em>str</em>) – The column name in the ‘contacts’ table to update.</p></li>
 <li><p><strong>value</strong> (<em>int</em><em> | </em><em>bool</em>) – The new value for the property.</p></li>
 </ul>
@@ -627,7 +650,7 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="env_pipeline.RequestManager.read_verifications_properties">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">read_verifications_properties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#env_pipeline.RequestManager.read_verifications_properties" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">read_verifications_properties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">datetime.datetime.time</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#env_pipeline.RequestManager.read_verifications_properties" title="Link to this definition">¶</a></dt>
 <dd><p>Retrieve the verifications for a user.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -713,7 +736,7 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="env_pipeline.RequestManager.transfer_pending_requests">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">transfer_pending_requests</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_username</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#env_pipeline.RequestManager.transfer_pending_requests" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">transfer_pending_requests</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_username</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#env_pipeline.RequestManager.transfer_pending_requests" title="Link to this definition">¶</a></dt>
 <dd><p>Transfer pending requests to the ‘contact_requests’ table and delete them from the ‘pending_requests’ table.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -882,14 +905,14 @@ for the given user based on the provided key.</p>
         
         <div class="related-pages">
           
-          <a class="prev-page" href="../commands/index.html">
+          <a class="prev-page" href="../init_database/index.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">commands</div>
+                <div class="title">init_database</div>
                 
               </div>
             </a>
@@ -937,6 +960,7 @@ for the given user based on the provided key.</p>
 <li><a class="reference internal" href="#env_pipeline.RequestManager.user_exists"><code class="docutils literal notranslate"><span class="pre">RequestManager.user_exists()</span></code></a></li>
 <li><a class="reference internal" href="#env_pipeline.RequestManager.update_user_properties"><code class="docutils literal notranslate"><span class="pre">RequestManager.update_user_properties()</span></code></a></li>
 <li><a class="reference internal" href="#env_pipeline.RequestManager.update_contacts_properties"><code class="docutils literal notranslate"><span class="pre">RequestManager.update_contacts_properties()</span></code></a></li>
+<li><a class="reference internal" href="#env_pipeline.RequestManager.update_contacts_pairing"><code class="docutils literal notranslate"><span class="pre">RequestManager.update_contacts_pairing()</span></code></a></li>
 <li><a class="reference internal" href="#env_pipeline.RequestManager.update_contacts_reload"><code class="docutils literal notranslate"><span class="pre">RequestManager.update_contacts_reload()</span></code></a></li>
 <li><a class="reference internal" href="#env_pipeline.RequestManager.add_contacts"><code class="docutils literal notranslate"><span class="pre">RequestManager.add_contacts()</span></code></a></li>
 <li><a class="reference internal" href="#env_pipeline.RequestManager.del_contacts"><code class="docutils literal notranslate"><span class="pre">RequestManager.del_contacts()</span></code></a></li>

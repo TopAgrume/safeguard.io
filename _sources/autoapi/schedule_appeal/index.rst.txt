@@ -26,7 +26,7 @@ Module Contents
 ---------------
 
 .. py:data:: WAITING_TIME
-   :value: 9
+   :value: 8
 
 
 .. py:data:: bot
@@ -35,7 +35,29 @@ Module Contents
    :async:
 
 
+   Sends a daily scheduled message to the user, prompting them to confirm their status.
+
+   :param user_id: The Telegram user ID to send the message to.
+   :type user_id: int
+   :param username: The username of the user for logging purposes.
+   :type username: str
+   :param verif_time: The scheduled time for the verification message.
+   :type verif_time: datetime.time
+   :param description: A description associated with the daily message.
+   :type description: str
+
+   :returns: The Telegram message object representing the sent daily message.
+   :rtype: Message
+
+
 .. py:function:: run_schedule() -> None
    :async:
+
+
+   Runs the main scheduling loop, sending daily messages at the specified time for each user.
+
+   This function checks the current time every minute and sends messages to users
+   when their scheduled verification time matches the current time. If the verification
+   is skipped or marked as a fast-check, it updates the user's status accordingly.
 
 

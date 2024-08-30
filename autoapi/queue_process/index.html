@@ -3,7 +3,7 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" />
+<link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" /><link rel="next" title="init_database" href="../init_database/index.html" /><link rel="prev" title="schedule_appeal" href="../schedule_appeal/index.html" />
 
     <!-- Generated with Sphinx 7.4.7 and Furo 2024.08.06 -->
         <title>queue_process - Safeguard.io 0.1 documentation</title>
@@ -200,12 +200,15 @@
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
   <p class="caption" role="heading"><span class="caption-text">Chatbot</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../react_chatbot/index.html">Chatbot</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../commands/index.html">Commands</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../schedule_appeal/index.html">Scheduler</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Queue Processing</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Utils</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../init_database/index.html">Init Databases</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../env_pipeline/index.html">Request Manager</a></li>
 </ul>
 
@@ -273,13 +276,13 @@
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#queue_process.send_reminder" title="queue_process.send_reminder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">send_reminder</span></code></a>(→ telegram.Message)</p></td>
-<td><p></p></td>
+<td><p>Sends a reminder message to a user, prompting them to respond to a verification message.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#queue_process.send_alert_message" title="queue_process.send_alert_message"><code class="xref py py-obj docutils literal notranslate"><span class="pre">send_alert_message</span></code></a>(→ telegram.Message)</p></td>
-<td><p></p></td>
+<td><p>Sends an alert message to a user's emergency contacts if the user fails to respond.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#queue_process.check_for_response" title="queue_process.check_for_response"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_for_response</span></code></a>()</p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#queue_process.check_for_response" title="queue_process.check_for_response"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_for_response</span></code></a>(→ None)</p></td>
+<td><p>Continuously checks for user responses and manages the reminder and alert system.</p></td>
 </tr>
 </tbody>
 </table>
@@ -305,17 +308,54 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="queue_process.send_reminder">
 <em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">send_reminder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">username</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reminder_count</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">telegram.Message</span></span></span><a class="headerlink" href="#queue_process.send_reminder" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Sends a reminder message to a user, prompting them to respond to a verification message.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>user_id</strong> (<em>int</em>) – The Telegram user ID to send the message to.</p></li>
+<li><p><strong>username</strong> (<em>str</em>) – The username of the user for logging purposes.</p></li>
+<li><p><strong>reminder_count</strong> (<em>int</em>) – The count of the reminder being sent.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The Telegram message object representing the sent reminder.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Message</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="queue_process.send_alert_message">
-<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">send_alert_message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">desc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">telegram.Message</span></span></span><a class="headerlink" href="#queue_process.send_alert_message" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">send_alert_message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verif_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime.datetime.time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">desc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">telegram.Message</span></span></span><a class="headerlink" href="#queue_process.send_alert_message" title="Link to this definition">¶</a></dt>
+<dd><p>Sends an alert message to a user’s emergency contacts if the user fails to respond.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>user_id</strong> (<em>int</em>) – The Telegram user ID to alert.</p></li>
+<li><p><strong>verif_time</strong> (<em>datetime.time</em>) – The time when the verification was supposed to occur.</p></li>
+<li><p><strong>desc</strong> (<em>str</em>) – Description provided for the callback.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The Telegram message object sent to the user after alerting their contacts.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Message</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="queue_process.check_for_response">
-<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">check_for_response</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#queue_process.check_for_response" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">check_for_response</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#queue_process.check_for_response" title="Link to this definition">¶</a></dt>
+<dd><p>Continuously checks for user responses and manages the reminder and alert system.</p>
+<p>This function runs an infinite loop that checks for user responses to scheduled verification
+messages. If a response is not received within the set waiting time, it sends reminders.
+If the user fails to respond after several reminders, it sends alerts to emergency contacts.</p>
+<p>The function also manages the queue of users to be checked and updates their status accordingly.</p>
+</dd></dl>
 
 </section>
 </section>
@@ -325,8 +365,26 @@
       <footer>
         
         <div class="related-pages">
-          
-          
+          <a class="next-page" href="../init_database/index.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">init_database</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="../schedule_appeal/index.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">schedule_appeal</div>
+                
+              </div>
+            </a>
         </div>
         <div class="bottom-of-page">
           <div class="left-details">
