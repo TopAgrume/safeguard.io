@@ -470,7 +470,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Message:
         )
 
 
-        message = (f"<b>Successful association @{target_username} 🎉. "
+        message = (f"<b>Successful association with @{target_username} 🎉. "
                    f"You will now be informed if this person no longer gives any news.</b>")
 
     return await query.edit_message_text(text=message, parse_mode=ParseMode.HTML)

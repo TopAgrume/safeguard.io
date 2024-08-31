@@ -137,8 +137,8 @@ async def check_for_response() -> None:
             VerificationService.update_check_queue_property(user_id, "waiting_time", waiting_time - 1)
 
         # Wait for the next minute before checking again
-        current_minute = datetime.now().second
-        while datetime.now().second == current_minute:
+        current_minute = datetime.now().minute
+        while datetime.now().minute == current_minute:
             await asyncio.sleep(1)
         await asyncio.sleep(5)
 

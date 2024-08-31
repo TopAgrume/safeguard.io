@@ -1,9 +1,11 @@
 # Safeguard.io
+![Safeguard.io](assets/safeguard_logo.jpg)
 
-Safeguard.io is a powerful Telegram bot designed to enhance user safety and well-being through regular check-ins and emergency alerts.
+[Safeguard.io](https://t.me/Safeguard_io_bot) is a powerful Telegram bot designed to enhance user safety and well-being through regular check-ins and emergency alerts.
 Whether you're traveling alone, working in a high-risk environment, or just want to ensure peace of mind, Safeguard.io is here to help.
 
-Visit our official website [here](https://topagrume.github.io/safeguard.io/).
+Visit our official website [here](https://topagrume.github.io/safeguard.io/).\
+Visit the bot on telegram [here](https://t.me/Safeguard_io_bot).
 
 ## 📑 Table of Contents
 - [Features](#-features)
@@ -121,8 +123,6 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 ## 💬 Support
 
 If you encounter issues or have questions, check out the [Issues](https://github.com/TopAgrume/safeguard.io/issues) on our GitHub repository. If your problem isn't listed, feel free to open a new issue.
-
-For urgent matters, contact us at support@safeguard.io.
 
 ---
 
