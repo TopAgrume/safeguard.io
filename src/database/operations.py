@@ -38,7 +38,8 @@ class DatabaseOperations:
         """
         with get_db_cursor() as cur:
             cur.execute("SELECT 1 FROM users WHERE id = %s LIMIT 1", (user_id,))
-            return cur.fetchone()[0] is not None
+            user = cur.fetchone()
+            return user is not None if user else False
 
     @staticmethod
     def user_already_registered(user_id: int) -> bool:
@@ -197,7 +198,8 @@ class DatabaseOperations:
             notifications = []
             for target_username in target_usernames:
                 cur.execute("SELECT id FROM users WHERE username = %s", (target_username,))
-                contact_user = cur.fetchone()[0]
+                contact_user = cur.fetchone()
+                contact_user = contact_user[0] if contact_user else None
 
                 if contact_user:
                     # Check if contact already exists
@@ -488,8 +490,8 @@ class DatabaseOperations:
         with get_db_cursor(commit=True) as cur:
             cur.execute("INSERT INTO bug_reports (user_id, username, content) VALUES (%s, %s, %s) RETURNING id",
                         (user_id, username, message))
-            report_id = cur.fetchone()[0]
-            return report_id if report_id else 0
+            report_id = cur.fetchone()
+            return report_id[0] if report_id else 0
 
 
     # -- Check Queue-related methods -----------------------------------------------------
