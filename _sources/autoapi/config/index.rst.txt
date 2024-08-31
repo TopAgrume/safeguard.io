@@ -34,11 +34,31 @@ Module Contents
 
       :type: str
 
+   .. attribute:: DISCORD_API_TOKEN
+
+      The API token for the Discord bot, retrieved from the
+      environment variables.
+
+      :type: str
+
+   .. attribute:: DISCORD_CHANNEL_ID
+
+      The channel ID for the Discord bot, retrieved from the
+      environment variables.
+
+      :type: str
+
 
    .. py:attribute:: TELEGRAM_API_TOKEN
 
 
    .. py:attribute:: TELEGRAM_BOT_USERNAME
+
+
+   .. py:attribute:: DISCORD_API_TOKEN
+
+
+   .. py:attribute:: DISCORD_CHANNEL_ID
 
 
    .. py:method:: validate()

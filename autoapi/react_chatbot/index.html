@@ -285,6 +285,15 @@
 <tr class="row-even"><td><p><a class="reference internal" href="#react_chatbot.bot" title="react_chatbot.bot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bot</span></code></a></p></td>
 <td><p>The Telegram bot object used to send messages and interact with users.</p></td>
 </tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#react_chatbot.DISCORD_API_TOKEN" title="react_chatbot.DISCORD_API_TOKEN"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DISCORD_API_TOKEN</span></code></a></p></td>
+<td><p>The API token for the Discord bot, retrieved from the configuration file.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#react_chatbot.DISCORD_CHANNEL_ID" title="react_chatbot.DISCORD_CHANNEL_ID"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DISCORD_CHANNEL_ID</span></code></a></p></td>
+<td><p>The Discord channel ID for sending bug reports to developers.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#react_chatbot.discord_client" title="react_chatbot.discord_client"><code class="xref py py-obj docutils literal notranslate"><span class="pre">discord_client</span></code></a></p></td>
+<td><p>The Discord bot object used to send the bug reports to developers.</p></td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -294,52 +303,55 @@
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#react_chatbot.debug_logger" title="react_chatbot.debug_logger"><code class="xref py py-obj docutils literal notranslate"><span class="pre">debug_logger</span></code></a>(func)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#react_chatbot.on_ready" title="react_chatbot.on_ready"><code class="xref py py-obj docutils literal notranslate"><span class="pre">on_ready</span></code></a>()</p></td>
+<td><p>Event handler for the Discord bot's 'on_ready' event.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#react_chatbot.debug_logger" title="react_chatbot.debug_logger"><code class="xref py py-obj docutils literal notranslate"><span class="pre">debug_logger</span></code></a>(func)</p></td>
 <td><p>A decorator that logs the entry of an asynchronous function call at the API level.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#react_chatbot.sub_debug_logger" title="react_chatbot.sub_debug_logger"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sub_debug_logger</span></code></a>(func)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#react_chatbot.sub_debug_logger" title="react_chatbot.sub_debug_logger"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sub_debug_logger</span></code></a>(func)</p></td>
 <td><p>A decorator that logs the entry of an asynchronous function call at the sub-level</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#react_chatbot.send_hope_message" title="react_chatbot.send_hope_message"><code class="xref py py-obj docutils literal notranslate"><span class="pre">send_hope_message</span></code></a>(→ telegram.Message)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#react_chatbot.send_hope_message" title="react_chatbot.send_hope_message"><code class="xref py py-obj docutils literal notranslate"><span class="pre">send_hope_message</span></code></a>(→ telegram.Message)</p></td>
 <td><p>Send a message indicating that the alert status has been reset.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#react_chatbot.notif_pairing_invitation" title="react_chatbot.notif_pairing_invitation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">notif_pairing_invitation</span></code></a>(→ None)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#react_chatbot.notif_pairing_invitation" title="react_chatbot.notif_pairing_invitation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">notif_pairing_invitation</span></code></a>(→ None)</p></td>
 <td><p>Send notification to users about a pairing invitation.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#react_chatbot.process_contacts" title="react_chatbot.process_contacts"><code class="xref py py-obj docutils literal notranslate"><span class="pre">process_contacts</span></code></a>(→ telegram.Message)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#react_chatbot.process_contacts" title="react_chatbot.process_contacts"><code class="xref py py-obj docutils literal notranslate"><span class="pre">process_contacts</span></code></a>(→ telegram.Message)</p></td>
 <td><p>Process adding or deleting contacts.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#react_chatbot.process_verifications" title="react_chatbot.process_verifications"><code class="xref py py-obj docutils literal notranslate"><span class="pre">process_verifications</span></code></a>(→ telegram.Message)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#react_chatbot.process_verifications" title="react_chatbot.process_verifications"><code class="xref py py-obj docutils literal notranslate"><span class="pre">process_verifications</span></code></a>(→ telegram.Message)</p></td>
 <td><p>Process adding or deleting verifications.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#react_chatbot.extract_bugreport" title="react_chatbot.extract_bugreport"><code class="xref py py-obj docutils literal notranslate"><span class="pre">extract_bugreport</span></code></a>(→ telegram.Message)</p></td>
-<td><p>Extract and save a bug report.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#react_chatbot.extract_bugreport" title="react_chatbot.extract_bugreport"><code class="xref py py-obj docutils literal notranslate"><span class="pre">extract_bugreport</span></code></a>(→ telegram.Message | None)</p></td>
+<td><p>Extract and save a bug report. Send it to Discord if enabled.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#react_chatbot.process_alarm" title="react_chatbot.process_alarm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">process_alarm</span></code></a>(→ telegram.Message)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#react_chatbot.process_alarm" title="react_chatbot.process_alarm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">process_alarm</span></code></a>(→ telegram.Message)</p></td>
 <td><p>Process skipping or undoing skip for alarms.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#react_chatbot.extract_fastcheck" title="react_chatbot.extract_fastcheck"><code class="xref py py-obj docutils literal notranslate"><span class="pre">extract_fastcheck</span></code></a>(→ telegram.Message)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#react_chatbot.extract_fastcheck" title="react_chatbot.extract_fastcheck"><code class="xref py py-obj docutils literal notranslate"><span class="pre">extract_fastcheck</span></code></a>(→ telegram.Message)</p></td>
 <td><p>Extract and process a fast check request.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#react_chatbot.state_dispatcher" title="react_chatbot.state_dispatcher"><code class="xref py py-obj docutils literal notranslate"><span class="pre">state_dispatcher</span></code></a>(→ telegram.Message)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#react_chatbot.state_dispatcher" title="react_chatbot.state_dispatcher"><code class="xref py py-obj docutils literal notranslate"><span class="pre">state_dispatcher</span></code></a>(→ telegram.Message)</p></td>
 <td><p>Dispatch the appropriate function based on the current state.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#react_chatbot.handle_messages" title="react_chatbot.handle_messages"><code class="xref py py-obj docutils literal notranslate"><span class="pre">handle_messages</span></code></a>(→ telegram.Message)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#react_chatbot.handle_messages" title="react_chatbot.handle_messages"><code class="xref py py-obj docutils literal notranslate"><span class="pre">handle_messages</span></code></a>(→ telegram.Message)</p></td>
 <td><p>Handle incoming messages and route them to the appropriate function.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#react_chatbot.error" title="react_chatbot.error"><code class="xref py py-obj docutils literal notranslate"><span class="pre">error</span></code></a>(→ None)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#react_chatbot.error" title="react_chatbot.error"><code class="xref py py-obj docutils literal notranslate"><span class="pre">error</span></code></a>(→ None)</p></td>
 <td><p>Log errors caused by updates.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#react_chatbot.manual_help" title="react_chatbot.manual_help"><code class="xref py py-obj docutils literal notranslate"><span class="pre">manual_help</span></code></a>(→ None)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#react_chatbot.manual_help" title="react_chatbot.manual_help"><code class="xref py py-obj docutils literal notranslate"><span class="pre">manual_help</span></code></a>(→ None)</p></td>
 <td><p>Send a manual help alert to user's contacts.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#react_chatbot.manual_undohelp" title="react_chatbot.manual_undohelp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">manual_undohelp</span></code></a>(→ None)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#react_chatbot.manual_undohelp" title="react_chatbot.manual_undohelp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">manual_undohelp</span></code></a>(→ None)</p></td>
 <td><p>Send a manual undo help alert to user's contacts.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#react_chatbot.button" title="react_chatbot.button"><code class="xref py py-obj docutils literal notranslate"><span class="pre">button</span></code></a>(→ telegram.Message)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#react_chatbot.button" title="react_chatbot.button"><code class="xref py py-obj docutils literal notranslate"><span class="pre">button</span></code></a>(→ telegram.Message)</p></td>
 <td><p>Handle button callback queries.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#react_chatbot.run_api" title="react_chatbot.run_api"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_api</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#react_chatbot.run_api" title="react_chatbot.run_api"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_api</span></code></a>()</p></td>
 <td><p>Initialize and run the Telegram bot.</p></td>
 </tr>
 </tbody>
@@ -370,6 +382,30 @@
 <dt class="sig sig-object py" id="react_chatbot.bot">
 <span class="sig-name descname"><span class="pre">bot</span></span><a class="headerlink" href="#react_chatbot.bot" title="Link to this definition">¶</a></dt>
 <dd><p>The Telegram bot object used to send messages and interact with users.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="react_chatbot.DISCORD_API_TOKEN">
+<span class="sig-name descname"><span class="pre">DISCORD_API_TOKEN</span></span><a class="headerlink" href="#react_chatbot.DISCORD_API_TOKEN" title="Link to this definition">¶</a></dt>
+<dd><p>The API token for the Discord bot, retrieved from the configuration file.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="react_chatbot.DISCORD_CHANNEL_ID">
+<span class="sig-name descname"><span class="pre">DISCORD_CHANNEL_ID</span></span><a class="headerlink" href="#react_chatbot.DISCORD_CHANNEL_ID" title="Link to this definition">¶</a></dt>
+<dd><p>The Discord channel ID for sending bug reports to developers.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="react_chatbot.discord_client">
+<span class="sig-name descname"><span class="pre">discord_client</span></span><a class="headerlink" href="#react_chatbot.discord_client" title="Link to this definition">¶</a></dt>
+<dd><p>The Discord bot object used to send the bug reports to developers.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="react_chatbot.on_ready">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">on_ready</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#react_chatbot.on_ready" title="Link to this definition">¶</a></dt>
+<dd><p>Event handler for the Discord bot’s ‘on_ready’ event.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -473,8 +509,8 @@ indicates that a sub-level function is being called, and is indented for clarity
 
 <dl class="py function">
 <dt class="sig sig-object py" id="react_chatbot.extract_bugreport">
-<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">extract_bugreport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">update</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">telegram.Update</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">telegram.Message</span></span></span><a class="headerlink" href="#react_chatbot.extract_bugreport" title="Link to this definition">¶</a></dt>
-<dd><p>Extract and save a bug report.</p>
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">extract_bugreport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">update</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">telegram.Update</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">telegram.Message</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#react_chatbot.extract_bugreport" title="Link to this definition">¶</a></dt>
+<dd><p>Extract and save a bug report. Send it to Discord if enabled.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -663,6 +699,10 @@ indicates that a sub-level function is being called, and is indented for clarity
 <li><a class="reference internal" href="#react_chatbot.API_TOKEN"><code class="docutils literal notranslate"><span class="pre">API_TOKEN</span></code></a></li>
 <li><a class="reference internal" href="#react_chatbot.BOT_USERNAME"><code class="docutils literal notranslate"><span class="pre">BOT_USERNAME</span></code></a></li>
 <li><a class="reference internal" href="#react_chatbot.bot"><code class="docutils literal notranslate"><span class="pre">bot</span></code></a></li>
+<li><a class="reference internal" href="#react_chatbot.DISCORD_API_TOKEN"><code class="docutils literal notranslate"><span class="pre">DISCORD_API_TOKEN</span></code></a></li>
+<li><a class="reference internal" href="#react_chatbot.DISCORD_CHANNEL_ID"><code class="docutils literal notranslate"><span class="pre">DISCORD_CHANNEL_ID</span></code></a></li>
+<li><a class="reference internal" href="#react_chatbot.discord_client"><code class="docutils literal notranslate"><span class="pre">discord_client</span></code></a></li>
+<li><a class="reference internal" href="#react_chatbot.on_ready"><code class="docutils literal notranslate"><span class="pre">on_ready()</span></code></a></li>
 <li><a class="reference internal" href="#react_chatbot.debug_logger"><code class="docutils literal notranslate"><span class="pre">debug_logger()</span></code></a></li>
 <li><a class="reference internal" href="#react_chatbot.sub_debug_logger"><code class="docutils literal notranslate"><span class="pre">sub_debug_logger()</span></code></a></li>
 <li><a class="reference internal" href="#react_chatbot.send_hope_message"><code class="docutils literal notranslate"><span class="pre">send_hope_message()</span></code></a></li>

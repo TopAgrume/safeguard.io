@@ -13,6 +13,9 @@ Attributes
    react_chatbot.API_TOKEN
    react_chatbot.BOT_USERNAME
    react_chatbot.bot
+   react_chatbot.DISCORD_API_TOKEN
+   react_chatbot.DISCORD_CHANNEL_ID
+   react_chatbot.discord_client
 
 
 Functions
@@ -20,6 +23,7 @@ Functions
 
 .. autoapisummary::
 
+   react_chatbot.on_ready
    react_chatbot.debug_logger
    react_chatbot.sub_debug_logger
    react_chatbot.send_hope_message
@@ -56,6 +60,25 @@ Module Contents
 .. py:data:: bot
 
    The Telegram bot object used to send messages and interact with users.
+
+.. py:data:: DISCORD_API_TOKEN
+
+   The API token for the Discord bot, retrieved from the configuration file.
+
+.. py:data:: DISCORD_CHANNEL_ID
+
+   The Discord channel ID for sending bug reports to developers.
+
+.. py:data:: discord_client
+
+   The Discord bot object used to send the bug reports to developers.
+
+.. py:function:: on_ready()
+   :async:
+
+
+   Event handler for the Discord bot's 'on_ready' event.
+
 
 .. py:function:: debug_logger(func)
 
@@ -141,11 +164,11 @@ Module Contents
    :type action: str
 
 
-.. py:function:: extract_bugreport(update: telegram.Update, content: str) -> telegram.Message
+.. py:function:: extract_bugreport(update: telegram.Update, content: str) -> telegram.Message | None
    :async:
 
 
-   Extract and save a bug report.
+   Extract and save a bug report. Send it to Discord if enabled.
 
    :param update: The update object from Telegram.
    :type update: Update
