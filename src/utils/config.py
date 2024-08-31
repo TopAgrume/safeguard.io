@@ -10,9 +10,15 @@ class Config:
                                   environment variables.
         TELEGRAM_BOT_USERNAME (str): The username of the Telegram bot, retrieved from the
                                      environment variables.
+        DISCORD_API_TOKEN (str): The API token for the Discord bot, retrieved from the
+                                    environment variables.
+        DISCORD_CHANNEL_ID (str): The channel ID for the Discord bot, retrieved from the
+                                    environment variables.
     """
     TELEGRAM_API_TOKEN = os.getenv('TELEGRAM_API_TOKEN')
     TELEGRAM_BOT_USERNAME = os.getenv('TELEGRAM_BOT_USERNAME')
+    DISCORD_API_TOKEN = os.getenv('DISCORD_API_TOKEN')
+    DISCORD_CHANNEL_ID = os.getenv('DISCORD_CHANNEL_ID')
 
     @classmethod
     def validate(cls):

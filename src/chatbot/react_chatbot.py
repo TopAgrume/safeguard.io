@@ -1,5 +1,6 @@
 import re
 import functools
+import asyncio
 
 from datetime import datetime, timedelta
 from utils.logger import setup_logger
@@ -13,6 +14,7 @@ from services.contact_service import ContactService
 from services.user_service import UserService
 from services.verification_service import VerificationService
 from database.models import init_database
+from discord import Client, Intents, Embed
 
 try:
     Config.validate()
@@ -29,6 +31,21 @@ BOT_USERNAME = Config.TELEGRAM_BOT_USERNAME
 """The username of the Telegram bot, retrieved from the configuration file."""
 bot = Bot(API_TOKEN)
 """The Telegram bot object used to send messages and interact with users."""
+DISCORD_API_TOKEN = Config.DISCORD_API_TOKEN
+"""The API token for the Discord bot, retrieved from the configuration file."""
+DISCORD_CHANNEL_ID = Config.DISCORD_CHANNEL_ID
+"""The Discord channel ID for sending bug reports to developers."""
+discord_client = Client(intents=Intents.default()) if DISCORD_API_TOKEN else None
+"""The Discord bot object used to send the bug reports to developers."""
+
+
+@discord_client.event
+async def on_ready():
+    """Event handler for the Discord bot's 'on_ready' event."""
+    logger.info(f'Discord bot is ready. Logged in as {discord_client.user}')
+    for guild in discord_client.guilds:
+        logger.info(f'└── Connected to the {guild.name} server (id: {guild.id})')
+
 
 def debug_logger(func):
     """
@@ -194,9 +211,9 @@ async def process_verifications(update: Update, content: str, action: str) -> Me
 
 
 @sub_debug_logger
-async def extract_bugreport(update: Update, content: str) -> Message:
+async def extract_bugreport(update: Update, content: str) -> Message | None:
     """
-    Extract and save a bug report.
+    Extract and save a bug report. Send it to Discord if enabled.
 
     Args:
         update (Update): The update object from Telegram.
@@ -207,6 +224,27 @@ async def extract_bugreport(update: Update, content: str) -> Message:
     username = user.username or user.first_name
 
     report_id = BugReportService.add_bug_report(user_id, username, content)
+
+    # Discord option
+    if discord_client:
+        try:
+            channel = discord_client.get_channel(int(DISCORD_CHANNEL_ID))
+            if not channel:
+                logger.error(f"Discord channel with ID {DISCORD_CHANNEL_ID} not found.")
+                return None
+
+            embed = Embed(
+                title=f"New Bug Report: {report_id}!",
+                description=f"**Received from: @{username}**\n{content}",
+                color=0xff0000
+            )
+            await channel.send(embed=embed)
+            logger.debug(f"    └── Bug report {report_id} sent to Discord Server")
+
+        except Exception as e:
+            logger.error(f"Failed to send bug report to Discord: {e}")
+            return None
+
     return await update.message.reply_text(f"Thank you for the report! Your report ID is: {report_id}")
 
 
@@ -440,8 +478,12 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Message:
 
 def run_api():
     """Initialize and run the Telegram bot."""
-    logger.info('Starting bot...')
+    # Start the Discord client in the background
+    if discord_client:
+        loop = asyncio.get_event_loop()
+        loop.create_task(discord_client.start(DISCORD_API_TOKEN))
 
+    logger.info('Starting bot...')
     app = Application.builder().token(API_TOKEN).build()
 
     # Commands
