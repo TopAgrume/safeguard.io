@@ -1,5 +1,7 @@
 # Safeguard.io
-![Safeguard.io](assets/safeguard_logo.jpg)
+<div align="center">
+  <img src="assets/safeguard_logo.jpg" alt="Safeguard.io" width="40%" />
+</div>
 
 [Safeguard.io](https://t.me/Safeguard_io_bot) is a powerful Telegram bot designed to enhance user safety and well-being through regular check-ins and emergency alerts.
 Whether you're traveling alone, working in a high-risk environment, or just want to ensure peace of mind, Safeguard.io is here to help.
