@@ -124,7 +124,7 @@ async def check_for_response() -> None:
                 waiting_time = WAITING_TIME
                 reminder_c += 1
                 VerificationService.update_check_queue_property(user_id, "reminder_count", reminder_c)
-                await send_reminder(user_id, username, reminder_c)
+                await send_reminder(user_id, username, reminder_c) if reminder_c < 5 else None
 
             # If the maximum number of reminders has been reached, send an alert
             if reminder_c >= 5:

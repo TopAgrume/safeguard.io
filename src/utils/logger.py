@@ -16,7 +16,7 @@ def setup_logger(name: str, file_name: str = None) -> logging.Logger:
         logging.Logger: A configured logger instance with handlers attached.
     """
     logger = logging.getLogger(name)
-    logger.setLevel(logging.INFO)
+    logger.setLevel(logging.DEBUG)
 
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
