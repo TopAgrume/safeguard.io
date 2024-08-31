@@ -10,7 +10,7 @@ Chatbot
 
 .. toctree::
    :maxdepth: 2
-   :caption: Chatbot
+   :caption: Chatbot service
 
    Chatbot <autoapi/react_chatbot/index>
    Commands <autoapi/commands/index>
@@ -20,17 +20,17 @@ Scheduler
 
 .. toctree::
    :maxdepth: 2
-   :caption: Chatbot
+   :caption: Verifications services
 
    Scheduler <autoapi/scheduler/index>
    Queue Processing <autoapi/verif_processing/index>
 
-Services
---------
+Data Services
+-------------
 
 .. toctree::
    :maxdepth: 2
-   :caption: Chatbot
+   :caption: Data Services
 
    User <autoapi/user_service/index>
    Contact <autoapi/contact_service/index>
@@ -42,7 +42,7 @@ Database
 
 .. toctree::
    :maxdepth: 2
-   :caption: Utils
+   :caption: Database
 
    Connection <autoapi/connection/index>
    Models <autoapi/models/index>
