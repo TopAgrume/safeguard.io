@@ -14,6 +14,7 @@ Visit the bot on telegram [here](https://t.me/Safeguard_io_bot).
 - [Getting Started](#-getting-started)
   - [Prerequisites](#prerequisites)
   - [Installation](#installation)
+  - [Optional: Enabling the systemd service](#optional-enabling-the-systemd-service)
 - [Usage](#-usage)
 - [Tech Stack](#-tech-stack)
 - [Project Structure](#-project-structure)
@@ -67,6 +68,33 @@ Before setting up Safeguard.io, ensure you have the following:
    ```
 
 Now, your bot should be up and running!
+
+### [Optional] Enabling the systemd service
+
+1. **Create the systemd service file**:
+```sh
+sudo cp safeguard_io.service /etc/systemd/system/safeguard_io.service
+```
+
+2. **Reload the systemd daemon**:
+```sh
+sudo systemctl daemon-reload
+```
+
+3. **Enable the fan control service to start on boot**:
+```sh
+sudo systemctl enable safeguard_io.service
+```
+
+4. **Start the fan control service**:
+```sh
+sudo systemctl start safeguard_io.service
+```
+
+5. **Check the status of the service**:
+```sh
+sudo systemctl status safeguard_io.service
+```
 
 ## 📚 Usage
 
