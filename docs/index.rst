@@ -1,3 +1,5 @@
+.. include:: ../README.rst
+
 Welcome to Safeguard.io Documentation
 =====================================
 

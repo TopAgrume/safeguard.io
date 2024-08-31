@@ -35,6 +35,7 @@ extlinks_detect_hardcoded_links = True
 source_suffix = {
     '.rst': 'restructuredtext',
 }
+html_extra_path = ['../README.rst']
 
 # -----------------------------------------------------------------------------#
 # autoapi options :
