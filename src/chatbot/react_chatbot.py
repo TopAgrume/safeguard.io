@@ -143,7 +143,11 @@ async def process_contacts(update: Update, content: str, action: str) -> Message
 
     for line in content.splitlines():
         if match := re.match(r'@(\w+)', line):
-            valid_contacts.append(match.group(1))
+            new_contact = match.group(1)
+            if new_contact == user_username:
+                logger.debug(f"    └── User @{user_username} tried to add themselves as a contact")
+                continue
+            valid_contacts.append(new_contact)
         else:
             error_contacts.append(line)
 
