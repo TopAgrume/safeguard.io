@@ -83,7 +83,7 @@ async def run_schedule() -> None:
 
                 # Fast-check scenario: delete the created check
                 VerificationService.delete_verifications(user_id, [verif_time])
-                logger.debug(f"Kill fast check for @{username} at {verif_time} {verif_active}")
+                logger.debug(f"Kill fast check for @{username} at {verif_time}")
 
             # Update user properties and initialize the verification process
             UserService.update_user_property(user_id, "response_message", False)

@@ -106,7 +106,9 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kw
     UserService.create_user(user_id, username)
     logger.debug(f"└── New user @{username} registered")
 
-    message = f"Hello {user.first_name} 🌟! Thanks for chatting with me! I am Safeguard.io 😊."
+    message = (f"Hi {user.first_name} 🌟! Welcome to Safeguard.io 😊 — your personal security companion. "
+               f"If you ever have ideas for new features, feel free to reach out at safeguard.io@yahoo.com. "
+               f"To see all the commands and get started, just type /info.")
     await update.message.reply_text(message)
 
     requester_keys = ContactService.transfer_pending_requests(user_id, username)
