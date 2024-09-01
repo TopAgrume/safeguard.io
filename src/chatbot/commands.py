@@ -156,7 +156,8 @@ async def info_command(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwa
                "/fastcheck - Perform a quick verification.\n"
                "\n<b>Miscellaneous</b>\n"
                "/bugreport - Report any bugs you encounter or suggest improvements!\n\n"
-               "Feel free to ask for assistance or information anytime! 😊")
+               "Feel free to ask for assistance or information anytime! 😊\n"
+               "Got feature ideas? Email us at safeguard.io@yahoo.com.")
 
     return await update.message.reply_text(message, parse_mode=P_HTML)
 
