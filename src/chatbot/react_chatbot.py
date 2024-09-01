@@ -527,7 +527,7 @@ def run_api():
 
     # Polls the bot
     logger.info('Bot is running...')
-    app.run_polling()
+    app.run_polling(poll_interval=0.5)
 
 
 if __name__ == "__main__":
