@@ -44,7 +44,7 @@ def verify_condition(func: Callable) -> Callable: # VALID
     """
     @wraps(func)
     async def wrapper(update: Update, context: ContextTypes.DEFAULT_TYPE, **kwargs: Any) -> Any:
-        logger.debug(f"{'React Chatbot' if func.__name__ == 'handle_messages' else ''}{func.__name__} call")
+        logger.debug(f"{'React Chatbot ' if func.__name__ == 'handle_messages' else ''}{func.__name__} call")
 
         message = update.message
         chat_type = message.chat.type
