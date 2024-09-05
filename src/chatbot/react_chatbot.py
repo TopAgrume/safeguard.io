@@ -181,7 +181,7 @@ async def process_verifications(update: Update, content: str, action: str) -> Me
 
     for line in content.splitlines():
         if action == 'add':
-            if match := re.match(r'^(0?[0-9]|1[0-9]|2[0-3]) *- *([\w ]+)', line):
+            if match := re.match(r'^(0?[0-9]|1[0-9]|2[0-3]):([0-5][0-9]) *- *([\w ]+)', line):
                 chosen_time, desc = f"{match.group(1)}:{match.group(2)}", match.group(3)
                 valid_verifs.append({"time": chosen_time, "description": desc, "active": True})
             else:
